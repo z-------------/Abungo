@@ -148,7 +148,7 @@ function main() {
                 }
                 reader.readAsDataURL(file);
             } else {
-                alert("The file you chose is too big. Choose a file less than 100mb in size.");
+                alert("The file you chose is too big. Choose a file less than 2mb in size.");
             }
         }
     }
