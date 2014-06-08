@@ -20,7 +20,7 @@ First, you'll need to download and install [node.js](http://nodejs.org) if you h
 
 `cd` to the Abungo directory and install Socket.IO and Express:
 
-```shell
+```bash
 npm install --save socket.io
 npm install --save express
 
