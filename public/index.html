@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Abungo</title>
+        <meta name="viewport" content="width=device-width, height=device-height"/>
+        <meta charset="UTF-8"/>
+        <link rel="stylesheet" href="style.css">
+        <script src="libraries/autolink-min.js" async></script>
+    </head>
+    <body>
+        <ul id="messages"></ul>
+        <form>
+            <input id="m" autocomplete="off" placeholder="Type your message">
+            <label id="fileshare">
+                <input type="file">
+            </label>
+            <div id="users"></div>
+        </form>
+        
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>

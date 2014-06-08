@@ -1,0 +1,242 @@
+@import url(http://fonts.googleapis.com/css?family=Lato:400,700);
+
+@-webkit-keyframes new_message {
+    from {opacity:0}
+    to {opacity:1}
+}
+
+@keyframes new_message {
+    from {opacity:0}
+    to {opacity:1}
+}
+
+*,*:before,*:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*:focus {
+    outline:none;
+}
+
+html,body {
+    height:100%;
+    width:100%;
+    overflow:hidden;
+}
+
+body {
+    font: 17px Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #2980b9;
+}
+
+form {
+    width:100%;
+}
+
+#m {
+    font: 17px Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    width:300px;
+    max-width:100%;
+    padding:20px;
+    margin:20px;
+    position:absolute;
+    bottom:0;
+    left:50%;
+    margin-left:-150px;
+    border:none;
+    height:60px;
+}
+
+#messages {
+    list-style-type: none;
+    height:100%;
+    width:100%;
+    overflow-y:auto;
+    padding-bottom:100px;
+    -webkit-mask-image: linear-gradient(black calc(100% - 100px), transparent 100%);
+}
+
+#messages li {
+    padding: 10px 50px;
+    width: 100%;
+    display: block;
+}
+
+#messages li div {
+    background:white;
+    width:auto;
+    word-wrap: break-word;
+    -webkit-animation:new_message .3s;
+    animation:new_message .3s;
+    display:inline-block;
+    padding: 20px;
+    padding-top: 15px;
+    position:relative;
+}
+
+#messages li:not(.status) div {
+    max-width:500px;
+}
+
+#messages li.self {
+    text-align: right;
+}
+
+#messages li:not(.status) strong {
+    display:block;
+    margin:0;
+    margin-bottom:7px;
+}
+
+#messages li.status div {
+    font-style: italic;
+    width: 100%;
+    text-align: center;
+    background:transparent;
+    color:white;
+    padding:0;
+}
+
+#messages li.normal div:before, #messages li.self div:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    top:0;
+}
+
+#messages li.normal div:before {
+    border-width: 0 20px 20px 0;
+    border-color: transparent #fff transparent transparent;
+    left:-20px;
+}
+
+#messages li.self div:after {
+    border-width: 20px 20px 0 0;
+    border-color: #fff transparent transparent transparent;
+    right:-20px;
+}
+
+#messages li.console div {
+    background:#9fd848;
+}
+
+#messages li.typing {
+    font-style: italic;
+}
+
+#messages li.typing div {
+    padding-top:20px;
+    -webkit-animation:none;
+    animation:none;
+}
+
+#messages li.typing div strong {
+    display:inline-block;
+    margin-bottom:0;
+}
+
+#messages li.console div:before {
+    border-color:transparent #9fd848 transparent transparent;
+}
+
+#users{
+    width:300px;
+    margin:20px;
+    max-width:calc(100% / 2 - 220px - 40px);
+    overflow-y:auto;
+    color:white;
+    font-size:15px;
+    padding:3px;
+    position:absolute;
+    bottom:0;
+}
+
+#users {
+    right:0;
+    text-align:right;
+}
+
+label input {
+    display:none;
+}
+
+#fileshare { /* label element */
+    height: 60px;
+    width: 60px;
+    position: absolute;
+    bottom: 0;
+    left: calc(50% + 150px);
+    margin: 20px;
+    background-image: url(img/attachment.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor:pointer;
+}
+
+#messages li div img {
+    max-width:100%;
+}
+
+a {
+    text-decoration:none;
+    color:#2980b9;
+}
+
+a:hover {
+    border-bottom:solid 1px #2980b9;
+}
+
+@media only screen and (max-width:480px) {
+    #messages li {
+        padding:10px 35px;
+    }
+    
+    #messages li:not(.status) div {
+        max-width:75%;
+        padding:15px;
+    }
+    
+    #users {
+        position:fixed;
+        top:0;
+        left:0;
+        background:white;
+        width:calc(100% - 40px);
+        height:40px;
+        padding:10px;
+        max-width:none;
+        margin:0;
+        color:black;
+        text-align:left;
+        white-space:nowrap;
+        box-shadow:0 7px rgba(0,0,0,.3);
+    }
+    
+    #fileshare {
+        height:40px;
+        width:40px;
+        background-image:url(img/attachment-negative.png);
+        top:0;
+        right:0;
+        margin:0;
+        background-size:40px;
+        left:auto;
+        box-shadow:0 7px rgba(0,0,0,.3);
+    }
+    
+    #messages {
+        padding-top:47px;
+        padding-bottom:80px;
+        -webkit-mask-image:none;
+    }
+    
+    #m {
+        margin-bottom:0;
+        margin-left:-50%;
+        width:100%;
+    }
+}

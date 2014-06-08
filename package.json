@@ -1,0 +1,9 @@
+{
+  "name": "Abungo",
+  "version": "0.0.1",
+  "description": "Simple anonymous chat",
+  "dependencies": {
+    "express": "^4.4.1",
+    "socket.io": "~1.0.4"
+  }
+}
