@@ -78,6 +78,12 @@ io.on("connection", function(socket){
                 console.log(data.nick + " shared an image: " + data.fileName);
             });
             
+            socket.on("audio share",function(data){
+                data.time = new Date().toString();
+                socket.broadcast.emit("audio share",data);
+                console.log(data.nick + " shared audio: " + data.fileName);
+            });
+            
             socket.on("file share",function(data){
                 data.time = new Date().toString();
                 socket.broadcast.emit("file share",data);

@@ -136,6 +136,14 @@ function main() {
                             fileName: file.name
                         });
                         writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'><img src='"+dataURI+"'/></a>","self",new Date().toString());
+                    } else if (file.type.indexOf("audio/") != -1) {
+                        var dataURI = this.result;
+                        socket.emit("audio share",{
+                            file: dataURI,
+                            nick: nick,
+                            fileName: file.name
+                        });
+                        writeListItem("<strong>"+nick+"</strong><audio controls src='"+dataURI+"'/></audio>","self",new Date().toString());
                     } else {
                         var dataURI = this.result;
                         socket.emit("file share",{
@@ -204,6 +212,10 @@ function main() {
     
     socket.on("image share", function(data){
         writeListItem("<strong>"+data.nick+"</strong><a href='"+data.file+"' target='_blank'><img src='"+data.file+"'/></a>","normal",data.time);
+    });
+    
+    socket.on("audio share", function(data){
+        writeListItem("<strong>"+data.nick+"</strong><audio controls src='"+data.file+"'></audio>","normal",data.time);
     });
     
     socket.on("file share", function(data){
