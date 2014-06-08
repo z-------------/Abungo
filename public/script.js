@@ -51,9 +51,6 @@ function main() {
         } else {
             liNode.classList.add("normal");
         }
-        /*if (time) {
-            liNode.setAttribute("title",time);
-        }*/
         if (type == "console") {
             liNode.classList.add("console");
         }
@@ -127,30 +124,32 @@ function main() {
     
     $("#fileshare input[type=file]").onchange = function(){
         var file = this.files[0];
-        if (file.size < 2233076) { // ~2mb
-            var reader = new FileReader();
-            reader.onload = function() {
-                if (file.type.indexOf("image/") != -1) { // file is an image
-                    var dataURI = this.result;
-                    socket.emit("image share",{
-                        file: dataURI,
-                        nick: nick,
-                        fileName: file.name
-                    });
-                    writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'><img src='"+dataURI+"'/></a>","self",new Date().toString());
-                } else {
-                    var dataURI = this.result;
-                    socket.emit("file share",{
-                        file: dataURI,
-                        nick: nick,
-                        fileName: file.name
-                    });
-                    writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'>"+file.name+"</a>","self",new Date().toString());
+        if (file) {
+            if (file.size < 2233076) { // ~2mb
+                var reader = new FileReader();
+                reader.onload = function() {
+                    if (file.type.indexOf("image/") != -1) { // file is an image
+                        var dataURI = this.result;
+                        socket.emit("image share",{
+                            file: dataURI,
+                            nick: nick,
+                            fileName: file.name
+                        });
+                        writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'><img src='"+dataURI+"'/></a>","self",new Date().toString());
+                    } else {
+                        var dataURI = this.result;
+                        socket.emit("file share",{
+                            file: dataURI,
+                            nick: nick,
+                            fileName: file.name
+                        });
+                        writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'>"+file.name+"</a>","self",new Date().toString());
+                    }
                 }
+                reader.readAsDataURL(file);
+            } else {
+                alert("The file you chose is too big. Choose a file less than 100mb in size.");
             }
-            reader.readAsDataURL(file);
-        } else {
-            alert("The file you chose is too big. Choose a file less than 100mb in size.");
         }
     }
     
