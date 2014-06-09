@@ -3,7 +3,7 @@ var socket = io();
 var $ = function(selector){return document.querySelector(selector)};
 var $$ = function(selector){return document.querySelectorAll(selector)};
 
-var nick;
+var nick, room;
 
 function encodeHTML(string) {
     var tempDiv = document.createElement("div");
@@ -11,29 +11,50 @@ function encodeHTML(string) {
     return tempDiv.innerHTML;
 }
 
+$("#nick_input").value = localStorage.lastNick || "";
+$("#chatroom").value = localStorage.lastRoom || "yeya";
+
 $("#nick_input").focus();
 
-$("#nick_input").value = localStorage.lastNick || "";
 $("#nick_input").onkeydown = function(e){
     if (e.which == 13) { // enter
+        //chooseNick();
+        $("#chatroom").focus();
+    }
+}
+
+$("#chatroom").onkeydown = function(e){
+    if (e.which == 13) {
         chooseNick();
     }
 }
 
 function chooseNick(){
-    nick = encodeHTML($("#nick_input").value);
-    if (nick) {
-        socket.emit("nick chosen",nick);
+    nick = encodeHTML($("#nick_input").value.substring(0,100));
+    room = encodeHTML($("#chatroom").value.toLowerCase().substring(0,100));
+    if (nick && room) {
+        socket.emit("nick chosen",{
+            nick: nick,
+            room: room
+        });
         localStorage.lastNick = nick;
+        localStorage.lastRoom = room;
         $("#welcome").style.opacity = "0";
         setTimeout(function(){
             $("#welcome").style.display = "none";
         },300);
         main();
     } else {
-        history.back();
+        alert("Choose a nickname and room");
+        $("#nick_input").focus();
     }
 };
+
+socket.on("try resume",function(){
+    if (nick) {
+        socket.emit("nick chosen",nick);
+    }
+})
 
 function main() {    
     var onlineUsers = [];
@@ -78,6 +99,10 @@ function main() {
         if ((!document.hasFocus() || !wasAtBottom) && type != "status" && type != "typing" && type != "self") {
             playSound("sound/message.ogg");
         }
+        
+        if (type != "typing") {
+            updateTypingList();
+        }
     }
     
     function playSound(url) {
@@ -88,7 +113,7 @@ function main() {
     
     function updateOnlineUsers() {
         onlineUsers = onlineUsers.sort();
-        $("#users").innerHTML = "<strong>Online users</strong>: " + onlineUsers.join(", ");
+        $("#users").innerHTML = "<strong>Online</strong>: " + onlineUsers.join(", ");
     }
     
     function updateTypingList() {
@@ -113,7 +138,7 @@ function main() {
     
     $("form").onsubmit = function(e){
         e.preventDefault();
-        var text = $("#m").value;
+        var text = $("#m").value.substring(0,10000);
         if ($("#m").value.split(" ").join("").length != 0) {
             socket.emit("chat message",{
                 text: text,
@@ -199,7 +224,11 @@ function main() {
     
     socket.on("kick", function(reason){
         alert("You have been kicked: " + reason);
-        history.back();
+        if (reason != "nick already in use") {
+            history.back();
+        } else {
+            location.reload();
+        }
     });
     
     socket.on("still kicked",function(){
@@ -236,4 +265,6 @@ function main() {
     socket.on("brainwash", function(){
         $("#messages").innerHTML = "";
     });
+    
+    $("#current_room").innerHTML = "<strong>Room</strong>: " + room;
 }

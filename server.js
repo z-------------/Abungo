@@ -28,7 +28,8 @@ function timeString() {
     return "[" + hours + ":" + minutes + ":" + seconds + "] ";
 }
 
-var connectedUsers = [];
+var roomUsers = {};
+
 var nickIdMap = {};
 var clients = {};
 var kickList = []; // a list of kicked ips
@@ -36,17 +37,21 @@ var kickList = []; // a list of kicked ips
 io.on("connection", function(socket){
     var ip = socket.request.connection.remoteAddress;
     var userNick;
+    var userRoom;
     var clientId = socket.id;
     
     console.log(timeString() + "a user connected from " + ip);
     
+    socket.emit("try resume"); // tells the client to check if a nickname has already been chosen
+    // useful when rejoining chat after idling (for example after computer sleeps)
+    
     socket.on("disconnect", function(){
-        if (userNick) {
+        if (userNick && userRoom) {
             clients[clientId] = undefined;
-            connectedUsers.remove(connectedUsers.indexOf(userNick));
-            io.emit("user left", {
+            roomUsers[userRoom].remove(roomUsers[userRoom].indexOf(userNick));
+            io.to(userRoom).emit("user left", {
                 nick: userNick,
-                users: connectedUsers,
+                users: roomUsers[userRoom],
                 time: new Date().toString()
             });
             console.log(timeString() + userNick + " (" + ip + ") disconnected");
@@ -55,11 +60,19 @@ io.on("connection", function(socket){
         }
     });
     
-    socket.on("nick chosen", function(nick){
-        console.log(timeString() + "user at " + ip + " chose nick '" + nick + "'");
+    socket.on("nick chosen", function(data){
+        var nick = data.nick;
+        var room = data.room;
+        
+        if (!roomUsers[room]) {
+            roomUsers[room] = []; // create array for this room if it doesn't yet exist
+        }
+    
+        console.log(timeString() + "user at " + ip + " chose nick '" + nick + "' and joined room '" + room + "'");
+        
         if (kickList.indexOf(ip) != -1) {
             socket.emit("still kicked");
-        } else if (connectedUsers.indexOf(nick) != -1) {
+        } else if (roomUsers[room].indexOf(nick) != -1) {
             socket.emit("kick","nick already in use");
             console.log(timeString() + nick + " (" + ip + ") was kicked: nick already in use");
         } else { // nick is not taken and ip isnt on kicklist
@@ -69,44 +82,49 @@ io.on("connection", function(socket){
             }
             
             userNick = nick;
-            connectedUsers.push(nick);
+            userRoom = room;
+            
             nickIdMap[nick] = clientId;
             
-            io.emit("user joined", {
+            roomUsers[room].push(nick);
+            
+            socket.join(room);
+            
+            io.to(room).emit("user joined", {
                 nick: nick,
-                users: connectedUsers,
+                users: roomUsers[room],
                 time: new Date().toString()
             });
             
             socket.on("chat message", function(msg){
                 msg.time = new Date().toString();
-                socket.broadcast.emit("chat message", msg);
+                socket.broadcast.to(room).emit("chat message", msg);
                 console.log(timeString() + msg.nick + " (" + ip + "): " + msg.text);
             });
             
             socket.on("typing",function(){
-                socket.broadcast.emit("typing", nick);
+                socket.broadcast.to(room).emit("typing", nick);
             });
             
             socket.on("stopped typing",function(){
-                socket.broadcast.emit("stopped typing",nick);
+                socket.broadcast.to(room).emit("stopped typing",nick);
             });
             
             socket.on("image share",function(data){
                 data.time = new Date().toString();
-                socket.broadcast.emit("image share",data);
+                socket.broadcast.to(room).emit("image share",data);
                 console.log(timeString() + data.nick + " shared an image: " + data.fileName);
             });
             
             socket.on("audio share",function(data){
                 data.time = new Date().toString();
-                socket.broadcast.emit("audio share",data);
+                socket.broadcast.to(room).emit("audio share",data);
                 console.log(timeString() + data.nick + " shared audio: " + data.fileName);
             });
             
             socket.on("file share",function(data){
                 data.time = new Date().toString();
-                socket.broadcast.emit("file share",data);
+                socket.broadcast.to(room).emit("file share",data);
                 console.log(timeString() + data.nick + " shared a file: " + data.fileName);
             });
         }
