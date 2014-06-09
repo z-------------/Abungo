@@ -4,15 +4,17 @@ Simple chat app made with node.js and Socket.IO.
 
 ## Simple and anonymous
 
-The server doesn't store any information about the users or keep logs. It simply relays the data from one client to the rest.
+The server doesn't store any information about the users or keep logs. It simply relays the data from one client to the rest. 
+
+Chat privately in chat rooms. The default room is "yeya".
 
 ## Responsive layout
 
 The Abungo client is minimally designed and adapts to different screen sizes.
 
-![Abungo on a PC](http://i.imgur.com/sCtiSAx.png)
+![Abungo on a PC](http://i.imgur.com/uHIjlEu.png)
 
-![Abungo on a smartphone](http://i.imgur.com/rDmaM1q.png)
+![Abungo on a smartphone](http://i.imgur.com/BzgCj67.png)
 
 ## Running Abungo
 
