@@ -15,6 +15,8 @@
     padding: 0;
     box-sizing: border-box;
     transition: .3s;
+    font-size: 17px;
+    font-family:Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 *:focus {
@@ -28,7 +30,6 @@ html,body {
 }
 
 body {
-    font: 17px Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: #2980b9;
 }
 
@@ -37,7 +38,6 @@ form {
 }
 
 #m {
-    font: 17px Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
     width:300px;
     max-width:100%;
     padding:20px;
@@ -189,6 +189,55 @@ a {
 
 a:hover {
     border-bottom:solid 1px #2980b9;
+}
+
+#welcome {
+    height:100%;
+    width:100%;
+    background-color:#2980b9;
+    position:absolute;
+    left:0;
+    top:0;
+    z-index:1;
+}
+
+#welcome,#welcome * {
+    transition:opacity .3s;
+}
+
+#nick_choose {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -85px;
+    margin-left: -150px;
+    text-align: center;
+}
+
+#nick_choose input {
+    border:none;
+    border-bottom:solid 3px rgba(255,255,255,.5);
+    background-color:transparent;
+    padding:20px;
+    height:60px;
+    width:300px;
+    color:white;
+}
+
+h1 {
+    color: white;
+    font-size: 50px;
+    font-weight: 300;
+    margin-bottom: 50px;
+}
+
+#nick_choose input::-webkit-input-placeholder {
+    color:rgba(255,255,255,.5);
+}
+
+#messages li div audio {
+    display:block;
+    margin-bottom:5px;
 }
 
 @media only screen and (max-width:480px) {

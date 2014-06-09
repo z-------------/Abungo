@@ -1,5 +1,8 @@
 var socket = io();
 
+var $ = function(selector){return document.querySelector(selector)};
+var $$ = function(selector){return document.querySelectorAll(selector)};
+
 var nick;
 
 function encodeHTML(string) {
@@ -8,23 +11,31 @@ function encodeHTML(string) {
     return tempDiv.innerHTML;
 }
 
-(function chooseNick(){
-    var lastNick = localStorage.lastNick || "";
-    nick = encodeHTML(prompt("Choose a nickname",lastNick));
+$("#nick_input").focus();
+
+$("#nick_input").value = localStorage.lastNick || "";
+$("#nick_input").onkeydown = function(e){
+    if (e.which == 13) { // enter
+        chooseNick();
+    }
+}
+
+function chooseNick(){
+    nick = encodeHTML($("#nick_input").value);
     if (nick) {
         socket.emit("nick chosen",nick);
         localStorage.lastNick = nick;
+        $("#welcome").style.opacity = "0";
+        setTimeout(function(){
+            $("#welcome").style.display = "none";
+        },300);
         main();
     } else {
-        //chooseNick();
         history.back();
     }
-})();
+};
 
-function main() {
-    var $ = function(selector){return document.querySelector(selector)};
-    var $$ = function(selector){return document.querySelectorAll(selector)};
-    
+function main() {    
     var onlineUsers = [];
     var typingList = [];
     
@@ -143,7 +154,7 @@ function main() {
                             nick: nick,
                             fileName: file.name
                         });
-                        writeListItem("<strong>"+nick+"</strong><audio controls src='"+dataURI+"'/></audio>","self",new Date().toString());
+                        writeListItem("<strong>"+nick+"</strong><audio controls src='"+dataURI+"'/></audio><a href='"+dataURI+"' target='_blank'>"+file.name+"</a>","self",new Date().toString());
                     } else {
                         var dataURI = this.result;
                         socket.emit("file share",{
@@ -215,7 +226,7 @@ function main() {
     });
     
     socket.on("audio share", function(data){
-        writeListItem("<strong>"+data.nick+"</strong><audio controls src='"+data.file+"'></audio>","normal",data.time);
+        writeListItem("<strong>"+data.nick+"</strong><audio controls src='"+data.file+"'></audio><a href='"+data.file+"' target='_blank'>"+data.fileName+"</a>","normal",data.time);
     });
     
     socket.on("file share", function(data){
