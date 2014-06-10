@@ -14,6 +14,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -moz-box-sizing:border-box;
     transition: .3s;
     font-size: 17px;
     font-family:Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -122,7 +123,12 @@ form {
 }
 
 #messages li.console div {
-    background:#9fd848;
+    background:#ddd;
+    color:#222;
+}
+
+#messages li.console div:before {
+    border-color:transparent #ddd transparent transparent;
 }
 
 #messages li.typing {
@@ -138,10 +144,6 @@ form {
 #messages li.typing div strong {
     display:inline-block;
     margin-bottom:0;
-}
-
-#messages li.console div:before {
-    border-color:transparent #9fd848 transparent transparent;
 }
 
 #users, #current_room {
@@ -255,7 +257,7 @@ h1 {
     text-align:center;
 }
 
-#nick_choose input::-webkit-input-placeholder {
+#nick_choose input::-webkit-input-placeholder,  #nick_choose input:-moz-input-placeholder {
     color:rgba(255,255,255,.5);
 }
 

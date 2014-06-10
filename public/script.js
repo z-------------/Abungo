@@ -7,7 +7,7 @@ var nick, room;
 
 function encodeHTML(string) {
     var tempDiv = document.createElement("div");
-    tempDiv.innerText = string;
+    tempDiv.textContent = string;
     return tempDiv.innerHTML;
 }
 
@@ -59,6 +59,9 @@ socket.on("try resume",function(){
 function main() {    
     var onlineUsers = [];
     var typingList = [];
+    var unreadCount = 0;
+    
+    var windowIsFocused = true;
     
     Array.prototype.remove = function(element){return this.splice(this.indexOf(element),1)};
     
@@ -70,6 +73,16 @@ function main() {
         callback: function(url) {
             return "<a href='"+url+"' target='_blank'>"+url+"</a>";
         }
+    }
+    
+    window.onblur = function(){
+        windowIsFocused = false;
+    }
+    
+    window.onfocus = function(){
+        windowIsFocused = true;
+        unreadCount = 0;
+        updateUnreadCount();
     }
     
     function writeListItem(html,type,time) {
@@ -96,8 +109,13 @@ function main() {
             $("#messages").scrollTop = $("#messages").scrollHeight;
         }
         
-        if ((!document.hasFocus() || !wasAtBottom) && type != "status" && type != "typing" && type != "self") {
+        if ((!windowIsFocused || !wasAtBottom) && type != "status" && type != "typing" && type != "self") {
             playSound("sound/message.ogg");
+        }
+        
+        if (!windowIsFocused && type != "status" && type != "typing" && type != "self") {
+            unreadCount += 1;
+            updateUnreadCount();
         }
         
         if (type != "typing") {
@@ -114,6 +132,14 @@ function main() {
     function updateOnlineUsers() {
         onlineUsers = onlineUsers.sort();
         $("#users").innerHTML = "<strong>Online</strong>: " + onlineUsers.join(", ");
+    }
+    
+    function updateUnreadCount() {
+        if (unreadCount > 0) {
+            document.title = "Abungo [" + unreadCount.toString() + "]"
+        } else {
+            document.title = "Abungo";
+        }
     }
     
     function updateTypingList() {
