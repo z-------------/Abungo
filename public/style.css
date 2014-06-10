@@ -169,7 +169,7 @@ form {
     left:0;
 }
 
-label input {
+form label input {
     display:none;
 }
 
@@ -217,28 +217,28 @@ a:hover {
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-top: -85px;
-    margin-left: -150px;
+    margin-top: -115px;
+    margin-left: -123px;
     text-align: center;
+    color:white;
+    text-align:right;
+}
+
+#nick_choose label {
+    color:rgba(255,255,255,.5);
+    display:block;
 }
 
 #nick_input, #chatroom {
     border:none;
     border-bottom:solid 3px rgba(255,255,255,.5);
     background-color:transparent;
-    padding:20px;
+    padding:10px;
     height:60px;
     color:white;
     border-radius:0;
-}
-
-#nick_input {
     width:200px;
-    
-}
-
-#chatroom {
-    width:100px;
+    margin-left:20px;
 }
 
 h1 {
@@ -246,6 +246,7 @@ h1 {
     font-size: 50px;
     font-weight: 300;
     margin-bottom: 50px;
+    text-align:center;
 }
 
 #nick_choose input::-webkit-input-placeholder {
