@@ -11,8 +11,20 @@ function encodeHTML(string) {
     return tempDiv.innerHTML;
 }
 
-$("#nick_input").value = localStorage.lastNick || "";
-$("#chatroom").value = localStorage.lastRoom || "yeya";
+function decodeHTML(string) {
+    var tempDiv = document.createElement("div");
+    tempDiv.innerHTML = string;
+    return tempDiv.textContent;
+}
+
+if (localStorage.lastNick) {
+    $("#nick_input").value = decodeHTML(localStorage.lastNick);
+}
+if (localStorage.lastRoom) {
+    $("#chatroom").value = decodeHTML(localStorage.lastRoom);
+} else {
+    $("#chatroom").value = "yeya";
+}
 
 $("#nick_input").focus();
 
