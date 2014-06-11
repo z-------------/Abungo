@@ -35,7 +35,7 @@ var clients = {};
 var kickList = []; // a list of kicked ips
 
 io.on("connection", function(socket){
-    var ip = socket.request.connection.remoteAddress;
+    var ip = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
     var userNick;
     var userRoom;
     var clientId = socket.id;
