@@ -12,7 +12,7 @@ app.get(/^(.+)$/, function(req, res) {
 
 Array.prototype.remove = function(index){return this.splice(index,1)};
 
-function timeString() {
+/*function timeString() {
     var date = new Date();
     var hours = date.getHours().toString();
     var minutes = date.getMinutes().toString();
@@ -25,8 +25,8 @@ function timeString() {
         seconds = "0" + seconds;
     }
     
-    return "[" + hours + ":" + minutes + ":" + seconds + "] ";
-}
+    return "[" + hours + ":" + minutes + ":" + seconds + "]";
+}*/
 
 var roomUsers = {};
 
@@ -40,7 +40,7 @@ io.on("connection", function(socket){
     var userRoom;
     var clientId = socket.id;
     
-    console.log(timeString() + "a user connected from " + ip);
+    console.log("a user connected from %s", ip);
     
     socket.emit("try resume"); // tells the client to check if a nickname has already been chosen
     // useful when rejoining chat after idling (for example after computer sleeps)
@@ -54,9 +54,9 @@ io.on("connection", function(socket){
                 users: roomUsers[userRoom],
                 time: new Date().toString()
             });
-            console.log(timeString() + userNick + " (" + ip + ") disconnected");
+            console.log("%s (%s %s) disconnected", userNick, userRoom, ip);
         } else {
-            console.log(timeString() + "user at (" + ip + ") disconnected");
+            console.log("user at (%s) disconnected", ip);
         }
     });
     
@@ -67,14 +67,14 @@ io.on("connection", function(socket){
         if (!roomUsers[room]) {
             roomUsers[room] = []; // create array for this room if it doesn't yet exist
         }
-    
-        console.log(timeString() + "user at " + ip + " chose nick '" + nick + "' and joined room '" + room + "'");
+        
+        console.log("user at %s chose nick '%s' and joined room '%s'", ip, nick, room);
         
         if (kickList.indexOf(ip) != -1) {
             socket.emit("still kicked");
         } else if (roomUsers[room].indexOf(nick) != -1) {
             socket.emit("kick","nick already in use");
-            console.log(timeString() + nick + " (" + ip + ") was kicked: nick already in use");
+            console.log("%s (%s %s) was kicked: nick already in use", nick, room, ip);
         } else { // nick is not taken and ip isnt on kicklist
             clients[clientId] = {
                 socket: socket,
@@ -99,7 +99,7 @@ io.on("connection", function(socket){
             socket.on("chat message", function(msg){
                 msg.time = new Date().toString();
                 socket.broadcast.to(room).emit("chat message", msg);
-                console.log(timeString() + msg.nick + " (" + ip + "): " + msg.text);
+                console.log("%s (%s %s): %s", nick, room, ip, msg.text);
             });
             
             socket.on("typing",function(){
@@ -107,25 +107,25 @@ io.on("connection", function(socket){
             });
             
             socket.on("stopped typing",function(){
-                socket.broadcast.to(room).emit("stopped typing",nick);
+                socket.broadcast.to(room).emit("stopped typing", nick);
             });
             
             socket.on("image share",function(data){
                 data.time = new Date().toString();
                 socket.broadcast.to(room).emit("image share",data);
-                console.log(timeString() + data.nick + " shared an image: " + data.fileName);
+                console.log("%s (%s %s) shared an image: %s", nick, room, ip, data.fileName);
             });
             
             socket.on("audio share",function(data){
                 data.time = new Date().toString();
                 socket.broadcast.to(room).emit("audio share",data);
-                console.log(timeString() + data.nick + " shared audio: " + data.fileName);
+                console.log("%s (%s %s) shared audio: %s", nick, room, ip, data.fileName);
             });
             
             socket.on("file share",function(data){
                 data.time = new Date().toString();
                 socket.broadcast.to(room).emit("file share",data);
-                console.log(timeString() + data.nick + " shared a file: " + data.fileName);
+                console.log("%s (%s %s) shared a file: %s", nick, room, ip, data.fileName);
             });
         }
     });
@@ -140,7 +140,7 @@ http.listen(3000, function(){
 process.stdin.resume();
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', function (text) {
-    if (text.indexOf("kick:") == 0) {
+    /*if (text.indexOf("kick:") == 0) {
         var userNick = text.substring("kick: ".length).replace("\n","");
         var userId = nickIdMap[userNick];
         var userIp = clients[userId].ip;
@@ -151,8 +151,8 @@ process.stdin.on('data', function (text) {
             kickList.remove(this.indexOf(userIp));
         },300000);
         
-        console.log(userNick + " was kicked: King Jimmy has spoken");
-    } else if (text.indexOf("stop") == 0) {
+        console.log("%s was kicked: King Jimmy has spoken", userNick);
+    } else */if (text.indexOf("stop") == 0) {
         io.emit("server stopping");
         process.exit();
     } else if (text.indexOf("brainwash") == 0) {
