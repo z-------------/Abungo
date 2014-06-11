@@ -1,9 +1,30 @@
 {
-  "name": "Abungo",
-  "version": "0.0.1",
-  "description": "Simple anonymous chat",
-  "dependencies": {
-    "express": "^4.4.1",
-    "socket.io": "~1.0.4"
-  }
+    "name": "Abungo",
+    "version": "0.2.0",
+    "description": "Simple anonymous chat with Socket.IO",
+    "dependencies": {
+        "express": "^4.4.1",
+        "socket.io": "~1.0.4"
+    },
+    "subdomain": "abungo",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "engines": {
+        "node": "0.10.x"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "http://github.com/z-------------/Abungo/issues",
+        "email": "zacharyguard@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/z-------------/Abungo.git"
+    },
+    "author": {
+        "name": "Zack Guard",
+        "email": "zacharyguard@gmail.com",
+        "url": "http://zacharyguard.co.nf/"
+    }
 }
