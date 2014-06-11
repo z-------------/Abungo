@@ -1,3 +1,9 @@
+/*
+ * Camerca icon by Designmodo
+ * Microphone icon by Stephen Hutchings - http://typicons.com/
+ * Folder icon by Ionicons - http://ionicons.com/
+ */
+
 @import url(http://fonts.googleapis.com/css?family=Lato:400,700);
 
 @-webkit-keyframes new_message {
@@ -255,6 +261,17 @@ h1 {
     font-weight: 300;
     margin-bottom: 50px;
     text-align:center;
+    margin-left:50px;
+}
+
+h1:before {
+    content:"";
+    background-image:url(img/icon.png);
+    height:30px;
+    width:45px;
+    position:absolute;
+    left:20px;
+    top:15px;
 }
 
 #nick_choose input::-webkit-input-placeholder,  #nick_choose input:-moz-input-placeholder {
@@ -280,6 +297,114 @@ h1 {
 
 ::selection {
     background-color:rgba(138,232,205,.5);
+}
+
+#fileoptions {
+    position:absolute;
+    bottom:100px;
+    left:50%;
+    width:143px;
+    height:0;
+    background:rgba(255,255,255,.7);
+    border-radius:5px;
+    transition:.3s;
+    margin-left:130px;
+    overflow:hidden;
+    opacity:0;
+}
+
+#photobooth {
+    height:0;
+}
+
+#fileoptions.opened {
+    height:60px;
+    opacity:1;
+}
+
+#fileoptions.booth {
+    width:400px;
+    height:300px;
+    margin-left:0;
+}
+
+#photobooth input {
+    position:absolute;
+    bottom:0;
+    right:0;
+    margin:10px;
+    display:none;
+    border:none;
+    background-image:url(img/file_sharing/camera.png);
+    background-size:cover;
+    background-repeat:no-repeat;
+    background-position:center;
+    background-color:rgba(255,255,255,.5);
+    padding:10px;
+    border-radius:5px;
+    height:40px;
+    width:40px;
+    cursor:pointer;
+}
+
+#fileoptions.booth #photobooth input {
+    display:block;
+}
+
+#fileoptions.booth #mainoptions {
+    height:0;
+    padding:0;
+}
+
+#fileoptions.booth #photobooth {
+    height:300px;
+}
+
+#filearrow {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 20px 20px 0 20px;
+    border-color: transparent;
+    margin-left: 180px;
+    transition:border-color .3s;
+}
+
+#filearrow.visible {
+    border-color: rgba(255,255,255,.7) transparent transparent transparent;
+}
+
+#mainoptions {
+    padding:10px;
+    overflow:hidden;
+}
+
+.fileoption {
+    display:inline-block;
+    height:40px;
+    width:40px;
+    margin:0 10px;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    opacity:.7;
+    transition:opacity .3s;
+    cursor:pointer;
+}
+
+.fileoption:hover {
+    opacity:1;
+}
+
+#take_photo {
+    background-image:url(img/file_sharing/camera.png);
+}
+
+#attach_file {
+    background-image:url(img/file_sharing/folder.png);
 }
 
 @media only screen and (max-width:480px) {
@@ -341,5 +466,17 @@ h1 {
         margin-bottom:0;
         margin-left:-50%;
         width:calc(100% - 60px);
+    }
+    
+    #tagline {
+        display:none;
+    }
+    
+    #fileoptions {
+        display:none;
+    }
+    
+    #filearrow {
+        display:none;
     }
 }

@@ -44,7 +44,7 @@ $("#chatroom").onkeydown = function(e){
 function chooseNick(){
     nick = encodeHTML($("#nick_input").value.substring(0,100));
     room = encodeHTML($("#chatroom").value.toLowerCase().substring(0,100));
-    if (nick && room) {
+    if (nick.split(" ").join("").length && room.split(" ").join("").length) {
         socket.emit("nick chosen",{
             nick: nick,
             room: room
@@ -74,6 +74,7 @@ function main() {
     var unreadCount = 0;
     
     var windowIsFocused = true;
+    var fileOptsOpened = false;
     
     Array.prototype.remove = function(element){return this.splice(this.indexOf(element),1)};
     
@@ -167,6 +168,10 @@ function main() {
         }
     }
     
+    function isMobile() {
+        return (navigator.userAgent.toLowerCase().indexOf("mobile") != -1);
+    }
+    
     // actual script
     
     $("#m").focus();
@@ -196,7 +201,7 @@ function main() {
         }
     };
     
-    $("#fileshare input[type=file]").onchange = function(){
+    $("#attach_file input[type=file]").onchange = function(){
         var file = this.files[0];
         if (file) {
             if (file.size < 2233076) { // ~2mb
@@ -229,10 +234,68 @@ function main() {
                     }
                 }
                 reader.readAsDataURL(file);
+                
+                $("#fileoptions").classList.remove("opened");
+                fileOptsOpened = false;
             } else {
                 alert("The file you chose is too big. Choose a file less than 2mb in size.");
             }
         }
+    }
+    
+    if (!isMobile()) {
+        $("#fileshare").onclick = function(){
+            if (fileOptsOpened) {
+                $("#fileoptions").classList.remove("opened");
+                $("#fileoptions").classList.remove("booth");
+                $("#filearrow").classList.remove("visible");
+                fileOptsOpened = false;
+            } else {
+                $("#fileoptions").classList.add("opened");
+                $("#filearrow").classList.add("visible");
+                fileOptsOpened = true;
+            }
+        }
+    } else {
+        $("#fileshare").onclick = function(){
+            $("#fileoptions input[type=file]").click();
+        }
+    }
+    
+    $("#take_photo").onclick = function(){
+        $("#fileoptions").classList.add("booth");
+        
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+  
+        navigator.getUserMedia({
+            video: true
+        }, function(stream) {
+            $("#photobooth video").src = window.URL.createObjectURL(stream);
+        }, function() {
+            alert("Please allow webcam access to use this feature");
+        });
+    }
+    
+    $("#photobooth input").onclick = function(){
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        canvas.height = 300;
+        canvas.width = 400;
+        ctx.drawImage($("#photobooth video"),0,0,400,300);
+        var dataURI = canvas.toDataURL();
+        
+        socket.emit("image share",{
+            file: dataURI,
+            nick: nick,
+            fileName: "Abungo booth capture.png"
+        });
+        
+        writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'><img src='"+dataURI+"'/></a>","self",new Date().toString());
+        
+        $("#fileoptions").classList.remove("opened");
+        $("#fileoptions").classList.remove("booth");
+        $("#filearrow").classList.remove("visible");
+        fileOptsOpened = false;
     }
     
     socket.on("chat message", function(msg){

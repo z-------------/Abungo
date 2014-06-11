@@ -27,9 +27,22 @@
         <ul id="messages"></ul>
         <form>
             <input id="m" autocomplete="off" placeholder="Type your message">
-            <label id="fileshare">
-                <input type="file">
-            </label>
+                
+            <div id="fileshare"></div>
+            <div id="fileoptions">
+                <div id="mainoptions">
+                    <div class="fileoption" id="take_photo"></div>
+                    <label class="fileoption" id="attach_file">
+                        <input type="file">
+                    </label>
+                </div>
+                <div id="photobooth">
+                    <video autoplay height="300" width="400"></video>
+                    <input type="button">
+                </div>
+            </div>
+            <div id="filearrow"></div>
+            
             <div id="current_room"></div>
             <div id="users"></div>
         </form>
