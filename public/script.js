@@ -243,17 +243,25 @@ function main() {
         }
     }
     
+    function closeFileOpts() {
+        $("#fileoptions").classList.remove("opened");
+        $("#fileoptions").classList.remove("booth");
+        $("#filearrow").classList.remove("visible");
+        fileOptsOpened = false;
+    }
+    
+    function openFileOpts() {
+        $("#fileoptions").classList.add("opened");
+            $("#filearrow").classList.add("visible");
+            fileOptsOpened = true;
+    }
+    
     if (!isMobile()) {
         $("#fileshare").onclick = function(){
             if (fileOptsOpened) {
-                $("#fileoptions").classList.remove("opened");
-                $("#fileoptions").classList.remove("booth");
-                $("#filearrow").classList.remove("visible");
-                fileOptsOpened = false;
+                closeFileOpts();
             } else {
-                $("#fileoptions").classList.add("opened");
-                $("#filearrow").classList.add("visible");
-                fileOptsOpened = true;
+                openFileOpts();
             }
         }
     } else {
@@ -292,10 +300,7 @@ function main() {
         
         writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'><img src='"+dataURI+"'/></a>","self",new Date().toString());
         
-        $("#fileoptions").classList.remove("opened");
-        $("#fileoptions").classList.remove("booth");
-        $("#filearrow").classList.remove("visible");
-        fileOptsOpened = false;
+        closeFileOpts();
     }
     
     socket.on("chat message", function(msg){
@@ -368,4 +373,8 @@ function main() {
     });
     
     $("#current_room").innerHTML = "<strong>Room</strong>: " + room;
+    
+    window.onbeforeunload = function(){
+        socket.disconnect();
+    }
 }
