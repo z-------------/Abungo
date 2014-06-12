@@ -30,3 +30,5 @@ npm install --save express
 ```
 
 After you have everything installed, run `node server` from the Abungo directory. Navigate to `http://localhost:3000` in your browser to see it in action.
+
+You might also want to check it live at http://abungo.jit.su
