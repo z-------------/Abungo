@@ -168,8 +168,27 @@ function main() {
         }
     }
     
+    function dataURItoBlob(dataURI) {
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+            byteString = atob(dataURI.split(',')[1]);
+        } else {
+            byteString = unescape(dataURI.split(',')[1]);
+        }
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        var bb = new BlobBuilder();
+        bb.append(ab);
+        return bb.getBlob(mimeString);
+    }
+    
     function isMobile() {
-        return (navigator.userAgent.toLowerCase().indexOf("mobile") != -1);
+        //return (navigator.userAgent.toLowerCase().indexOf("mobile") != -1);
+        return (window.innerWidth <= 480);
     }
     
     // actual script
@@ -201,47 +220,59 @@ function main() {
         }
     };
     
-    $("#attach_file input[type=file]").onchange = function(){
-        var file = this.files[0];
-        if (file) {
-            if (file.size < 2233076) { // ~2mb
-                var reader = new FileReader();
-                reader.onload = function() {
-                    if (file.type.indexOf("image/") != -1) { // file is an image
-                        var dataURI = this.result;
-                        socket.emit("image share",{
-                            file: dataURI,
-                            nick: nick,
-                            fileName: file.name
-                        });
-                        writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'><img src='"+dataURI+"'/></a>","self",new Date().toString());
-                    } else if (file.type.indexOf("audio/") != -1) {
-                        var dataURI = this.result;
-                        socket.emit("audio share",{
-                            file: dataURI,
-                            nick: nick,
-                            fileName: file.name
-                        });
-                        writeListItem("<strong>"+nick+"</strong><audio controls src='"+dataURI+"'/></audio><a href='"+dataURI+"' target='_blank'>"+file.name+"</a>","self",new Date().toString());
-                    } else {
-                        var dataURI = this.result;
-                        socket.emit("file share",{
-                            file: dataURI,
-                            nick: nick,
-                            fileName: file.name
-                        });
-                        writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'>"+file.name+"</a>","self",new Date().toString());
-                    }
-                }
-                reader.readAsDataURL(file);
-                
-                $("#fileoptions").classList.remove("opened");
-                fileOptsOpened = false;
+    function handleFile(file) {
+        if (file.size < 20971520) { // ~20mb
+            var blobURL = URL.createObjectURL(file);
+            socket.emit("file share",{
+                file: file,
+                nick: nick,
+                name: file.name,
+                type: file.type
+            });
+            
+            if (file.type.indexOf("image/") != -1) {
+                writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'></a>","self",new Date().toString());
+            } else if (file.type.indexOf("video/") != -1) {
+                writeListItem("<strong>"+nick+"</strong><video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self",new Date().toString());
+            } else if (file.type.indexOf("audio/") != -1) {
+                writeListItem("<strong>"+nick+"</strong><audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self",new Date().toString());
             } else {
-                alert("The file you chose is too big. Choose a file less than 2mb in size.");
+                writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self",new Date().toString());
+            }
+            
+            closeFileOpts();
+        } else {
+            alert("The file you chose (" + file.name + ") is too big. Choose a file less than 20mb in size.");
+        }
+    }
+    
+    $("#attach_file input[type=file]").onchange = function(){
+        var files = this.files;
+        if (files && files.length > 0) {
+            for (i=0; i<files.length; i++) {
+                handleFile(files[i]);
             }
         }
     }
+    
+    document.body.addEventListener("dragover", function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "copy";
+    }, false);
+    
+    document.body.addEventListener("drop", function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        
+        var files = e.dataTransfer.files;
+        
+        if (files && files.length > 0) {
+            for (i=0; i<files.length; i++) {
+                handleFile(files[i]);
+            }
+        }
+    }, false);
     
     function closeFileOpts() {
         $("#fileoptions").classList.remove("opened");
@@ -252,23 +283,23 @@ function main() {
     
     function openFileOpts() {
         $("#fileoptions").classList.add("opened");
-            $("#filearrow").classList.add("visible");
-            fileOptsOpened = true;
+        $("#filearrow").classList.add("visible");
+        fileOptsOpened = true;
     }
     
-    if (!isMobile()) {
-        $("#fileshare").onclick = function(){
+    $("#fileshare").onclick = function(){
+        if (!isMobile()) {
             if (fileOptsOpened) {
                 closeFileOpts();
             } else {
                 openFileOpts();
             }
-        }
-    } else {
-        $("#fileshare").onclick = function(){
+        } else {
             $("#fileoptions input[type=file]").click();
         }
     }
+    
+    var videoStream;
     
     $("#take_photo").onclick = function(){
         $("#fileoptions").classList.add("booth");
@@ -278,7 +309,8 @@ function main() {
         navigator.getUserMedia({
             video: true
         }, function(stream) {
-            $("#photobooth video").src = window.URL.createObjectURL(stream);
+            videoStream = stream;
+            $("#photobooth video").src = URL.createObjectURL(videoStream);
         }, function() {
             alert("Please allow webcam access to use this feature");
         });
@@ -290,15 +322,19 @@ function main() {
         canvas.height = 300;
         canvas.width = 400;
         ctx.drawImage($("#photobooth video"),0,0,400,300);
-        var dataURI = canvas.toDataURL();
         
-        socket.emit("image share",{
+        var dataURI = canvas.toDataURL();
+    
+        socket.emit("file share",{
             file: dataURI,
             nick: nick,
-            fileName: "Abungo booth capture.png"
+            name: "Abungo booth capture.png",
+            type: "image/png"
         });
         
-        writeListItem("<strong>"+nick+"</strong><a href='"+dataURI+"' target='_blank'><img src='"+dataURI+"'/></a>","self",new Date().toString());
+        videoStream.stop();
+        
+        writeListItem("<strong>"+nick+"</strong><img src='"+dataURI+"'/>","self",new Date().toString());
         
         closeFileOpts();
     }
@@ -356,16 +392,24 @@ function main() {
         alert("Server is stopping. Your messages will not be sent until the server is back online and you refresh the page.");
     });
     
-    socket.on("image share", function(data){
-        writeListItem("<strong>"+data.nick+"</strong><a href='"+data.file+"' target='_blank'><img src='"+data.file+"'/></a>","normal",data.time);
-    });
-    
-    socket.on("audio share", function(data){
-        writeListItem("<strong>"+data.nick+"</strong><audio controls src='"+data.file+"'></audio><a href='"+data.file+"' target='_blank'>"+data.fileName+"</a>","normal",data.time);
-    });
-    
     socket.on("file share", function(data){
-        writeListItem("<strong>"+data.nick+"</strong><a href='"+data.file+"' target='_blank'>"+data.fileName+"</a>","normal",data.time);
+        var blobURL;
+        if (typeof data.file == "string") {
+            blobURL = data.file;
+        } else {
+            var blob = new Blob([data.file],{type:data.type});
+            blobURL = URL.createObjectURL(blob);
+        }
+        
+        if (data.type.indexOf("image/") != -1) {
+            writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'>"+data.name+"</a>","normal",new Date().toString());
+        } else if (data.type.indexOf("video/") != -1) {
+            writeListItem("<strong>"+nick+"</strong><video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal",new Date().toString());
+        } else if (data.type.indexOf("audio/") != -1) {
+            writeListItem("<strong>"+nick+"</strong><audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal",new Date().toString());
+        } else {
+            writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","self",new Date().toString());
+        }
     });
     
     socket.on("brainwash", function(){

@@ -19,8 +19,10 @@
 *,*:before,*:after {
     margin: 0;
     padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-box-sizing:border-box;
+    -webkit-transition: .3s;
     transition: .3s;
     font-size: 17px;
     font-family:Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -63,7 +65,7 @@ form {
     width:100%;
     overflow-y:auto;
     padding-bottom:100px;
-    -webkit-mask-image: linear-gradient(black calc(100% - 100px), transparent 100%);
+    -webkit-mask-image: linear-gradient(black -webkit-calc(100% - 100px), transparent 100%);
 }
 
 #messages li {
@@ -155,6 +157,7 @@ form {
 #users, #current_room {
     width:300px;
     margin:20px;
+    max-width:-webkit-calc(100% / 2 - 220px - 40px);
     max-width:calc(100% / 2 - 220px - 40px);
     overflow-y:auto;
     color:white;
@@ -186,6 +189,7 @@ form label input {
     width: 60px;
     position: absolute;
     bottom: 0;
+    left: -webkit-calc(50% + 150px);
     left: calc(50% + 150px);
     margin: 20px;
     background-image: url(img/attachment.png);
@@ -219,6 +223,7 @@ a:hover {
 }
 
 #welcome,#welcome * {
+    -webkit-transition:opacity .3s;
     transition:opacity .3s;
 }
 
@@ -248,6 +253,7 @@ a:hover {
     border-radius:0;
     width:200px;
     margin-left:20px;
+    -webkit-transition:border .3s;
     transition:border .3s;
 }
 
@@ -278,7 +284,7 @@ h1:before {
     color:rgba(255,255,255,.5);
 }
 
-#messages li div audio {
+#messages audio,  #messages video {
     display:block;
     margin-bottom:5px;
     max-width:100%;
@@ -295,6 +301,10 @@ h1:before {
     color:rgba(255,255,255,.5);
 }
 
+::-moz-selection {
+    background-color:rgba(138,232,205,.5);
+}
+
 ::selection {
     background-color:rgba(138,232,205,.5);
 }
@@ -307,6 +317,7 @@ h1:before {
     height:0;
     background:rgba(255,255,255,.7);
     border-radius:5px;
+    -webkit-transition:.3s;
     transition:.3s;
     margin-left:130px;
     overflow:hidden;
@@ -315,6 +326,7 @@ h1:before {
 
 #photobooth {
     height:0;
+    position:relative;
 }
 
 #fileoptions.opened {
@@ -330,21 +342,21 @@ h1:before {
 
 #photobooth input {
     position:absolute;
-    bottom:0;
-    right:0;
-    margin:10px;
-    display:none;
+    top:0;
+    left:0;
+    height:100%;
+    width:100%;
+    opacity:0;
+    cursor:pointer;
     border:none;
+    background-color:rgba(255,255,255,.5);
     background-image:url(img/file_sharing/camera.png);
-    background-size:cover;
     background-repeat:no-repeat;
     background-position:center;
-    background-color:rgba(255,255,255,.5);
-    padding:10px;
-    border-radius:5px;
-    height:40px;
-    width:40px;
-    cursor:pointer;
+}
+
+#photobooth input:hover {
+    opacity:1;
 }
 
 #fileoptions.booth #photobooth input {
@@ -370,6 +382,7 @@ h1:before {
     border-width: 20px 20px 0 20px;
     border-color: transparent;
     margin-left: 180px;
+    -webkit-transition:border-color .3s;
     transition:border-color .3s;
 }
 
@@ -387,10 +400,12 @@ h1:before {
     height:40px;
     width:40px;
     margin:0 10px;
+    -webkit-background-size:cover;
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
     opacity:.7;
+    -webkit-transition:opacity .3s;
     transition:opacity .3s;
     cursor:pointer;
 }
@@ -428,18 +443,19 @@ h1:before {
         color:black;
         white-space:nowrap;
         overflow-y:hidden;
+        -webkit-box-shadow:0 7px rgba(0,0,0,.3);
         box-shadow:0 7px rgba(0,0,0,.3);
     }
     
     #users {
         left:0;
-        width:calc(100% - 100px);
+        width:50%;
         text-align:left;
     }
     
     #current_room {
         right:0;
-        width:100px;
+        width:50%;
         text-align:right;
         left:auto;
     }
@@ -452,19 +468,22 @@ h1:before {
         right: 0;
         margin: 10px;
         left: auto;
+        -webkit-background-size: 50px;
         background-size: 50px;
+        -webkit-box-shadow: 0 0 0 10px white;
         box-shadow: 0 0 0 10px white;
     }
     
     #messages {
         padding-top:47px;
         padding-bottom:80px;
-        -webkit-mask-image:linear-gradient(black calc(100% - 100px), black calc(100% - 60px),transparent calc(100% - 60px));
+        -webkit-mask-image:linear-gradient(black -webkit-calc(100% - 100px), black -webkit-calc(100% - 60px),transparent -webkit-calc(100% - 60px));
     }
     
     #m {
         margin-bottom:0;
         margin-left:-50%;
+        width:-webkit-calc(100% - 60px);
         width:calc(100% - 60px);
     }
     

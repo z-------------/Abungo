@@ -110,22 +110,10 @@ io.on("connection", function(socket){
                 socket.broadcast.to(room).emit("stopped typing", nick);
             });
             
-            socket.on("image share",function(data){
-                data.time = new Date().toString();
-                socket.broadcast.to(room).emit("image share",data);
-                console.log("%s (%s %s) shared an image: %s", nick, room, ip, data.fileName);
-            });
-            
-            socket.on("audio share",function(data){
-                data.time = new Date().toString();
-                socket.broadcast.to(room).emit("audio share",data);
-                console.log("%s (%s %s) shared audio: %s", nick, room, ip, data.fileName);
-            });
-            
             socket.on("file share",function(data){
                 data.time = new Date().toString();
                 socket.broadcast.to(room).emit("file share",data);
-                console.log("%s (%s %s) shared a file: %s", nick, room, ip, data.fileName);
+                console.log("%s (%s %s) shared a file: %s", nick, room, ip, data.name);
             });
         }
     });
