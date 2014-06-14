@@ -407,9 +407,7 @@ function main() {
         $("#messages").innerHTML = "";
     });
     
-    socket.on("file too big",function(){
-        fileTooBig();
-    })
+    socket.on("file too big",fileTooBig);
     
     $("#current_room").innerHTML = "<strong>Room</strong>: " + room;
     
