@@ -386,7 +386,7 @@ h1:before {
     transition:border-color .3s;
 }
 
-#filearrow.visible {
+#fileoptions.opened + #filearrow {
     border-color: rgba(255,255,255,.7) transparent transparent transparent;
 }
 

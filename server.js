@@ -111,9 +111,14 @@ io.on("connection", function(socket){
             });
             
             socket.on("file share",function(data){
-                data.time = new Date().toString();
-                socket.broadcast.to(room).emit("file share",data);
-                console.log("%s (%s %s) shared a file: %s", nick, room, ip, data.name);
+                var size = data.file.length;
+                if (!(size > 20971520)) { // 20mb
+                    data.time = new Date().toString();
+                    socket.broadcast.to(room).emit("file share",data);
+                    console.log("%s (%s %s) shared a file: %s", nick, room, ip, data.name);
+                } else {
+                    socket.emit("file too big");
+                }
             });
         }
     });

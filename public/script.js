@@ -98,40 +98,43 @@ function main() {
         updateUnreadCount();
     }
     
-    function writeListItem(html,type,time) {
-        var wasAtBottom = $("#messages").scrollBottom() == 0; // boolean
+    String.prototype.replaceVars = function(map) {
+        var mapKeys = Object.keys(map);
+        var returnVal = this;
+        
+        for (i=0; i<mapKeys.length; i++) {
+            returnVal = returnVal.split("%"+mapKeys[i]+"%").join(map[mapKeys[i]]);
+        }
+        
+        return returnVal;
+    }
+    
+    function writeListItem(nick,content,cssClass) {
+        var wasAtBottom = $("#messages").scrollBottom() == 0;
         
         var liNode = document.createElement("li");
-        liNode.innerHTML = "<div class='message'>" + html + "</div>";
-        
-        if (type == "self" || type == "status") {
-            liNode.classList.add(type);
-        } else {
-            liNode.classList.add("normal");
-        }
-        if (type == "console") {
-            liNode.classList.add("console");
-        }
-        if (type == "typing") {
-            liNode.classList.add("typing");
-        }
+        liNode.innerHTML = "<div class='message'><strong>%nick%</strong>%content%</div>".replaceVars({
+            nick: nick,
+            content: content
+        });
+        liNode.setAttribute("class",cssClass);
         
         $("#messages").appendChild(liNode);
         
-        if (wasAtBottom || type == "self") {
+        if (wasAtBottom || cssClass == "self") {
             $("#messages").scrollTop = $("#messages").scrollHeight;
         }
         
-        if ((!windowIsFocused || !wasAtBottom) && type != "status" && type != "typing" && type != "self") {
+        if ((!windowIsFocused || !wasAtBottom) && cssClass == "normal") {
             playSound("sound/message.ogg");
         }
         
-        if (!windowIsFocused && type != "status" && type != "typing" && type != "self") {
+        if (!windowIsFocused && cssClass == "normal") {
             unreadCount += 1;
             updateUnreadCount();
         }
         
-        if (type != "typing") {
+        if (cssClass.indexOf("typing") == -1) {
             updateTypingList();
         }
     }
@@ -163,29 +166,11 @@ function main() {
         }
         for (i=0; i<tListKeys.length; i++) {
             if (typingList[tListKeys[i]] == true) {
-                writeListItem("<strong>" + tListKeys[i] + "</strong> is typing","typing", new Date().toString());
+                writeListItem(tListKeys[i]," is typing","normal typing");
             }
         }
     }
-    
-    function dataURItoBlob(dataURI) {
-        var byteString;
-        if (dataURI.split(',')[0].indexOf('base64') >= 0) {
-            byteString = atob(dataURI.split(',')[1]);
-        } else {
-            byteString = unescape(dataURI.split(',')[1]);
-        }
-        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-        var ab = new ArrayBuffer(byteString.length);
-        var ia = new Uint8Array(ab);
-        for (var i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        var bb = new BlobBuilder();
-        bb.append(ab);
-        return bb.getBlob(mimeString);
-    }
-    
+        
     function isMobile() {
         //return (navigator.userAgent.toLowerCase().indexOf("mobile") != -1);
         return (window.innerWidth <= 480);
@@ -207,7 +192,7 @@ function main() {
                 nick: nick
             });
             socket.emit("stopped typing");
-            writeListItem("<strong>" + nick + "</strong>" + encodeHTML(text).autoLink(autoLinkOptions), "self", new Date().toString());
+            writeListItem(nick,encodeHTML(text).autoLink(autoLinkOptions),"self");
         }
         this.reset();
     }
@@ -220,6 +205,10 @@ function main() {
         }
     };
     
+    function fileTooBig() {
+        alert("The file you chose is too big. Choose a file less than 20mb in size.");
+    }
+    
     function handleFile(file) {
         if (file.size < 20971520) { // ~20mb
             var blobURL = URL.createObjectURL(file);
@@ -231,27 +220,28 @@ function main() {
             });
             
             if (file.type.indexOf("image/") != -1) {
-                writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'></a>","self",new Date().toString());
+                writeListItem(nick,"<a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'></a>","self")
             } else if (file.type.indexOf("video/") != -1) {
-                writeListItem("<strong>"+nick+"</strong><video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self",new Date().toString());
+                writeListItem(nick,"<video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self")
             } else if (file.type.indexOf("audio/") != -1) {
-                writeListItem("<strong>"+nick+"</strong><audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self",new Date().toString());
+                writeListItem(nick,"<audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self");
             } else {
-                writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self",new Date().toString());
+                writeListItem(nick,"<a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self")
             }
             
             closeFileOpts();
         } else {
-            alert("The file you chose (" + file.name + ") is too big. Choose a file less than 20mb in size.");
+            fileTooBig();
         }
     }
     
     $("#attach_file input[type=file]").onchange = function(){
         var files = this.files;
-        if (files && files.length > 0) {
-            for (i=0; i<files.length; i++) {
-                handleFile(files[i]);
-            }
+        
+        var inc = files.length;
+        while (inc) {
+            handleFile(files[inc-1]);
+            inc--;
         }
     }
     
@@ -267,23 +257,24 @@ function main() {
         
         var files = e.dataTransfer.files;
         
-        if (files && files.length > 0) {
-            for (i=0; i<files.length; i++) {
-                handleFile(files[i]);
-            }
+        var inc = files.length;
+        while (inc) {
+            handleFile(files[inc-1]);
+            inc--;
         }
     }, false);
     
     function closeFileOpts() {
         $("#fileoptions").classList.remove("opened");
         $("#fileoptions").classList.remove("booth");
-        $("#filearrow").classList.remove("visible");
+        if (videoStream) {
+            videoStream.stop();
+        }
         fileOptsOpened = false;
     }
     
     function openFileOpts() {
         $("#fileoptions").classList.add("opened");
-        $("#filearrow").classList.add("visible");
         fileOptsOpened = true;
     }
     
@@ -301,11 +292,11 @@ function main() {
     
     var videoStream;
     
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    
     $("#take_photo").onclick = function(){
         $("#fileoptions").classList.add("booth");
         
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-  
         navigator.getUserMedia({
             video: true
         }, function(stream) {
@@ -334,7 +325,7 @@ function main() {
         
         videoStream.stop();
         
-        writeListItem("<strong>"+nick+"</strong><img src='"+dataURI+"'/>","self",new Date().toString());
+        writeListItem(nick,"<img src='"+dataURI+"'/>","self");
         
         closeFileOpts();
     }
@@ -345,21 +336,21 @@ function main() {
         var time = msg.time;
         var type;
         
-        msg.fromConsole == true ? type = "console" : type = null;
+        msg.fromConsole == true ? type = "normal console" : type = "normal";
         
-        writeListItem("<strong>"+sender+"</strong>" + encodeHTML(text).autoLink(autoLinkOptions), type, time);
+        writeListItem(sender,encodeHTML(text).autoLink(autoLinkOptions), type);
     });
     
     socket.on("user joined", function(data){
         var nick = data.nick;                    
-        writeListItem("<strong>"+nick+"</strong> joined", "status", data.time);
+        writeListItem(nick, " joined", "status");
         onlineUsers = data.users;
         updateOnlineUsers();
     });
     
     socket.on("user left", function(data){
         var nick = data.nick;
-        writeListItem("<strong>"+nick+"</strong> left", "status", data.time);
+        writeListItem(nick, " left", "status");
         onlineUsers = data.users;
         updateOnlineUsers();
     });
@@ -402,19 +393,23 @@ function main() {
         }
         
         if (data.type.indexOf("image/") != -1) {
-            writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'>"+data.name+"</a>","normal",new Date().toString());
+            writeListItem(data.nick,"<a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'></a>","normal")
         } else if (data.type.indexOf("video/") != -1) {
-            writeListItem("<strong>"+nick+"</strong><video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal",new Date().toString());
+            writeListItem(data.nick,"<video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal")
         } else if (data.type.indexOf("audio/") != -1) {
-            writeListItem("<strong>"+nick+"</strong><audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal",new Date().toString());
+            writeListItem(data.nick,"<audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal");
         } else {
-            writeListItem("<strong>"+nick+"</strong><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","self",new Date().toString());
+            writeListItem(data.nick,"<a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal")
         }
     });
     
     socket.on("brainwash", function(){
         $("#messages").innerHTML = "";
     });
+    
+    socket.on("file too big",function(){
+        fileTooBig();
+    })
     
     $("#current_room").innerHTML = "<strong>Room</strong>: " + room;
     
