@@ -107,8 +107,6 @@ io.on("connection", function(socket){
                 ip: ip
             }
             
-            log(clientId);
-            
             userNick = nick;
             userRoom = room;
             
