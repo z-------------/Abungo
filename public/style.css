@@ -200,6 +200,9 @@ form label input {
 
 #messages li div img {
     max-width:100%;
+}
+
+#messages li div:hover img {
     background-image:url(img/checkerboard-bg.png);
 }
 
