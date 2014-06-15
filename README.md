@@ -24,8 +24,8 @@ Abungo comes with a simple admin dashboard for chat moderation. It can be access
 
 Commands you can use:
 
-+ `say` - send a chat message globally (all rooms can see it)
-+ `list` - lists all users by room
++ `say <text>` - send a chat message globally (all rooms can see it)
++ `list` - lists all users
 + `brainwash` - clear users' screens
 + `disconall` - disconnect all users
 + `kick <room>:<nick>` - force a user to disconnect
