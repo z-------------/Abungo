@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Abungo Admin Dashboard</title>
+        <style>
+            *,*:before,*:after {
+                box-sizing:border-box;
+                font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+            }
+            
+            *:focus {
+                outline:none;
+            }
+            
+            #command {
+                padding:20px;
+                font-size:15px;
+                width:200px;
+            }
+            
+            #command,#list {
+                font-family:Menlo,Consolas,"Courier New",monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Abungo Admin Dashboard</h1>
+        
+        <input id="command" placeholder="Command">
+        <output id="list"></output>
+            
+        <script src="/socket.io/socket.io.js"></script>
+        
+        <script>
+            var socket = io();
+            
+            var $ = function(selector) {return document.querySelector(selector)};
+            var $$ = function(selector) {return document.querySelectorAll(selector)};
+            
+            $("#command").onkeydown = function(e){
+                if (e.which == 13) {
+                    if (this.value.indexOf("stop") == 0) {
+                        socket.emit("admin stop");
+                    } else if (this.value.indexOf("brainwash") == 0) {
+                        socket.emit("admin brainwash");
+                    } else if (this.value.indexOf("list") == 0) {
+                        socket.emit("admin list");
+                    } else {
+                        socket.emit("admin chat",{
+                            text: this.value
+                        });
+                    }
+                    this.value = "";
+                }
+            }
+            
+            socket.on("admin list",function(list){
+                $("#list").innerHTML = JSON.stringify(list);
+            })
+        </script>
+    </body>
+</html>

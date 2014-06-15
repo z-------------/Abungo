@@ -1,9 +1,39 @@
-var app = require("express")();
+var express = require("express");
+var app = express();
+var bodyParser = require("body-parser")
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
+var fs = require("fs");
+
+app.use(bodyParser.urlencoded());
+
+var adminPassword = "default";
+
+fs.readFile("adminpassword",function(err,content){
+    if (err) {
+        throw err;
+    } else {
+        adminPassword = content;
+    }
+});
 
 app.get("/", function(req, res) {
     res.sendfile(__dirname + "/public/index.html");
+});
+
+app.get("/admin", function(req, res){
+    var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    res.sendfile(__dirname + "/admin/index.html");
+})
+
+app.post("/admin", function(req, res) {
+    var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    if (req.body.password === adminPassword) {
+        res.sendfile(__dirname + "/admin/auth.html");
+        console.log("someone at %s logged into admin dashboard",ip);
+    } else {
+        res.sendfile(__dirname + "/admin/index.html");
+    }
 });
 
 app.get(/^(.+)$/, function(req, res) {
@@ -11,22 +41,6 @@ app.get(/^(.+)$/, function(req, res) {
 });
 
 Array.prototype.remove = function(index){return this.splice(index,1)};
-
-/*function timeString() {
-    var date = new Date();
-    var hours = date.getHours().toString();
-    var minutes = date.getMinutes().toString();
-    var seconds = date.getSeconds().toString();
-    
-    if (minutes.length == 1) {
-        minutes = "0" + minutes;
-    }
-    if (seconds.length == 1) {
-        seconds = "0" + seconds;
-    }
-    
-    return "[" + hours + ":" + minutes + ":" + seconds + "]";
-}*/
 
 var roomUsers = {};
 
@@ -122,40 +136,35 @@ io.on("connection", function(socket){
             });
         }
     });
+    
+    // admin commands
+    socket.on("admin stop",function(){
+        io.emit("server stopping");
+        console.log("someone at %s executed admin command 'stop'",ip);
+        process.exit();
+    });
+    
+    socket.on("admin brainwash",function(){
+        io.emit("brainwash");
+        console.log("someone at %s executed admin command 'brainwash'",ip);
+    });
+    
+    socket.on("admin list",function(){
+        socket.emit("admin list",roomUsers);
+        console.log("someone at %s executed admin command 'list'",ip);
+    });
+    
+    socket.on("admin chat",function(data){
+        io.emit("chat message",{
+            text: data.text,
+            nick: "<pre>[console]</pre>",
+            time: new Date().toString(),
+            fromConsole: true
+        });
+        console.log("someone at %s sent message as console: '%s'",ip,data.text);
+    });
 });
 
 http.listen(3000, function(){
     console.log("listening on *:3000");
-});
-
-
-// listen for admin commands
-process.stdin.resume();
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', function (text) {
-    /*if (text.indexOf("kick:") == 0) {
-        var userNick = text.substring("kick: ".length).replace("\n","");
-        var userId = nickIdMap[userNick];
-        var userIp = clients[userId].ip;
-        clients[userId].socket.emit("kick","King Jimmy has spoken");
-        
-        kickList.push(userIp);
-        setTimeout(function(){
-            kickList.remove(this.indexOf(userIp));
-        },300000);
-        
-        console.log("%s was kicked: King Jimmy has spoken", userNick);
-    } else */if (text.indexOf("stop") == 0) {
-        io.emit("server stopping");
-        process.exit();
-    } else if (text.indexOf("brainwash") == 0) {
-        io.emit("brainwash");
-    } else {
-        io.emit("chat message", {
-            text: text,
-            nick: "<pre>[console]</pre>",
-            time: new Date().toString(),
-            fromConsole: true
-        })
-    }
 });
