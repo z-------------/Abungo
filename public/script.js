@@ -357,11 +357,7 @@ function main() {
     
     socket.on("kick", function(reason){
         alert("You have been kicked: " + reason);
-        if (reason != "nick already in use") {
-            history.back();
-        } else {
-            location.reload();
-        }
+        location.reload();
     });
     
     socket.on("still kicked",function(){

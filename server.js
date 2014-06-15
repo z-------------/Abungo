@@ -7,9 +7,20 @@ var fs = require("fs");
 
 app.use(bodyParser.urlencoded());
 
+function log(str,vars) {
+    var args = arguments;
+    for (i=1; i<args.length; i++) {
+        str = str.replace("%s",args[i]);
+    }
+    console.log(str);
+    for (i=0; i<adminList.length; i++) {
+        adminList[i].emit("admin log",str);
+    }
+}
+
 var adminPassword = "default";
 
-fs.readFile("adminpassword","utf8",function(err,content){
+fs.readFile(process.cwd() + "/adminpassword.txt","utf8",function(err,content){
     if (err) {
         throw err;
     } else {
@@ -30,7 +41,7 @@ app.post("/admin", function(req, res) {
     var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     if (req.body.password === adminPassword) {
         res.sendfile(__dirname + "/admin/auth.html");
-        console.log("someone at %s logged into admin dashboard",ip);
+        log("someone at %s logged into admin dashboard",ip);
     } else {
         res.sendfile(__dirname + "/admin/index.html");
     }
@@ -47,6 +58,7 @@ var roomUsers = {};
 var nickIdMap = {};
 var clients = {};
 var kickList = []; // a list of kicked ips
+var adminList = []; // a list of sockets that are connected from the admin dashboard
 
 io.on("connection", function(socket){
     var ip = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
@@ -54,7 +66,7 @@ io.on("connection", function(socket){
     var userRoom;
     var clientId = socket.id;
     
-    console.log("a user connected from %s", ip);
+    log("a user connected from %s", ip);
     
     socket.emit("try resume"); // tells the client to check if a nickname has already been chosen
     // useful when rejoining chat after idling (for example after computer sleeps)
@@ -68,9 +80,9 @@ io.on("connection", function(socket){
                 users: roomUsers[userRoom],
                 time: new Date().toString()
             });
-            console.log("%s (%s %s) disconnected", userNick, userRoom, ip);
+            log("%s (%s %s) disconnected", userNick, userRoom, ip);
         } else {
-            console.log("user at (%s) disconnected", ip);
+            log("user at (%s) disconnected", ip);
         }
     });
     
@@ -82,23 +94,25 @@ io.on("connection", function(socket){
             roomUsers[room] = []; // create array for this room if it doesn't yet exist
         }
         
-        console.log("user at %s chose nick '%s' and joined room '%s'", ip, nick, room);
+        log("user at %s chose nick '%s' and joined room '%s'", ip, nick, room);
         
         if (kickList.indexOf(ip) != -1) {
             socket.emit("still kicked");
         } else if (roomUsers[room].indexOf(nick) != -1) {
             socket.emit("kick","nick already in use");
-            console.log("%s (%s %s) was kicked: nick already in use", nick, room, ip);
+            log("%s (%s %s) was kicked: nick already in use", nick, room, ip);
         } else { // nick is not taken and ip isnt on kicklist
             clients[clientId] = {
                 socket: socket,
                 ip: ip
             }
             
+            log(clientId);
+            
             userNick = nick;
             userRoom = room;
             
-            nickIdMap[nick] = clientId;
+            nickIdMap[room + ":" + nick] = clientId;
             
             roomUsers[room].push(nick);
             
@@ -113,7 +127,7 @@ io.on("connection", function(socket){
             socket.on("chat message", function(msg){
                 msg.time = new Date().toString();
                 socket.broadcast.to(room).emit("chat message", msg);
-                console.log("%s (%s %s): %s", nick, room, ip, msg.text);
+                log("%s (%s %s): %s", nick, room, ip, msg.text);
             });
             
             socket.on("typing",function(){
@@ -129,7 +143,7 @@ io.on("connection", function(socket){
                 if (!(size > 20971520)) { // 20mb
                     data.time = new Date().toString();
                     socket.broadcast.to(room).emit("file share",data);
-                    console.log("%s (%s %s) shared a file: %s", nick, room, ip, data.name);
+                    log("%s (%s %s) shared a file: %s", nick, room, ip, data.name);
                 } else {
                     socket.emit("file too big");
                 }
@@ -137,45 +151,63 @@ io.on("connection", function(socket){
         }
     });
     
-    // admin commands
-    socket.on("admin stop",function(){
-        io.emit("server stopping");
-        console.log("someone at %s executed admin command 'stop'",ip);
-        process.exit();
-    });
-    
-    socket.on("admin brainwash",function(){
-        io.emit("brainwash");
-        console.log("someone at %s executed admin command 'brainwash'",ip);
-    });
-    
-    socket.on("admin list",function(){
-        socket.emit("admin list",roomUsers);
-        console.log("someone at %s executed admin command 'list'",ip);
-    });
-    
-    socket.on("admin disconall",function(){
-        var clientKeys = Object.keys(clients);
-        var sockets = io.sockets.sockets;
-        for (i=0; i<clientKeys.length; i++) {
-            if (clientKeys[i] !== clientId) {
-                clients[clientKeys[i]].socket.disconnect();
-            }
-        }
-        console.log("someone at %s executed admin command 'disconall'",ip);
-    });
-    
-    socket.on("admin chat",function(data){
-        io.emit("chat message",{
-            text: data.text,
-            nick: "<pre>[console]</pre>",
-            time: new Date().toString(),
-            fromConsole: true
+    socket.on("i am admin",function(){
+        adminList.push(socket);
+        
+        // admin commands
+        socket.on("admin stop",function(){
+            io.emit("server stopping");
+            log("admin at %s executed command 'stop'",ip);
+            process.exit();
         });
-        console.log("someone at %s sent message as console: '%s'",ip,data.text);
+        
+        socket.on("admin brainwash",function(){
+            io.emit("brainwash");
+            log("admin at %s executed command 'brainwash'",ip);
+        });
+        
+        socket.on("admin list",function(){
+            socket.emit("admin list",roomUsers);
+            log("admin at %s executed admin command 'list'",ip);
+        });
+        
+        socket.on("admin disconall",function(){
+            var clientKeys = Object.keys(clients);
+            for (i=0; i<clientKeys.length; i++) {
+                if (clientKeys[i] !== clientId) {
+                    clients[clientKeys[i]].socket.disconnect();
+                }
+            }
+            log("admin at %s executed command 'disconall'",ip);
+        });
+        
+        socket.on("admin chat",function(data){
+            io.emit("chat message",{
+                text: data.text,
+                nick: "<pre>[console]</pre>",
+                time: new Date().toString(),
+                fromConsole: true
+            });
+            log("admin at %s sent message as console: '%s'",ip,data.text);
+        });
+        
+        socket.on("kick",function(data){
+            var reason = data.reason;
+            var kickeeNick = data.nick;
+            var kickeeRoom = data.room;
+            var kickeeId = nickIdMap[kickeeRoom + ":" + kickeeNick];
+            if (clients[kickeeId]) {
+                var kickeeSocket = clients[kickeeId].socket;
+                kickeeSocket.emit("kick",reason);
+                kickeeSocket.disconnect();
+                log("admin at %s executed command 'kick %s:%s'",ip,kickeeRoom,kickeeNick);
+            } else {
+                log("admin at %s tried to kick %s (%s) but user wasn't found",ip,kickeeNick,kickeeRoom);
+            }
+        });
     });
 });
 
 http.listen(3000, function(){
-    console.log("listening on *:3000");
+    log("listening on *:3000");
 });
