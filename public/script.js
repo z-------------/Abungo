@@ -173,7 +173,7 @@ function main() {
         
     function isMobile() {
         //return (navigator.userAgent.toLowerCase().indexOf("mobile") != -1);
-        return (window.innerWidth <= 480);
+        return (window.innerWidth <= 480 || navigator.userAgent.toLowerCase().indexOf("mobile") != -1);
     }
     
     // actual script
