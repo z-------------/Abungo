@@ -21,9 +21,7 @@ function log(str,vars) {
 var adminPassword = "default";
 
 fs.readFile(process.cwd() + "/adminpassword.txt","utf8",function(err,content){
-    if (err) {
-        throw err;
-    } else {
+    if (!err) {
         adminPassword = content;
     }
 });
