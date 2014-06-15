@@ -35,13 +35,12 @@ A password is required to access admin tools. By default, the password is `defau
 
 First, you'll need to download and install [node.js](http://nodejs.org) if you haven't already.
 
-`cd` to the Abungo directory and install Socket.IO and Express:
+`cd` to the Abungo directory and install Socket.IO, Express and body-parser:
 
 ```bash
-npm install --save socket.io
-npm install --save express
-
-# save option automatically adds the package to package.json
+npm install socket.io
+npm install express
+npm install body-parser
 ```
 
 After you have everything installed, run `node server` from the Abungo directory. Navigate to `http://localhost:3000` in your browser to see it in action.
