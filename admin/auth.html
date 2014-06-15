@@ -45,6 +45,8 @@
                         socket.emit("admin brainwash");
                     } else if (this.value.indexOf("list") == 0) {
                         socket.emit("admin list");
+                    } else if (this.value.indexOf("disconall") == 0) {
+                        socket.emit("admin disconall");
                     } else {
                         socket.emit("admin chat",{
                             text: this.value

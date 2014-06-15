@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded());
 
 var adminPassword = "default";
 
-fs.readFile("adminpassword",function(err,content){
+fs.readFile("adminpassword","utf8",function(err,content){
     if (err) {
         throw err;
     } else {
@@ -152,6 +152,17 @@ io.on("connection", function(socket){
     socket.on("admin list",function(){
         socket.emit("admin list",roomUsers);
         console.log("someone at %s executed admin command 'list'",ip);
+    });
+    
+    socket.on("admin disconall",function(){
+        var clientKeys = Object.keys(clients);
+        var sockets = io.sockets.sockets;
+        for (i=0; i<clientKeys.length; i++) {
+            if (clientKeys[i] !== clientId) {
+                clients[clientKeys[i]].socket.disconnect();
+            }
+        }
+        console.log("someone at %s executed admin command 'disconall'",ip);
     });
     
     socket.on("admin chat",function(data){
