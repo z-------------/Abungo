@@ -209,6 +209,7 @@ form label input {
 a {
     text-decoration:none;
     color:#58b69b;
+    transition:none;
 }
 
 a:hover {
