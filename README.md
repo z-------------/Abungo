@@ -34,7 +34,7 @@ A password is required to access the admin dashboard. By default, the password i
 ```bash
 # the simplest way to do it
 
-printf "my_super_secure_password" >> adminpassword
+printf "my_super_secure_password" > adminpassword
 ```
 
 **It is not recommended to use the same password as your other accounts since Abungo is not encrypted**.
