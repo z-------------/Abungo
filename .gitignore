@@ -29,3 +29,6 @@ node_modules
 
 # Admin password file
 adminpassword
+
+# npm ignore file
+.npmignore
