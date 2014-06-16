@@ -29,7 +29,15 @@ Commands you can use:
 + `kick <room>:<nick>` - force a user to disconnect
 + `stop` - stop the server
 
-A password is required to access the admin dashboard. By default, the password is `default` and it can be changed by making an `adminpassword` file containing the new password in the Abungo directory. **It is not recommended to use the same password as your other accounts since Abungo is not encrypted**.
+A password is required to access the admin dashboard. By default, the password is `default` and it can be changed by making an `adminpassword` file containing the new password in the Abungo directory. 
+
+```bash
+# the simplest way to do it
+
+printf "my_super_secure_password" >> adminpassword
+```
+
+**It is not recommended to use the same password as your other accounts since Abungo is not encrypted**.
 
 ## Running Abungo
 
