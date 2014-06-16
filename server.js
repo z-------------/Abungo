@@ -5,6 +5,8 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var fs = require("fs");
 
+var packageJSON = require("./package.json");
+
 app.use(bodyParser.urlencoded());
 
 function log(str,vars) {
@@ -20,7 +22,7 @@ function log(str,vars) {
 
 var adminPassword = "default";
 
-fs.readFile(process.cwd() + "/adminpassword.txt","utf8",function(err,content){
+fs.readFile(process.cwd() + "/adminpassword","utf8",function(err,content){
     if (!err) {
         adminPassword = content;
     }
@@ -71,8 +73,11 @@ io.on("connection", function(socket){
     
     socket.on("disconnect", function(){
         if (userNick && userRoom) {
-            clients[clientId] = undefined;
+            delete clients[clientId];
             roomUsers[userRoom].remove(roomUsers[userRoom].indexOf(userNick));
+            if (roomUsers[userRoom].length == 0) {
+                delete roomUsers[userRoom];
+            }
             io.to(userRoom).emit("user left", {
                 nick: userNick,
                 users: roomUsers[userRoom],
@@ -96,7 +101,7 @@ io.on("connection", function(socket){
         
         if (kickList.indexOf(ip) != -1) {
             socket.emit("still kicked");
-        } else if (roomUsers[room].indexOf(nick) != -1) {
+        } else if (roomUsers[room].indexOf(nick) != -1 && nickIdMap[room + ":" + nick]) {
             socket.emit("kick","nick already in use");
             log("%s (%s %s) was kicked: nick already in use", nick, room, ip);
         } else { // nick is not taken and ip isnt on kicklist
@@ -164,7 +169,7 @@ io.on("connection", function(socket){
         
         socket.on("admin list",function(){
             socket.emit("admin list",roomUsers);
-            log("admin at %s executed admin command 'list'",ip);
+            log("admin at %s executed command 'list'",ip);
         });
         
         socket.on("admin disconall",function(){
@@ -203,6 +208,8 @@ io.on("connection", function(socket){
         });
     });
 });
+
+log("Abungo v%s started",packageJSON.version);
 
 http.listen(3000, function(){
     log("listening on *:3000");

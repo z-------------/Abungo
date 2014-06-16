@@ -5,7 +5,7 @@
         <style>
             *,*:before,*:after {
                 box-sizing:border-box;
-                font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+                font-family:Menlo,Consolas,"Courier New",monospace;
                 margin:0;
                 padding:0;
             }
@@ -24,7 +24,6 @@
             }
             
             #command, li {
-                font-family:Menlo,Consolas,"Courier New",monospace;
                 display:block;
                 width:100%;
                 border:none;
@@ -39,6 +38,10 @@
                 left:0;
                 bottom:0;
                 height:58px;
+            }
+            
+            ::-webkit-input-placeholder, ::-moz-placeholder {
+                color:#090;
             }
             
             #log {
@@ -56,7 +59,7 @@
     </head>
     <body>
         <ul id="log"></ul>
-        <input id="command">
+        <input id="command" placeholder="Command">
             
         <script src="/socket.io/socket.io.js"></script>
         
@@ -71,11 +74,19 @@
                 this.scrollTop = this.scrollHeight;
             }
             
+            function newLine(text,raw) {
+                var liNode = document.createElement("li");
+                if (text) {
+                    liNode.textContent = text;
+                } else {
+                    liNode.innerHTML = "<br>";
+                }
+                $("#log").append(liNode);
+            }
+            
             $("#command").onkeydown = function(e){
                 if (e.which == 13) {
-                    if (this.value == "stop") {
-                        socket.emit("admin stop");
-                    } else if (this.value == "brainwash") {
+                    if (this.value == "brainwash") {
                         socket.emit("admin brainwash");
                     } else if (this.value == "list") {
                         socket.emit("admin list");
@@ -95,32 +106,30 @@
                             reason: "King Jimmy has spoken"
                         });
                     } else {
-                        var liNode = document.createElement("li");
-                        liNode.textContent = "Unknown command '"+this.value+"'";
-                        $("#log").append(liNode);
+                        newLine("Invalid command '"+this.value+"'");
                     }
                     this.value = "";
                 }
             }
             
-            window.onload = window.onfocus = window.onclick = function(){
+            window.onload = function(){
                 $("#command").focus();
             }
             
             socket.on("admin list",function(list){
-                var listStr = JSON.stringify(list);
-                var liNode = document.createElement("li");
-                liNode.textContent = listStr;
-                $("#log").append(liNode);
+                newLine(JSON.stringify(list));
             });
             
             socket.on("admin log",function(str){
-                var liNode = document.createElement("li");
-                liNode.textContent = str;
-                $("#log").append(liNode);
+                newLine(str);
             });
             
             socket.emit("i am admin");
+            
+            newLine("+-- Abungo Admin Dashboard --+");
+            newLine();
+            newLine("get help at http://github.com/z-------------/Abungo#admin-dashboard");
+            newLine();
         </script>
     </body>
 </html>

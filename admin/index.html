@@ -2,13 +2,35 @@
 <html>
     <head>
         <title>Abungo Admin Dashboard</title>
+        <style>
+            *,*:before,*:after {
+                box-sizing:border-box;
+                margin:0;
+                padding:0;
+                font-family:Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+            }
+            
+            body {
+                text-align:center;
+            }
+            
+            h1 {
+                font-size:50px;
+                text-align:center;
+                margin:50px 0;
+            }
+            
+            input {
+                margin:0 10px;
+            }
+        </style>
     </head>
     <body>
         <h1>Abungo Admin Dashboard</h1>
         <form method="post">
             <label>
                 Password
-                <input type="password" name="password">
+                <input type="password" name="password" autofocus>
             </label>
         </form>
     </body>

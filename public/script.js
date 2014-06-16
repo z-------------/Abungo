@@ -1,9 +1,9 @@
-var socket = io();
-
 var $ = function(selector){return document.querySelector(selector)};
 var $$ = function(selector){return document.querySelectorAll(selector)};
 
 var nick, room;
+
+var connectionTime;
 
 function encodeHTML(string) {
     var tempDiv = document.createElement("div");
@@ -45,10 +45,7 @@ function chooseNick(){
     nick = encodeHTML($("#nick_input").value.substring(0,100));
     room = encodeHTML($("#chatroom").value.toLowerCase().substring(0,100));
     if (nick.split(" ").join("").length && room.split(" ").join("").length) {
-        socket.emit("nick chosen",{
-            nick: nick,
-            room: room
-        });
+        connectionTime = new Date().getTime();
         localStorage.lastNick = nick;
         localStorage.lastRoom = room;
         $("#welcome").style.opacity = "0";
@@ -62,13 +59,24 @@ function chooseNick(){
     }
 };
 
-socket.on("try resume",function(){
-    if (nick) {
-        socket.emit("nick chosen",nick);
-    }
-})
-
-function main() {    
+function main() {
+    var socket = io();
+    
+    socket.emit("nick chosen",{
+        nick: nick,
+        room: room
+    });
+    
+    socket.on("try resume",function(){
+        var now = new Date().getTime();
+        if (nick && room && (now - connectionTime >= 20000)) { // connected to a room at least 20 seconds ago
+            socket.emit("nick chosen",{
+                nick: nick,
+                room: room
+            });
+        }
+    });
+    
     var onlineUsers = [];
     var typingList = [];
     var unreadCount = 0;
@@ -84,7 +92,7 @@ function main() {
     
     var autoLinkOptions = {
         callback: function(url) {
-            return "<a href='"+url+"' target='_blank'>"+url+"</a>";
+            return "<a href='"+url+"'>"+url+"</a>";
         }
     }
     
@@ -220,13 +228,13 @@ function main() {
             });
             
             if (file.type.indexOf("image/") != -1) {
-                writeListItem(nick,"<a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'></a>","self")
+                writeListItem(nick,"<a href='"+blobURL+"'><img src='"+blobURL+"'></a>","self")
             } else if (file.type.indexOf("video/") != -1) {
-                writeListItem(nick,"<video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self")
+                writeListItem(nick,"<video src='"+blobURL+"' controls></video><a href='"+blobURL+"'>"+file.name+"</a>","self")
             } else if (file.type.indexOf("audio/") != -1) {
-                writeListItem(nick,"<audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self");
+                writeListItem(nick,"<audio src='"+blobURL+"' controls></audio><a href='"+blobURL+"'>"+file.name+"</a>","self");
             } else {
-                writeListItem(nick,"<a target='_blank' href='"+blobURL+"'>"+file.name+"</a>","self")
+                writeListItem(nick,"<a href='"+blobURL+"'>"+file.name+"</a>","self")
             }
             
             closeFileOpts();
@@ -325,7 +333,7 @@ function main() {
         
         videoStream.stop();
         
-        writeListItem(nick,"<img src='"+dataURI+"'/>","self");
+        writeListItem(nick,"<a href='"+dataURI+"'><img src='"+dataURI+"'></a>","self");
         
         closeFileOpts();
     }
@@ -389,13 +397,13 @@ function main() {
         }
         
         if (data.type.indexOf("image/") != -1) {
-            writeListItem(data.nick,"<a target='_blank' href='"+blobURL+"' target='_blank'><img src='"+blobURL+"'></a>","normal")
+            writeListItem(data.nick,"<a href='"+blobURL+"'><img src='"+blobURL+"'></a>","normal")
         } else if (data.type.indexOf("video/") != -1) {
-            writeListItem(data.nick,"<video src='"+blobURL+"' controls></video><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal")
+            writeListItem(data.nick,"<video src='"+blobURL+"' controls></video><a href='"+blobURL+"'>"+data.name+"</a>","normal")
         } else if (data.type.indexOf("audio/") != -1) {
-            writeListItem(data.nick,"<audio src='"+blobURL+"' controls></audio><a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal");
+            writeListItem(data.nick,"<audio src='"+blobURL+"' controls></audio><a href='"+blobURL+"'>"+data.name+"</a>","normal");
         } else {
-            writeListItem(data.nick,"<a target='_blank' href='"+blobURL+"'>"+data.name+"</a>","normal")
+            writeListItem(data.nick,"<a href='"+blobURL+"'>"+data.name+"</a>","normal")
         }
     });
     
