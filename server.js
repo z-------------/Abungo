@@ -83,6 +83,7 @@ io.on("connection", function(socket){
                 users: roomUsers[userRoom],
                 time: new Date().toString()
             });
+            io.to(userRoom).emit("stopped typing", userNick);
             log("%s (%s %s) disconnected", userNick, userRoom, ip);
         } else {
             log("user at (%s) disconnected", ip);
