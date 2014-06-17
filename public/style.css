@@ -1,10 +1,7 @@
 /*
  * Camerca icon by Designmodo
- * Microphone icon by Stephen Hutchings - http://typicons.com/
  * Folder icon by Ionicons - http://ionicons.com/
  */
-
-@import url(//fonts.googleapis.com/css?family=Lato:300,400,700);
 
 @-webkit-keyframes new_message {
     from {opacity:0}
@@ -293,7 +290,7 @@ h1:before {
     color:rgba(255,255,255,.5);
 }
 
-#messages audio,  #messages video {
+#messages video {
     display:block;
     margin-bottom:5px;
     max-width:100%;
