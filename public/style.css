@@ -4,7 +4,7 @@
  * Folder icon by Ionicons - http://ionicons.com/
  */
 
-@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
+@import url(//fonts.googleapis.com/css?family=Lato:300,400,700);
 
 @-webkit-keyframes new_message {
     from {opacity:0}
@@ -506,8 +506,13 @@ pre {
     
     #messages {
         padding-top:47px;
-        padding-bottom:80px;
-        -webkit-mask-image:linear-gradient(black -webkit-calc(100% - 100px), black -webkit-calc(100% - 60px),transparent -webkit-calc(100% - 60px));
+        padding-bottom:0;
+        height:calc(100% - 60px);
+        -webkit-mask-image:linear-gradient(black, black calc(100% - 5px), rgba(0,0,0,.5) calc(100% - 5px));
+    }
+    
+    #messages > :last-child {
+        margin-bottom:20px;
     }
     
     #m {
