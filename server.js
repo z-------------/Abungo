@@ -75,7 +75,7 @@ io.on("connection", function(socket){
         if (userNick && userRoom) {
             delete clients[clientId];
             roomUsers[userRoom].remove(roomUsers[userRoom].indexOf(userNick));
-            if (roomUsers[userRoom].length == 0) {
+            if (roomUsers[userRoom].length === 0) {
                 delete roomUsers[userRoom];
             }
             io.to(userRoom).emit("user left", {
@@ -142,7 +142,7 @@ io.on("connection", function(socket){
             
             socket.on("file share",function(data){
                 var size = data.file.length;
-                if (!(size > 20971520)) { // 20mb
+                if (size <= 20971520) { // 20mb
                     data.time = new Date().toString();
                     socket.broadcast.to(room).emit("file share",data);
                     log("%s (%s %s) shared a file: %s", nick, room, ip, data.name);

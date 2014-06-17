@@ -57,7 +57,7 @@ function chooseNick(){
         alert("Choose a nickname and room");
         $("#nick_input").focus();
     }
-};
+}
 
 function main() {
     var socket = io();
@@ -118,7 +118,7 @@ function main() {
     }
     
     function writeListItem(nick,content,cssClass) {
-        var wasAtBottom = $("#messages").scrollBottom() == 0;
+        var wasAtBottom = $("#messages").scrollBottom() === 0;
         
         var liNode = document.createElement("li");
         liNode.innerHTML = "<div class='message'><strong>%nick%</strong>%content%</div>".replaceVars({
@@ -173,7 +173,7 @@ function main() {
             typings[i].parentElement.removeChild(typings[i]);
         }
         for (i=0; i<tListKeys.length; i++) {
-            if (typingList[tListKeys[i]] == true) {
+            if (typingList[tListKeys[i]] === true) {
                 writeListItem(tListKeys[i]," is typing","normal typing");
             }
         }
@@ -194,7 +194,7 @@ function main() {
     $("form").onsubmit = function(e){
         e.preventDefault();
         var text = $("#m").value.substring(0,10000);
-        if ($("#m").value.split(" ").join("").length != 0) {
+        if ($("#m").value.split(" ").join("").length !== 0) {
             socket.emit("chat message",{
                 text: text,
                 nick: nick
@@ -341,10 +341,9 @@ function main() {
     socket.on("chat message", function(msg){
         var text = msg.text;
         var sender = msg.nick;
-        var time = msg.time;
         var type;
         
-        msg.fromConsole == true ? type = "normal console" : type = "normal";
+        msg.fromConsole === true ? type = "normal console" : type = "normal";
         
         writeListItem(sender,encodeHTML(text).autoLink(autoLinkOptions), type);
     });
