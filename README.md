@@ -53,4 +53,4 @@ npm install body-parser
 
 After you have everything installed, run `node server` from the Abungo directory. Navigate to `http://localhost:3000` in your browser to see it in action.
 
-You might also want to check it live at http://abungo.jit.su
+You might also want to check it out live at https://abungo.jit.su
