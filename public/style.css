@@ -4,13 +4,25 @@
  */
 
 @-webkit-keyframes new_message {
-    from {opacity:0}
-    to {opacity:1}
+    from {
+        opacity:0;
+        -webkit-transform:translateY(50px);
+    }
+    
+    to {
+        opacity:1;
+    }
 }
 
 @keyframes new_message {
-    from {opacity:0}
-    to {opacity:1}
+    from {
+        opacity:0;
+        transform:translateY(50px);
+    }
+    
+    to {
+        opacity:1;
+    }
 }
 
 *,*:before,*:after {
@@ -55,12 +67,17 @@ form {
     height:60px;
 }
 
+::-moz-placeholder {
+    opacity:1;
+    color:rgb(169, 169, 169);
+}
+
 #messages {
     list-style-type: none;
     height:100%;
     width:100%;
     overflow-y:auto;
-    -webkit-mask-image: linear-gradient(black -webkit-calc(100% - 100px), transparent 100%);
+    -webkit-mask-image: linear-gradient(black calc(100% - 100px), transparent 100%);
 }
 
 #messages li {
@@ -157,7 +174,6 @@ form {
 #users, #current_room {
     width:300px;
     margin:20px;
-    max-width:-webkit-calc(100% / 2 - 220px - 40px);
     max-width:calc(100% / 2 - 220px - 40px);
     overflow-y:auto;
     color:white;
@@ -189,7 +205,6 @@ form label input {
     width: 60px;
     position: absolute;
     bottom: 0;
-    left: -webkit-calc(50% + 150px);
     left: calc(50% + 150px);
     margin: 20px;
     background-image: url(img/attachment.png);
@@ -281,10 +296,6 @@ h1:before {
     position:absolute;
     left:20px;
     top:15px;
-}
-
-#nick_choose input::-webkit-input-placeholder,  #nick_choose input:-moz-input-placeholder {
-    color:rgba(255,255,255,.5);
 }
 
 #messages video {
@@ -509,7 +520,6 @@ pre {
     #m {
         margin-bottom:0;
         margin-left:-50%;
-        width:-webkit-calc(100% - 60px);
         width:calc(100% - 60px);
     }
     

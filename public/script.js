@@ -117,6 +117,10 @@ function main() {
         return returnVal;
     }
     
+    HTMLElement.prototype.remove = function() {
+        this.parentElement.removeChild(this);
+    }
+    
     function writeListItem(nick,content,cssClass) {
         var wasAtBottom = $("#messages").scrollBottom() === 0;
         
@@ -143,7 +147,9 @@ function main() {
         }
         
         if (cssClass.indexOf("typing") == -1) {
-            updateTypingList();
+            moveTypersToBottom();
+        } else {
+            liNode.dataset.typer = nick;
         }
     }
     
@@ -167,15 +173,26 @@ function main() {
     }
     
     function updateTypingList() {
-        var tListKeys = Object.keys(typingList).sort();
-        var typings = $$("li.typing");
-        for (i=0; i<typings.length;i++) {
-            typings[i].parentElement.removeChild(typings[i]);
-        }
-        for (i=0; i<tListKeys.length; i++) {
-            if (typingList[tListKeys[i]] === true) {
-                writeListItem(tListKeys[i]," is typing","normal typing");
+        var typers = Object.keys(typingList).sort();
+        var typingElems = $$("li.typing");
+        for (i=0; i<typers.length; i++) {
+            if (!$("li.typing[data-typer="+typers[i]+"]")) {
+                writeListItem(typers[i], " is typing", "normal typing");
             }
+        }
+        for (i=0; i<typingElems.length; i++) {
+            if (typers.indexOf(typingElems[i].dataset.typer) == -1) {
+                typingElems[i].remove();
+            }
+        }
+    }
+    
+    function moveTypersToBottom() {
+        var typingElems = $$("li.typing");
+        for (i=0; i<typingElems.length; i++) {
+            var typer = typingElems[i].dataset.typer;
+            typingElems[i].remove();
+            writeListItem(typer," is typing","normal typing old");
         }
     }
         
@@ -378,7 +395,7 @@ function main() {
     });
     
     socket.on("stopped typing",function(nick){
-        typingList[nick] = false;
+        delete typingList[nick];
         updateTypingList();
     });
     
