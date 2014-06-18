@@ -207,6 +207,12 @@ io.on("connection", function(socket){
                 log("admin at %s tried to kick %s (%s) but user wasn't found",ip,kickeeNick,kickeeRoom);
             }
         });
+        
+        socket.on("admin version",function(){
+            var version = require("./package.json").version;
+            socket.emit("admin version",version);
+            log("admin at %s executed command 'version'",ip);
+        })
     });
 });
 

@@ -19,7 +19,6 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-transition: .3s;
     transition: .3s;
     font-size: 17px;
     font-family:Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -229,7 +228,6 @@ a:hover {
 }
 
 #welcome,#welcome * {
-    -webkit-transition:opacity .3s;
     transition:opacity .3s;
 }
 
@@ -259,7 +257,6 @@ a:hover {
     border-radius:0;
     width:200px;
     margin-left:20px;
-    -webkit-transition:border .3s;
     transition:border .3s;
 }
 
@@ -323,7 +320,6 @@ h1:before {
     height:0;
     background:rgba(255,255,255,.7);
     border-radius:5px;
-    -webkit-transition:.3s;
     transition:.3s;
     margin-left:130px;
     overflow:hidden;
@@ -388,7 +384,6 @@ h1:before {
     border-width: 20px 20px 0 20px;
     border-color: transparent;
     margin-left: 180px;
-    -webkit-transition:border-color .3s;
     transition:border-color .3s;
 }
 
@@ -411,7 +406,6 @@ h1:before {
     background-position:center;
     background-repeat:no-repeat;
     opacity:.7;
-    -webkit-transition:opacity .3s;
     transition:opacity .3s;
     cursor:pointer;
 }

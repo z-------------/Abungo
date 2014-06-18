@@ -105,6 +105,8 @@
                             room: room,
                             reason: "King Jimmy has spoken"
                         });
+                    } else if (this.value.indexOf("version") == 0) {
+                        socket.emit("admin version");
                     } else {
                         newLine("Invalid command '"+this.value+"'");
                     }
@@ -122,6 +124,10 @@
             
             socket.on("admin log",function(str){
                 newLine(str);
+            });
+            
+            socket.on("admin version",function(version){
+                newLine("Abungo v" + version);
             });
             
             socket.emit("i am admin");
