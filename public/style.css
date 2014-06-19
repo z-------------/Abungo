@@ -300,7 +300,7 @@ h1:before {
     top:15px;
 }
 
-#messages video {
+#messages video, #messages audio {
     display:block;
     margin-bottom:5px;
     max-width:100%;
