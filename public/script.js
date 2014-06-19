@@ -176,7 +176,7 @@ function main() {
         var typers = Object.keys(typingList).sort();
         var typingElems = $$("li.typing");
         for (i=0; i<typers.length; i++) {
-            if (!$("li.typing[data-typer="+typers[i]+"]")) {
+            if (!$("li.typing[data-typer='"+typers[i]+"']")) {
                 writeListItem(typers[i], " is typing", "normal typing");
             }
         }
