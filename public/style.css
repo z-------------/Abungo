@@ -4,25 +4,23 @@
  */
 
 @-webkit-keyframes new_message {
-    from {
-        opacity:0;
-        -webkit-transform:translateY(50px);
-    }
-    
-    to {
-        opacity:1;
-    }
+    from { opacity:0; }
+    to { opacity:1; }
 }
 
 @keyframes new_message {
-    from {
-        opacity:0;
-        transform:translateY(50px);
-    }
-    
-    to {
-        opacity:1;
-    }
+    from { opacity:0; }
+    to { opacity:1; }
+}
+
+@-webkit-keyframes new_message_transform {
+    from { -webkit-transform:translateY(50px); }
+    to { -webkit-transform:translateY(0); }
+}
+
+@keyframes new_message_transform {
+    from { transform:translateY(50px); }
+    to { transform:translateY(0); }
 }
 
 *,*:before,*:after {
@@ -95,8 +93,12 @@ form {
     background:white;
     width:auto;
     word-wrap: break-word;
-    -webkit-animation:new_message .3s;
-    animation:new_message .3s;
+    
+    -webkit-animation-duration: .3s;
+    -webkit-animation-name: new_message, new_message_transform;
+    animation-duration: .3s;
+    animation-name: new_message, new_message_transform;
+    
     display:inline-block;
     padding: 20px;
     padding-top: 15px;
@@ -464,6 +466,11 @@ pre {
         padding:15px;
     }
     
+    #messages li div {
+        animation-name: new_message;
+        -webkit-animation-name: new_message;
+    }
+    
     #users, #current_room {
         position:fixed;
         top:0;
@@ -508,7 +515,6 @@ pre {
     
     #messages {
         padding-top:47px;
-        padding-bottom:0;
         height:calc(100% - 60px);
         -webkit-mask-image:linear-gradient(black, black calc(100% - 5px), rgba(0,0,0,.5) calc(100% - 5px));
     }
