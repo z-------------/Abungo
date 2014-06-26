@@ -408,18 +408,18 @@ function main() {
         if (typeof data.file == "string") {
             blobURL = data.file;
         } else {
-            var blob = new Blob([data.file],{type:data.type});
+            var blob = new Blob([data.file], {type: data.type});
             blobURL = URL.createObjectURL(blob);
         }
         
         if (data.type.indexOf("image/") != -1) {
-            writeListItem(data.nick,"<a href='"+blobURL+"'><img src='"+blobURL+"'></a>","normal")
+            writeListItem(data.nick,"<a href='"+blobURL+"'><img src='"+blobURL+"'></a>","normal");
         } else if (data.type.indexOf("video/") != -1) {
-            writeListItem(data.nick,"<video src='"+blobURL+"' controls></video><a href='"+blobURL+"'>"+data.name+"</a>","normal")
+            writeListItem(data.nick,"<video src='"+blobURL+"' controls></video><a href='"+blobURL+"'>"+data.name+"</a>","normal");
         } else if (data.type.indexOf("audio/") != -1) {
             writeListItem(data.nick,"<audio src='"+blobURL+"' controls></audio><a href='"+blobURL+"'>"+data.name+"</a>","normal");
         } else {
-            writeListItem(data.nick,"<a href='"+blobURL+"'>"+data.name+"</a>","normal")
+            writeListItem(data.nick,"<a href='"+blobURL+"'>"+data.name+"</a>","normal");
         }
     });
     

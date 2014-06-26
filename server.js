@@ -22,7 +22,7 @@ function log(str,vars) {
 
 var adminPassword = "default";
 
-fs.readFile(process.cwd() + "/adminpassword","utf8",function(err,content){
+fs.readFile(process.cwd() + "/adminpassword", "utf8", function(err,content){
     if (!err) {
         adminPassword = content;
     }
@@ -61,7 +61,7 @@ var kickList = []; // a list of kicked ips
 var adminList = []; // a list of sockets that are connected from the admin dashboard
 
 io.on("connection", function(socket){
-    var ip = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+    var ip = socket.handshake.headers["x-forwarded-for"] || socket.request.connection.remoteAddress;
     var userNick;
     var userRoom;
     var clientId = socket.id;
@@ -216,7 +216,7 @@ io.on("connection", function(socket){
     });
 });
 
-log("Abungo v%s started",packageJSON.version);
+log("Abungo v%s started", packageJSON.version);
 
 http.listen(3000, function(){
     log("listening on *:3000");
