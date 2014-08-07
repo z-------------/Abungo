@@ -23,7 +23,7 @@
     to { transform:translateY(0); }
 }
 
-*,*:before,*:after {
+*, :before, :after {
     margin: 0;
     padding: 0;
     -webkit-box-sizing: border-box;
@@ -31,10 +31,11 @@
     box-sizing: border-box;
     transition: .3s;
     font-size: 17px;
-    font-family:Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
-*:focus {
+:focus {
     outline:none;
 }
 
@@ -252,7 +253,7 @@ a:hover {
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-top: -115px;
+    margin-top: -140px;
     margin-left: -133px;
     text-align: center;
     color:white;
@@ -410,50 +411,60 @@ h1:before {
 }
 
 .fileoption {
-    display:inline-block;
-    height:40px;
-    width:40px;
-    margin:0 10px;
-    -webkit-background-size:cover;
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-    opacity:.7;
-    transition:opacity .3s;
-    cursor:pointer;
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    margin: 0 10px;
+    -webkit-background-size: cover;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: .7;
+    transition: opacity .3s;
+    cursor: pointer;
 }
 
 .fileoption:hover {
-    opacity:1;
+    opacity: 1;
 }
 
 #take_photo {
-    background-image:url(img/file_sharing/camera.png);
+    background-image: url(img/file_sharing/camera.png);
 }
 
 #attach_file {
-    background-image:url(img/file_sharing/folder.png);
+    background-image: url(img/file_sharing/folder.png);
 }
 
 pre {
-    font-family:Menlo,Consolas,"Courier New",Courier,monospace;
+    font-family: Menlo, Consolas, "Courier New", Courier, monospace;
 }
 
 #tagline * {
-    font-size:13px;
+    font-size: 13px;
 }
 
 #tagline span {
-    margin:0 10px;
+    margin: 0 10px;
 }
 
 #welcome a {
-    color:rgba(255,255,255,.5);
+    color: rgba(255,255,255,.5);
 }
 
 #welcome a:hover {
-    color:white;
-    border-bottom:solid 1px rgba(255,255,255,.5);
+    color: white;
+    border-bottom: solid 1px rgba(255,255,255,.5);
+}
+
+#welcome button {
+    background: rgba(255, 255, 255, .3);
+    border: none;
+    color: inherit;
+    padding: 10px;
+    margin: 20px 0;
+    cursor: pointer;
+    width: 100%;
 }
 
 @media only screen and (max-width:480px) {
@@ -539,5 +550,17 @@ pre {
     
     #filearrow {
         display:none;
+    }
+    
+    h1 {
+        margin-bottom: 20px;
+    }
+    
+    #nick_choose {
+        margin-top: -115px;
+    }
+    
+    #nick_choose input {
+        height: 50px;
     }
 }
