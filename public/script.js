@@ -34,13 +34,12 @@ $("#nick_input").focus();
 
 $("#nick_input").onkeydown = function (e) {
     if (e.which === 13) { // enter
-        //chooseNick();
         $("#chatroom").focus();
     }
 };
 
-$("#chatroom").onkeydown = function (e) {
-    if (e.which === 13) {
+$("#chatroom").onkeydown = $("#enter").onclick = function (e) {
+    if (e.which === 13 || e.which === 1) { // also accept 1 to make it work with enter button's onclick
         chooseNick();
     }
 };
