@@ -222,7 +222,7 @@ function main() {
                 nick: nick
             });
             socket.emit("stopped typing");
-            writeListItem(nick, encodeHTML(text).autoLink(autoLinkOptions), "self");
+            writeListItem(nick, encodeHTML(text).autoLink(autoLinkOptions).replace(/\(y\)/g, "<img class='thumbsup' src='img/thumb.svg'>"), "self");
         }
         this.reset();
     };
@@ -367,7 +367,7 @@ function main() {
 
         msg.fromConsole === true ? type = "normal console" : type = "normal";
 
-        writeListItem(sender, encodeHTML(text).autoLink(autoLinkOptions), type);
+        writeListItem(sender, encodeHTML(text).autoLink(autoLinkOptions).replace(/\(y\)/g, "<img class='thumbsup' src='img/thumb.svg'>"), type);
     });
 
     socket.on("user joined", function (data) {
