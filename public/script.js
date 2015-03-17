@@ -222,7 +222,10 @@ function main() {
                 nick: nick
             });
             socket.emit("stopped typing");
-            writeListItem(nick, encodeHTML(text).autoLink(autoLinkOptions).replace(/\(y\)/g, "<img class='thumbsup' src='img/thumb.svg'>"), "self");
+            writeListItem(nick, encodeHTML(text).autoLink(autoLinkOptions)
+                          .replace(/:y:/g, "<img class='thumbsup' src='img/emote/thumb.svg'>")
+                          .replace(/:y1:/g, "<img class='thumbsup med' src='img/emote/thumb.svg'>")
+                          .replace(/:y2:/g, "<img class='thumbsup big' src='img/emote/thumb.svg'>"), "self");
         }
         this.reset();
     };
