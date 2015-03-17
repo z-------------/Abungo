@@ -467,24 +467,28 @@ pre {
     width: 100%;
 }
 
-img.thumbsup, img.gourd {
+.emote {
     display: inline-block;
     width: 20px;
     height: 20px;
     background: transparent !important;
 }
 
-img.thumbsup.med, img.gourd.med {
+.emote.med, .emote.big, .emote.huge {
+    display: block;
+}
+
+.emote.med {
     width: 40px;
     height: 40px;
 }
 
-img.thumbsup.big, img.gourd.big {
+.emote.big {
     width: 100px;
     height: 100px;
 }
 
-img.approve {
+.emote.huge {
     width: 300px;
     height: 300px;
 }
