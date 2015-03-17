@@ -150,7 +150,7 @@ function main() {
         var wasAtBottom = $("#messages").scrollBottom() === 0;
 
         var liNode = document.createElement("li");
-        liNode.innerHTML = "<div class='message'><strong>%nick%</strong>%content%</div>".replaceVars({
+        liNode.innerHTML = ("<div class='message'>" + (cssClass === "self" ? "" : "<strong>%nick%</strong>") + "%content%</div>").replaceVars({
             nick: nick,
             content: content
         });
