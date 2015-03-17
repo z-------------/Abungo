@@ -21,6 +21,16 @@ function decodeHTML(string) {
     return tempDiv.textContent;
 }
 
+function addEmotes(string) {
+    return string.replace(/:y:/g, "<img class='thumbsup' src='img/emote/thumb.svg'>")
+                  .replace(/:y1:/g, "<img class='thumbsup med' src='img/emote/thumb.svg'>")
+                  .replace(/:y2:/g, "<img class='thumbsup big' src='img/emote/thumb.svg'>")
+                  .replace(/:gourd:/g, "<img class='gourd' src='img/emote/gourd.svg'>")
+                  .replace(/:gourd1:/g, "<img class='gourd med' src='img/emote/gourd.svg'>")
+                  .replace(/:gourd2:/g, "<img class='gourd big' src='img/emote/gourd.svg'>")
+                  .replace(/:approve:/g, "<img class='approve' src='img/emote/seal.svg'>");
+}
+
 if (localStorage.lastNick) {
     $("#nick_input").value = decodeHTML(localStorage.lastNick);
 }
@@ -222,14 +232,7 @@ function main() {
                 nick: nick
             });
             socket.emit("stopped typing");
-            writeListItem(nick, encodeHTML(text).autoLink(autoLinkOptions)
-                          .replace(/:y:/g, "<img class='thumbsup' src='img/emote/thumb.svg'>")
-                          .replace(/:y1:/g, "<img class='thumbsup med' src='img/emote/thumb.svg'>")
-                          .replace(/:y2:/g, "<img class='thumbsup big' src='img/emote/thumb.svg'>")
-                          .replace(/:gourd:/g, "<img class='gourd' src='img/emote/gourd.svg'>")
-                          .replace(/:gourd1:/g, "<img class='gourd med' src='img/emote/gourd.svg'>")
-                          .replace(/:gourd2:/g, "<img class='gourd big' src='img/emote/gourd.svg'>")
-                          .replace(/:approve:/g, "<img class='approve' src='img/emote/seal.svg'>"), "self");
+            writeListItem(nick, addEmotes(encodeHTML(text).autoLink(autoLinkOptions)), "self");
         }
         this.reset();
     };
@@ -374,7 +377,7 @@ function main() {
 
         msg.fromConsole === true ? type = "normal console" : type = "normal";
 
-        writeListItem(sender, encodeHTML(text).autoLink(autoLinkOptions).replace(/\(y\)/g, "<img class='thumbsup' src='img/thumb.svg'>"), type);
+        writeListItem(sender, addEmotes(encodeHTML(text).autoLink(autoLinkOptions)), type);
     });
 
     socket.on("user joined", function (data) {
