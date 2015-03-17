@@ -225,7 +225,11 @@ function main() {
             writeListItem(nick, encodeHTML(text).autoLink(autoLinkOptions)
                           .replace(/:y:/g, "<img class='thumbsup' src='img/emote/thumb.svg'>")
                           .replace(/:y1:/g, "<img class='thumbsup med' src='img/emote/thumb.svg'>")
-                          .replace(/:y2:/g, "<img class='thumbsup big' src='img/emote/thumb.svg'>"), "self");
+                          .replace(/:y2:/g, "<img class='thumbsup big' src='img/emote/thumb.svg'>")
+                          .replace(/:gourd:/g, "<img class='gourd' src='img/emote/gourd.svg'>")
+                          .replace(/:gourd1:/g, "<img class='gourd med' src='img/emote/gourd.svg'>")
+                          .replace(/:gourd2:/g, "<img class='gourd big' src='img/emote/gourd.svg'>")
+                          .replace(/:approve:/g, "<img class='approve' src='img/emote/seal.svg'>"), "self");
         }
         this.reset();
     };

@@ -467,21 +467,26 @@ pre {
     width: 100%;
 }
 
-img.thumbsup {
+img.thumbsup, img.gourd {
     display: inline-block;
     width: 20px;
     height: 20px;
     background: transparent !important;
 }
 
-img.thumbsup.med {
+img.thumbsup.med, img.gourd.med {
     width: 40px;
     height: 40px;
 }
 
-img.thumbsup.big {
+img.thumbsup.big, img.gourd.big {
     width: 100px;
     height: 100px;
+}
+
+img.approve {
+    width: 300px;
+    height: 300px;
 }
 
 @media only screen and (max-width:480px) {
