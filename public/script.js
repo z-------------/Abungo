@@ -25,9 +25,11 @@ function addEmotes(string) {
     return string.replace(/:y:/g, "<img class='emote' src='img/emote/thumb.svg'>")
                   .replace(/:y1:/g, "<img class='emote med' src='img/emote/thumb.svg'>")
                   .replace(/:y2:/g, "<img class='emote big' src='img/emote/thumb.svg'>")
+                  .replace(/:y3:/g, "<img class='emote huge' src='img/emote/thumb.svg'>")
                   .replace(/:gourd:/g, "<img class='emote' src='img/emote/gourd.svg'>")
                   .replace(/:gourd1:/g, "<img class='emote med' src='img/emote/gourd.svg'>")
                   .replace(/:gourd2:/g, "<img class='emote big' src='img/emote/gourd.svg'>")
+                  .replace(/:gourd3:/g, "<img class='emote huge' src='img/emote/gourd.svg'>")
                   .replace(/:approve:/g, "<img class='emote huge' src='img/emote/seal.svg'>")
                   .replace(/HARFITT/g, "<span style='font-family: \"Comic Sans MS\", sans-serif; font-weight: 700; text-shadow: 0 1px 3px rgba(0, 0, 0, .5);'>\
 <span style='color: red'>H</span>\
