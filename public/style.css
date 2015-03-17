@@ -144,6 +144,10 @@ form {
     left:-20px;
 }
 
+#messages li.self div {
+    padding-top: 20px;
+}
+
 #messages li.self div:after {
     border-width: 20px 20px 0 0;
     border-color: #fff transparent transparent transparent;
