@@ -46,13 +46,7 @@ printf "my_super_secure_password" > adminpassword
 
 First, you'll need to download and install [node.js](http://nodejs.org) if you haven't already.
 
-`cd` to the Abungo directory and install Socket.IO, Express and body-parser:
-
-```bash
-npm install socket.io
-npm install express
-npm install body-parser
-```
+`cd` to the Abungo directory and run `npm install` to install dependencies (`socket.io`, `express` and `body-parser`).
 
 Once you have everything installed, run `node server` from the Abungo directory. Navigate to `http://localhost:3000` in your browser to see it in action.
 
