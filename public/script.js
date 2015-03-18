@@ -58,7 +58,11 @@ $("#nick_input").focus();
 
 $("#nick_input").onkeydown = function (e) {
     if (e.which === 13) { // enter
-        $("#chatroom").focus();
+        if (!$("#chatroom").getAttribute("readonly")) {
+            $("#chatroom").focus();
+        } else {
+            chooseNick();
+        }
     }
 };
 
