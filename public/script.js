@@ -44,7 +44,12 @@ function addEmotes(string) {
 if (localStorage.lastNick) {
     $("#nick_input").value = decodeHTML(localStorage.lastNick);
 }
-if (localStorage.lastRoom) {
+
+if (location.hash.length > 1) {
+    $("#chatroom").value = decodeURIComponent(location.hash.substring(1));
+    $("#chatroom").setAttribute("readonly", "true");
+    location.hash = "";
+} else if (localStorage.lastRoom) {
     $("#chatroom").value = decodeHTML(localStorage.lastRoom);
 } else {
     $("#chatroom").value = "yeya";

@@ -32,6 +32,12 @@ app.get("/", function (req, res) {
     res.sendfile(__dirname + "/public/index.html");
 });
 
+app.get("/room/*", function (req, res) {
+    var path = req.originalUrl;
+    var roomName = path.split("/")[2];
+    res.redirect("/#" + roomName);
+});
+
 app.get("/admin", function (req, res) {
     var ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     res.sendfile(__dirname + "/admin/index.html");

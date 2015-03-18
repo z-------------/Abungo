@@ -286,6 +286,11 @@ a:hover {
     border-bottom-color: white;
 }
 
+#nick_choose input[readonly] {
+    pointer-events: none;
+    border-bottom: none;
+}
+
 h1 {
     color: white;
     font-size: 50px;
