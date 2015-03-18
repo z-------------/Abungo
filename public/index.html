@@ -5,15 +5,26 @@
             
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
         <meta charset="UTF-8">
+        
         <base target="_blank">
+        
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="shortcut icon" href="favicon.ico">
         <link rel="icon" sizes="196x196" href="/img/icon196.png">
         <link rel="icon" sizes="128x128" href="/img/icon128.png">
         <link rel="apple-touch-icon-precomposed" sizes="128x128" href="/img/icon128.png">
+        
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,400,700">
+        
+        <script>
+            var urlRoomName;
+            if (location.hash.length > 1) {
+                urlRoomName = location.hash.substring(1);
+                history.pushState("", document.title, window.location.pathname);
+            }
+        </script>
         <script src="libraries/autolink-min.js" async></script>
     </head>
     <body>
