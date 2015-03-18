@@ -26,12 +26,10 @@
 *, :before, :after {
     margin: 0;
     padding: 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+    box-sizing: inherit;
     transition: .3s;
     font-size: 17px;
-    font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: inherit;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -46,7 +44,9 @@ html,body {
 }
 
 body {
+    box-sizing: border-box;
     background: #58b69b;
+    font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 form {
