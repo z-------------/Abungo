@@ -33,12 +33,13 @@ Commands you can use:
 + `kick <room>:<nick>` - force a user to disconnect
 + `stop` - stop the server
 
-A password is required to access the admin dashboard. By default, the password is `default` and it can be changed by making an `adminpassword` file containing the new password in the root. 
+A password is required to access the admin dashboard. By default, the password is `default` and it can be changed by creating a `.env` file (if it doesn't already exist) and changing the `ADMIN_PWD` value like so:
 
-```bash
-# one of the many ways to do it
-printf "my_super_secure_password" > adminpassword
 ```
+ADMIN_PWD=mysupersecurepassword
+```
+
+See [Running Abungo](#running-abungo) below for more details.
 
 **It is not recommended to use the same password as your other accounts since the password will not be encrypted**.
 
@@ -46,8 +47,18 @@ printf "my_super_secure_password" > adminpassword
 
 First, you'll need to download and install [node.js](http://nodejs.org) if you haven't already.
 
+If you want to use a `.env` file to set admin password and port, you will need to install [`foreman`](http://github.com/ddollar/foreman#readme).
+
 `cd` to the Abungo directory and run `npm install` to install dependencies (`socket.io`, `express` and `body-parser`).
 
-Once you have everything installed, run `node server` from the Abungo directory. Navigate to `http://localhost:3000` in your browser to see it in action.
+Once you have everything installed, run `foreman start` from the Abungo directory (if you don't have `foreman`, just do `node server.js`). Navigate to `http://localhost:3000` in your browser to see it in action.
 
-You might also want to check it out live at https://abungo.jit.su
+You can change the port by creating a `.env` file (if it doesn't already exist) and changing the `PORT` value like so:
+
+```
+PORT=1337
+```
+
+---
+
+You can check it out live at https://abungo.herokuapp.com
