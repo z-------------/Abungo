@@ -5,6 +5,8 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var fs = require("fs");
 
+var PORT = process.env.PORT || 3000;
+
 var packageJSON = require("./package.json");
 
 app.use(bodyParser.urlencoded());
@@ -20,13 +22,7 @@ function log(str, vars) {
     }
 }
 
-var adminPassword = "default";
-
-fs.readFile(process.cwd() + "/adminpassword", "utf8", function (err, content) {
-    if (!err) {
-        adminPassword = content;
-    }
-});
+var adminPassword = process.env.ADMIN_PWD || "default";
 
 app.get("/", function (req, res) {
     res.sendfile(__dirname + "/public/index.html");
@@ -226,6 +222,6 @@ io.on("connection", function (socket) {
 
 log("Abungo v%s started", packageJSON.version);
 
-http.listen(3000, function () {
-    log("listening on *:3000");
+http.listen(PORT, function () {
+    log("listening on *:%s", PORT);
 });
