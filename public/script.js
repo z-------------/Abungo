@@ -177,6 +177,23 @@ function main() {
         if (!windowIsFocused && cssClass === "normal") {
             unreadCount += 1;
             updateUnreadCount();
+            
+            if(window.Notification && Notification.permission !== "denied") {
+                Notification.requestPermission(function(status) {
+                    if (status === "granted") {
+                        var n = new Notification(nick + " on #" + room, {
+                            body: content,
+                            icon: "/img/icon128.png"
+                        });
+                        window.addEventListener("focus", function(){
+                            if (n) n.close();
+                        });
+                        n.addEventListener("click", function(){
+                            window.focus();
+                        });
+                    }
+                });
+            }
         }
 
         if (cssClass.indexOf("typing") === -1) {
