@@ -1,0 +1,63 @@
+@import "mixins.scss";
+
+$black: #333;
+
+*, :before, :after {
+    box-sizing: inherit;
+    font-family: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    
+    transition-duration: .3s;
+}
+
+body {
+    box-sizing: border-box;
+    font-family: "Lato", sans-serif;
+    background-color: #58b69b;
+    color: #fff;
+}
+
+input {
+    border: none;
+}
+
+.showonlogin {
+    display: none;
+    
+    &.visible {
+        display: block;
+    }
+}
+
+aside input {
+    background: none;
+    font-size: 2em;
+    display: block;
+    background-image: linear-gradient(90deg, rgba(255, 255, 255, .5), transparent 100px);
+}
+
+.sendbar {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    @include material-shadow(3);
+}
+
+.sendbar_compose_input {
+    min-height: 50px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 400px;
+    margin: 10px;
+    
+    background-color: #fff;
+    color: $black;
+    padding: 10px;
+    
+    @include material-shadow(1);
+}

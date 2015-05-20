@@ -1,0 +1,28 @@
+doctype html
+html
+    head
+        title Abungo
+        meta(charset="utf-8")
+        
+        link(rel="stylesheet", href="style.css")
+    body
+        aside
+            header
+                h1.logo Abungo
+            form#login
+                label
+                    div Nick
+                    input#login_nick(type="text", required="true")
+                label
+                    div Room
+                    input#login_room(type="text", required="true")
+                button#login_button Connect
+            ol#users.showonlogin
+        
+        .messages.showonlogin
+            .sendbar
+                .sendbar_compose
+                    .sendbar_compose_input(contenteditable="true")
+        
+        script(src="/socket.io/socket.io.js")
+        script(src="client.js")
