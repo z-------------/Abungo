@@ -72,7 +72,11 @@ var server = app.listen(PORT, function() {
                 nickTaken = true;
                 if (rooms[data.room].users[data.nick].userID === data.userID) {
                     userIDExists = true;
+                } else {
+                    console.log("user id doesnt exist");
                 }
+            } else {
+                console.log("user id doesnt exist");
             }
             
             if (!nickTaken && !userIDExists) {
@@ -128,8 +132,4 @@ var server = app.listen(PORT, function() {
             }
         });
     });
-    
-    setInterval(function(){
-        console.log(rooms);
-    }, 5000);
 });

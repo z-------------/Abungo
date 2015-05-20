@@ -50,7 +50,7 @@ var loginButton = $("#login_button");
 
 loginForm.addEventListener("submit", function(e){
     e.preventDefault();
-    if (this.checkValidity()) {
+    if (this.checkValidity() && !this.classList.contains("notouch")) {
         socket.emit("login", {
             nick: loginNickInput.value,
             room: loginRoomInput.value,
@@ -66,6 +66,8 @@ socket.on("login_accepted", function(data) {
     
     console.log("login_accepted", data);
     
+    loginButton.textContent = "Connected";
+    loginForm.classList.add("notouch");
     each($$(".showonlogin"), function(elem) {
         elem.classList.add("visible");
     });

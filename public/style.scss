@@ -2,6 +2,7 @@
 
 $black: #333;
 $grey: #777;
+$darkgrey: #555;
 $green: #58b69b;
 
 *, :before, :after {
@@ -12,6 +13,9 @@ $green: #58b69b;
     padding: 0;
     
     max-width: 100%;
+    
+    background-repeat: no-repeat;
+    background-position: center;
     
     transition-duration: .3s;
 }
@@ -25,8 +29,12 @@ body {
     overflow-y: auto;
 }
 
-input {
+input, textarea, button {
     border: none;
+}
+
+button {
+    cursor: pointer;
 }
 
 .showonlogin {
@@ -37,17 +45,21 @@ input {
     }
 }
 
+.notouch {
+    pointer-events: none;
+}
+
 aside {
     position: absolute;
     left: 0;
     top: 0;
     width: 250px;
     height: 100%;
-    background-color: #fff;
-    color: $black;
+    background-color: $black;
+    color: #fff;
+    z-index: 1;
     
     label {
-        font-size: 1.5em;
         position: relative;
         
         input {
@@ -74,10 +86,39 @@ aside {
         }
     }
     
+    header {
+        padding: 20px;
+    }
+    
     .logo {
         color: $green;
         font-size: 2.5em;
         font-weight: 700;
+        position: relative;
+        padding-left: 50px;
+        
+        &:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50px;
+            height: 100%;
+            background-image: url(img/icon.svg);
+            background-size: 1em;
+        }
+    }
+    
+    form {
+        padding: 0 20px;
+        font-size: 1.5em;
+    }
+    
+    button {
+        font-size: 0.7em;
+        background: rgba(127, 127, 127, .2);
+        border-radius: 4px;
+        padding: 10px 15px;
     }
 }
 
@@ -111,9 +152,8 @@ aside {
     top: 0;
     right: 0;
     width: calc(100% - 250px);
-    height: 100%;
+    height: calc(100% - 70px);
     padding: 20px;
-    padding-bottom: 100px;
     overflow-x: hidden;
     overflow-y: scroll;
 }
