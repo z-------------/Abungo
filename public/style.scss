@@ -159,28 +159,51 @@ aside {
 }
 
 .message {
-    padding: 10px;
     margin: 10px;
     clear: both;
     word-wrap: break-word;
+    position: relative;
     
     &.message-received, &.message-self {
         max-width: 400px;
         color: $black;
         background-color: #fff;
+        padding: 10px 15px;
         @include material-shadow(1);
+        
+        &:after {
+            content: "";
+            width: 0;
+            height: 0;
+            border-style: solid;
+            position: absolute;
+            top: 0;
+        }
     }
     
     &.message-received {
         float: left;
+        
+        &:after {
+            border-width: 0 15px 15px 0;
+            border-color: transparent #ffffff transparent transparent;
+            left: -15px;
+        }
     }
 
     &.message-self {
         float: right;
+        
+        &:after {
+            border-width: 15px 15px 0 0;
+            border-color: #ffffff transparent transparent transparent;
+            right: -15px;
+        }
     }
     
     &.message-join {
         text-align: center;
+        padding: 5px 0;
     }
     
     h3 {
