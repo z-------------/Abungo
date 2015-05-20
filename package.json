@@ -18,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/z-------------/Abungo/issues"
   },
-  "homepage": "https://github.com/z-------------/Abungo"
+  "homepage": "https://github.com/z-------------/Abungo",
+  "dependencies": {
+    "express": "^4.12.4",
+    "jade": "^1.9.2",
+    "socket.io": "^1.3.5"
+  }
 }
