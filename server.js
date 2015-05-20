@@ -75,7 +75,7 @@ var server = app.listen(PORT, function() {
                 }
             }
             
-            if (!nickTaken || userIDExists) {
+            if (!nickTaken && !userIDExists) {
                 if (!rooms[data.room]) {
                     rooms[data.room] = {
                         users: {}
@@ -94,6 +94,13 @@ var server = app.listen(PORT, function() {
                     userID: userID,
                     nick: data.nick,
                     room: data.room
+                });
+                
+                Object.keys(room.users).forEach(function(userNick) {
+                    var user = room.users[userNick];
+                    user.socket.emit("user_joined", {
+                        nick: data.nick
+                    });
                 });
                 
                 socket.on("message", function(data) {
@@ -121,4 +128,8 @@ var server = app.listen(PORT, function() {
             }
         });
     });
+    
+    setInterval(function(){
+        console.log(rooms);
+    }, 5000);
 });

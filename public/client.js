@@ -80,11 +80,11 @@ socket.on("login_accepted", function(data) {
         return elem;
     };
     
-    var makeLeaveElem = function(data) {
+    var makeJoinElem = function(data, action) {
         var elem = document.createElement("div");
-        elem.innerHTML = "<p>" + data.nick + " left.</p>";
+        elem.innerHTML = "<p>" + data.nick + " " + action + ".</p>";
         elem.classList.add("message");
-        elem.classList.add("message-leave");
+        elem.classList.add("message-join");
         return elem;
     };
     
@@ -110,8 +110,12 @@ socket.on("login_accepted", function(data) {
         $(".messages").appendChild(makeMessageElem(data, type));
     });
     
+    socket.on("user_joined", function(data) {
+        $(".messages").appendChild(makeJoinElem(data, "joined"));
+    });
+    
     socket.on("user_left", function(data) {
-        $(".messages").appendChild(makeLeaveElem(data));
+        $(".messages").appendChild(makeJoinElem(data, "left"));
     });
 });
 

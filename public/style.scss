@@ -1,13 +1,17 @@
 @import "mixins.scss";
 
 $black: #333;
+$grey: #777;
+$green: #58b69b;
 
 *, :before, :after {
     box-sizing: inherit;
-    font-family: inherit;
+    font: inherit;
     color: inherit;
     margin: 0;
     padding: 0;
+    
+    max-width: 100%;
     
     transition-duration: .3s;
 }
@@ -15,8 +19,10 @@ $black: #333;
 body {
     box-sizing: border-box;
     font-family: "Lato", sans-serif;
-    background-color: #58b69b;
+    background-color: $green;
     color: #fff;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 input {
@@ -31,20 +37,58 @@ input {
     }
 }
 
-aside input {
-    background: none;
-    font-size: 2em;
-    display: block;
-    background-image: linear-gradient(90deg, rgba(255, 255, 255, .5), transparent 100px);
+aside {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #fff;
+    color: $black;
+    
+    label {
+        font-size: 1.5em;
+        position: relative;
+        
+        input {
+            background: none;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            
+            &:focus, &:valid {
+                + div {
+                    transform: scale(0.5) translateY(-35px);
+                }
+            }
+        }
+        
+        div {
+            position: absolute;
+            left: 0;
+            top: 0;
+            margin-top: -50px;
+            margin-left: 10px;
+            pointer-events: none;
+            color: $grey;
+        }
+    }
+    
+    .logo {
+        color: $green;
+        font-size: 2.5em;
+        font-weight: 700;
+    }
 }
 
 .sendbar {
     position: fixed;
-    left: 0;
+    right: 0;
     bottom: 0;
-    width: 100%;
+    width: calc(100% - 250px);
     height: 70px;
-    @include material-shadow(3);
+    background-color: $green;
+    box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.16), 0 -3px 6px rgba(0, 0, 0, 0.23);
 }
 
 .sendbar_compose_input {
@@ -60,4 +104,46 @@ aside input {
     padding: 10px;
     
     @include material-shadow(1);
+}
+
+.messages {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(100% - 250px);
+    height: 100%;
+    padding: 20px;
+    padding-bottom: 100px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.message {
+    padding: 10px;
+    margin: 10px;
+    clear: both;
+    word-wrap: break-word;
+    
+    &.message-received, &.message-self {
+        max-width: 400px;
+        color: $black;
+        background-color: #fff;
+        @include material-shadow(1);
+    }
+    
+    &.message-received {
+        float: left;
+    }
+
+    &.message-self {
+        float: right;
+    }
+    
+    &.message-join {
+        text-align: center;
+    }
+    
+    h3 {
+        font-weight: 700;
+    }
 }
