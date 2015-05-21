@@ -78,7 +78,7 @@ socket.on("login_accepted", function(data) {
     
     var sendbarComposeInput = $(".sendbar_compose_input");
     
-    loginButton.textContent = "Connected";
+    loginButton.textContent = "Connected.";
     loginForm.classList.add("notouch");
     each($$(".showonlogin"), function(elem) {
         elem.classList.add("visible");
@@ -107,7 +107,7 @@ socket.on("login_accepted", function(data) {
     };
     
     var updateUsersList = function() {
-        $("#users").innerHTML = "";
+        $(".userlist_list").innerHTML = "";
         socketInfo.users.forEach(function(nick) {
             var elem = document.createElement("li");
             elem.classList.add("user");
@@ -115,7 +115,7 @@ socket.on("login_accepted", function(data) {
             if (nick === socketInfo.nick) {
                 elem.classList.add("user-self");
             }
-            $("#users").appendChild(elem);
+            $(".userlist_list").appendChild(elem);
         });
     };
     

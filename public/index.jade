@@ -17,7 +17,10 @@ html
                     input#login_room(type="text", required="true")
                     div Room
                 button#login_button Connect
-            ol#users.showonlogin
+            .separator
+            .userlist.showonlogin
+                h2 Online
+                ol.userlist_list
         
         .messages.showonlogin
             .sendbar
