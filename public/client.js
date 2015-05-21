@@ -18,6 +18,13 @@ var each = function(list, func) {
     list.forEach(func);
 };
 
+Array.prototype.remove = function(elem) {
+    var index = this.indexOf(elem);
+    if (index !== -1) {
+        return this.splice(index, 1);
+    }
+};
+
 /* track pressed keys */
 
 var pressedKeys = [];
@@ -63,6 +70,7 @@ socket.on("login_accepted", function(data) {
     socketInfo.userID = data.userID;
     socketInfo.nick = data.nick;
     socketInfo.room = data.room;
+    socketInfo.users = data.users;
     
     console.log("login_accepted", data);
     
@@ -113,11 +121,29 @@ socket.on("login_accepted", function(data) {
     });
     
     socket.on("user_joined", function(data) {
+        if (socketInfo.users.indexOf(data.nick) === -1) {
+            socketInfo.users.push(data.nick);
+        }
         $(".messages").appendChild(makeJoinElem(data, "joined"));
     });
     
     socket.on("user_left", function(data) {
+        socketInfo.users.remove(data.nick);
         $(".messages").appendChild(makeJoinElem(data, "left"));
+    });
+    
+    Object.observe(socketInfo.users, function() {
+        socketInfo.users.sort();
+        $("#users").innerHTML = "";
+        socketInfo.users.forEach(function(nick) {
+            var elem = document.createElement("li");
+            elem.classList.add("user");
+            elem.textContent = nick;
+            if (nick === socketInfo.nick) {
+                elem.classList.add("user-self");
+            }
+            $("#users").appendChild(elem);
+        });
     });
 });
 

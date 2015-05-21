@@ -97,7 +97,8 @@ var server = app.listen(PORT, function() {
                 socket.emit("login_accepted", {
                     userID: userID,
                     nick: data.nick,
-                    room: data.room
+                    room: data.room,
+                    users: Object.keys(room.users)
                 });
                 
                 Object.keys(room.users).forEach(function(userNick) {
