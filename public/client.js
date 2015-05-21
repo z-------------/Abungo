@@ -37,7 +37,9 @@ var cleanseHTML = function(str) {
 
 var pressedKeys = [];
 window.addEventListener("keydown", function(e){
-    pressedKeys.push(e.keyCode);
+    if (pressedKeys.indexOf(e.keyCode) === -1) {
+        pressedKeys.push(e.keyCode);
+    }
 });
 window.addEventListener("keyup", function(e){
     if (pressedKeys.indexOf(e.keyCode) !== -1) {
@@ -45,6 +47,45 @@ window.addEventListener("keyup", function(e){
         pressedKeys.splice(index, 1);
     }
 });
+
+/* convenience functions */
+    
+var makeMessageElem = function(data, type) {
+    var elem = document.createElement("div");
+
+    var bodyContent = (data.mediaID
+                       ? "<a target='_blank' href='/file/" + data.mediaID + "/" + cleanseHTML(data.mediaName) + "'>" + cleanseHTML(data.mediaName) + "</a>"
+                       : cleanseHTML(data.message).replace(/\n/gi, "<br>"));
+
+    elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
+    elem.classList.add("message");
+    elem.classList.add("message-" + type);
+    if (data.mediaID) {
+        elem.classList.add("message-file");
+    }
+    return elem;
+};
+
+var makeJoinElem = function(data, action) {
+    var elem = document.createElement("div");
+    elem.innerHTML = "<p>" + cleanseHTML(data.nick) + " " + action + ".</p>";
+    elem.classList.add("message");
+    elem.classList.add("message-join");
+    return elem;
+};
+
+var updateUsersList = function() {
+    $(".userlist_list").innerHTML = "";
+    abungoState.users.forEach(function(nick) {
+        var elem = document.createElement("li");
+        elem.classList.add("user");
+        elem.textContent = nick;
+        if (nick === abungoState.nick) {
+            elem.classList.add("user-self");
+        }
+        $(".userlist_list").appendChild(elem);
+    });
+};
 
 /* socket.io shenanigans */
 
@@ -98,45 +139,6 @@ socket.on("login_accepted", function(data) {
         elem.setAttribute("readonly", "true");
     });
     sendbarComposeInput.focus();
-    
-    /* convenience functions */
-    
-    var makeMessageElem = function(data, type) {
-        var elem = document.createElement("div");
-        
-        var bodyContent = (data.mediaID
-                           ? "<a target='_blank' href='/file/" + data.mediaID + "/" + cleanseHTML(data.mediaName) + "'>" + cleanseHTML(data.mediaName) + "</a>"
-                           : cleanseHTML(data.message).replace(/\n/gi, "<br>"));
-        
-        elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
-        elem.classList.add("message");
-        elem.classList.add("message-" + type);
-        if (data.mediaID) {
-            elem.classList.add("message-file");
-        }
-        return elem;
-    };
-    
-    var makeJoinElem = function(data, action) {
-        var elem = document.createElement("div");
-        elem.innerHTML = "<p>" + cleanseHTML(data.nick) + " " + action + ".</p>";
-        elem.classList.add("message");
-        elem.classList.add("message-join");
-        return elem;
-    };
-    
-    var updateUsersList = function() {
-        $(".userlist_list").innerHTML = "";
-        abungoState.users.forEach(function(nick) {
-            var elem = document.createElement("li");
-            elem.classList.add("user");
-            elem.textContent = nick;
-            if (nick === abungoState.nick) {
-                elem.classList.add("user-self");
-            }
-            $(".userlist_list").appendChild(elem);
-        });
-    };
     
     /* send messages */
     
