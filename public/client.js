@@ -101,6 +101,27 @@ var updateUsersList = function() {
     });
 };
 
+var showNotification = function(nick, text) {
+    if(window.Notification && Notification.permission !== "denied") {
+        Notification.requestPermission(function(status) {
+            if (status === "granted" && !document.hasFocus()) {
+                var n = new Notification(nick + " on #" + abungoState.room, {
+                    body: text,
+                    icon: "/img/icon196.png"
+                });
+                window.addEventListener("focus", function(){
+                    if (n) {
+                        n.close();
+                    }
+                });
+                n.addEventListener("click", function(){
+                    window.focus();
+                });
+            }
+        });
+    }
+};
+
 /* socket.io shenanigans */
 
 var socket = io();
@@ -179,6 +200,12 @@ socket.on("login_accepted", function(data) {
             type = "self";
         }
         $(".messages").appendChild(makeMessageElem(data, type));
+        
+        var notifText = data.message;
+        if (data.mediaID) {
+            notifText = "File: " + data.mediaName;
+        }
+        showNotification(data.nick, notifText);
         
         if (isAtBottom) { // scroll to bottom if previously at bottom
             $(".messages").scrollTop = $(".messages").offsetHeight + $(".messages").scrollHeight;
