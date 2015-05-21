@@ -5,6 +5,20 @@ $grey: #777;
 $darkgrey: #555;
 $green: #58b69b;
 
+@keyframes messageAppearLeft {
+    from {
+        transform: translateX(-50px);
+        opacity: 0;
+    }
+}
+
+@keyframes messageAppearRight {
+    from {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+}
+
 *, :before, :after {
     box-sizing: inherit;
     font: inherit;
@@ -148,6 +162,7 @@ aside {
     
     h2 {
         color: rgba(255, 255, 255, .8);
+        margin-bottom: 10px;
     }
 }
 
@@ -155,10 +170,14 @@ aside {
     position: fixed;
     right: 0;
     bottom: 0;
+    z-index: 1;
     width: calc(100% - 250px);
     height: 70px;
     background-color: $green;
-    box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.16), 0 -3px 6px rgba(0, 0, 0, 0.23);
+    
+    &.float {
+        box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.16), 0 -3px 6px rgba(0, 0, 0, 0.23);
+    }
 }
 
 .sendbar_compose_input {
@@ -209,6 +228,7 @@ aside {
         background-color: #fff;
         padding: 10px 15px;
         @include material-shadow(1);
+        animation-duration: .3s;
         
         &:after {
             content: "";
@@ -222,6 +242,7 @@ aside {
     
     &.message-received {
         float: left;
+        animation-name: messageAppearLeft;
         
         &:after {
             border-width: 0 15px 15px 0;
@@ -232,6 +253,7 @@ aside {
 
     &.message-self {
         float: right;
+        animation-name: messageAppearRight;
         
         &:after {
             border-width: 15px 15px 0 0;
