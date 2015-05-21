@@ -1,3 +1,5 @@
+/* basic, non specific functions */
+
 var $ = function(selector) {
     if (document.querySelectorAll(selector).length > 1) {
         return document.querySelectorAll(selector);
@@ -23,6 +25,12 @@ Array.prototype.remove = function(elem) {
     if (index !== -1) {
         return this.splice(index, 1);
     }
+};
+
+var cleanseHTML = function(str) {
+    var elem = document.createElement("div");
+    elem.textContent = str;
+    return elem.innerHTML;
 };
 
 /* track pressed keys */
@@ -68,6 +76,8 @@ loginForm.addEventListener("submit", function(e){
 
 loginNickInput.focus();
 
+/* forming in a straight line */
+
 socket.on("login_accepted", function(data) {
     abungoState.userID = data.userID;
     abungoState.nick = data.nick;
@@ -77,6 +87,7 @@ socket.on("login_accepted", function(data) {
     console.log("login_accepted", data);
     
     var sendbarComposeInput = $(".sendbar_compose_input");
+    var sendbarFileInput = $("#fileinput");
     
     loginButton.textContent = "Connected.";
     loginForm.classList.add("notouch");
@@ -88,19 +99,27 @@ socket.on("login_accepted", function(data) {
     });
     sendbarComposeInput.focus();
     
-    /* send and receive messages */
+    /* convenience functions */
     
     var makeMessageElem = function(data, type) {
         var elem = document.createElement("div");
-        elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + data.message + "</p>";
+        
+        var bodyContent = (data.mediaID
+                           ? "<a target='_blank' href='/file/" + data.mediaID + "/" + cleanseHTML(data.mediaName) + "'>" + cleanseHTML(data.mediaName) + "</a>"
+                           : cleanseHTML(data.message).replace(/\n/gi, "<br>"));
+        
+        elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
         elem.classList.add("message");
         elem.classList.add("message-" + type);
+        if (data.mediaID) {
+            elem.classList.add("message-file");
+        }
         return elem;
     };
     
     var makeJoinElem = function(data, action) {
         var elem = document.createElement("div");
-        elem.innerHTML = "<p>" + data.nick + " " + action + ".</p>";
+        elem.innerHTML = "<p>" + cleanseHTML(data.nick) + " " + action + ".</p>";
         elem.classList.add("message");
         elem.classList.add("message-join");
         return elem;
@@ -119,6 +138,8 @@ socket.on("login_accepted", function(data) {
         });
     };
     
+    /* send messages */
+    
     sendbarComposeInput.addEventListener("keydown", function(e){
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault();
@@ -132,6 +153,8 @@ socket.on("login_accepted", function(data) {
         }
     });
     
+    /* receive messages (including files) */
+    
     socket.on("message_incoming", function(data) {
         var isAtBottom = ($(".messages").scrollTop + $(".messages").offsetHeight === $(".messages").scrollHeight);
         
@@ -141,10 +164,30 @@ socket.on("login_accepted", function(data) {
         }
         $(".messages").appendChild(makeMessageElem(data, type));
         
-        if (isAtBottom) {
+        if (isAtBottom) { // scroll to bottom if previously at bottom
             $(".messages").scrollTop = $(".messages").offsetHeight + $(".messages").scrollHeight;
         }
     });
+    
+    /* send files */
+    
+    sendbarFileInput.addEventListener("change", function(){
+        var file = this.files[0];
+        if (file.size < 10000000) { // 10 mb
+            socket.emit("message", {
+                nick: abungoState.nick,
+                userID: abungoState.userID,
+                room: abungoState.room,
+                upload: file,
+                type: file.type,
+                mediaName: file.name
+            });
+        } else {
+            alert("That file is too big. You can only upload files less than 10 megabytes in size.");
+        }
+    });
+    
+    /* user join/leave */
     
     socket.on("user_joined", function(data) {
         if (abungoState.users.indexOf(data.nick) === -1) {
@@ -157,6 +200,8 @@ socket.on("login_accepted", function(data) {
         abungoState.users.remove(data.nick);
         $(".messages").appendChild(makeJoinElem(data, "left"));
     });
+    
+    /* update users list */
     
     Object.observe(abungoState.users, function() {
         abungoState.users.sort();
@@ -182,4 +227,5 @@ socket.on("login_accepted", function(data) {
 
 socket.on("login_rejected", function(data) {
     console.log("login_rejected");
+    alert("That username is taken. Please choose another or join a different room.");
 });

@@ -34,6 +34,22 @@ app.get("/:path.css", function(req, res) {
     });
 });
 
+app.get("/file/:id/*", function(req, res) {
+    var mediaID = req.params.id;
+    if (files.hasOwnProperty(mediaID)) {
+        var fileObject = files[mediaID];
+        var file = fileObject.file;
+        var type = fileObject.type;
+        res.append("Content-Type", type);
+        res.send(file);
+    } else {
+        res.status(404);
+        res.send("<h1>Abungo</h1><p>The file you're looking for couldn't be found.</p>");
+    }
+});
+
+var files = {};
+
 var server = app.listen(PORT, function() {
     var host = server.address().address;
     var port = server.address().port;
@@ -45,17 +61,7 @@ var server = app.listen(PORT, function() {
     var io = socketio(server);
     
     var rooms = {};
-    var roomSockets = function(roomName) {
-        var room = rooms[roomName];
-        if (room) {
-            var sockets = [];
-            room.users.forEach(function(user) {
-                sockets.push(user.socket);
-            });
-            return sockets;
-        }
-        return null;
-    };
+    
     var disconnectUser = function(room, nick) {
         var user = room.users[nick];
         if (user) {
@@ -123,12 +129,28 @@ var server = app.listen(PORT, function() {
                 });
                 
                 socket.on("message", function(data) {
+                    var isFile = !!data.upload;
+                    
+                    var sendableMessageData = {
+                        nick: data.nick
+                    };
+                    
+                    if (isFile) {
+                        var mediaID = "" + Math.round(Math.random() * 100000) + new Date().getTime();
+                        files[mediaID] = {
+                            file: data.upload,
+                            type: data.type
+                        };
+                        sendableMessageData.mediaID = mediaID;
+                        sendableMessageData.mediaName = data.mediaName;
+                        sendableMessageData.mediaType = data.type;
+                    } else {
+                        sendableMessageData.message = data.message;
+                    }
+                    
                     Object.keys(room.users).forEach(function(userNick) {
                         var user = room.users[userNick];
-                        user.socket.emit("message_incoming", {
-                            message: data.message,
-                            nick: data.nick
-                        });
+                        user.socket.emit("message_incoming", sendableMessageData);
                     });
                 });
                 
