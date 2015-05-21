@@ -162,8 +162,10 @@ socket.on("login_accepted", function(data) {
     
     console.log("login_accepted", data);
     
+    var sendbarElem = $(".sendbar");
     var sendbarComposeInput = $(".sendbar_compose_input");
     var sendbarFileInput = $("#fileinput");
+    var messagesElem = $(".messages");
     
     loginButton.textContent = "Connected.";
     loginForm.classList.add("notouch");
@@ -193,13 +195,13 @@ socket.on("login_accepted", function(data) {
     /* receive messages (including files) */
     
     socket.on("message_incoming", function(data) {
-        var isAtBottom = ($(".messages").scrollTop + $(".messages").offsetHeight === $(".messages").scrollHeight);
+        var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
         
         var type = "received";
         if (data.nick === abungoState.nick) {
             type = "self";
         }
-        $(".messages").appendChild(makeMessageElem(data, type));
+        messagesElem.appendChild(makeMessageElem(data, type));
         
         var notifText = data.message;
         if (data.mediaID) {
@@ -208,7 +210,7 @@ socket.on("login_accepted", function(data) {
         showNotification(data.nick, notifText);
         
         if (isAtBottom) { // scroll to bottom if previously at bottom
-            $(".messages").scrollTop = $(".messages").offsetHeight + $(".messages").scrollHeight;
+            messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
         }
     });
     
@@ -236,12 +238,12 @@ socket.on("login_accepted", function(data) {
         if (abungoState.users.indexOf(data.nick) === -1) {
             abungoState.users.push(data.nick);
         }
-        $(".messages").appendChild(makeJoinElem(data, "joined"));
+        messagesElem.appendChild(makeJoinElem(data, "joined"));
     });
     
     socket.on("user_left", function(data) {
         abungoState.users.remove(data.nick);
-        $(".messages").appendChild(makeJoinElem(data, "left"));
+        messagesElem.appendChild(makeJoinElem(data, "left"));
     });
     
     /* update users list */
@@ -252,6 +254,16 @@ socket.on("login_accepted", function(data) {
     });
     updateUsersList();
     
+    /* show/hide sendbar box-shadow */
+
+    setInterval(function() {
+        if (messagesElem.scrollTop === messagesElem.scrollHeight - messagesElem.offsetHeight) {
+            sendbarElem.classList.remove("float");
+        } else {
+            sendbarElem.classList.add("float");
+        }
+    });
+
     /* ping the server to determine connectivity */
     
     (function(){
