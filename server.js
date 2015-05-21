@@ -40,7 +40,7 @@ app.get("/file/:id/*", function(req, res) {
         var fileObject = files[mediaID];
         var file = fileObject.file;
         var type = fileObject.type;
-        res.append("Content-Type", type);
+        res.append("Content-Type", type || "text/plain");
         res.send(file);
     } else {
         res.status(404);
