@@ -191,8 +191,13 @@ aside {
     background-color: #fff;
     color: $black;
     padding: 10px;
+    transition-property: box-shadow;
     
     @include material-shadow(1);
+    
+    &:focus {
+        @include material-shadow(2);
+    }
     
     &:empty:before {
         content: attr(placeholder);
