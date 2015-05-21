@@ -165,7 +165,7 @@ var server = app.listen(PORT, function() {
                         }
                         var delta = new Date() - user.lastPing;
 
-                        if (delta >= 30000) {
+                        if (delta > 30000) {
                             disconnectUser(room, data.nick);
                         }
 
@@ -173,7 +173,7 @@ var server = app.listen(PORT, function() {
                     } else {
                         clearInterval(pingInterval);
                     }
-                }, 10000);
+                }, 5000);
                 
                 socket.on("disconnect", function() {
                     disconnectUser(room, data.nick);

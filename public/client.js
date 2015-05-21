@@ -215,7 +215,7 @@ socket.on("login_accepted", function(data) {
         socket.on("pong", function(data) {
             console.log("pong", data);
             
-            setTimeout(ping, 10000);
+            setTimeout(ping, 5000);
         });
         var ping = function() {
             socket.emit("ping");
