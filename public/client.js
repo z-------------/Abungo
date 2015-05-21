@@ -66,6 +66,8 @@ loginForm.addEventListener("submit", function(e){
     }
 });
 
+loginNickInput.focus();
+
 socket.on("login_accepted", function(data) {
     socketInfo.userID = data.userID;
     socketInfo.nick = data.nick;
@@ -74,11 +76,17 @@ socket.on("login_accepted", function(data) {
     
     console.log("login_accepted", data);
     
+    var sendbarComposeInput = $(".sendbar_compose_input");
+    
     loginButton.textContent = "Connected";
     loginForm.classList.add("notouch");
     each($$(".showonlogin"), function(elem) {
         elem.classList.add("visible");
     });
+    each($$(".notouch input"), function(elem) {
+        elem.setAttribute("readonly", "true");
+    });
+    sendbarComposeInput.focus();
     
     /* send and receive messages */
     
@@ -98,7 +106,19 @@ socket.on("login_accepted", function(data) {
         return elem;
     };
     
-    var sendbarComposeInput = $(".sendbar_compose_input");
+    var updateUsersList = function() {
+        $("#users").innerHTML = "";
+        socketInfo.users.forEach(function(nick) {
+            var elem = document.createElement("li");
+            elem.classList.add("user");
+            elem.textContent = nick;
+            if (nick === socketInfo.nick) {
+                elem.classList.add("user-self");
+            }
+            $("#users").appendChild(elem);
+        });
+    };
+    
     sendbarComposeInput.addEventListener("keydown", function(e){
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault();
@@ -134,17 +154,9 @@ socket.on("login_accepted", function(data) {
     
     Object.observe(socketInfo.users, function() {
         socketInfo.users.sort();
-        $("#users").innerHTML = "";
-        socketInfo.users.forEach(function(nick) {
-            var elem = document.createElement("li");
-            elem.classList.add("user");
-            elem.textContent = nick;
-            if (nick === socketInfo.nick) {
-                elem.classList.add("user-self");
-            }
-            $("#users").appendChild(elem);
-        });
+        updateUsersList();
     });
+    updateUsersList();
 });
 
 socket.on("login_rejected", function(data) {

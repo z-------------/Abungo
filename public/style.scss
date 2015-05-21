@@ -55,6 +55,7 @@ aside {
     top: 0;
     width: 250px;
     height: 100%;
+    padding: 0 20px;
     background-color: $black;
     color: #fff;
     z-index: 1;
@@ -68,7 +69,7 @@ aside {
             margin: 10px 0;
             padding: 10px;
             
-            &:focus, &:valid {
+            &:focus, &:valid, &[readonly] {
                 + div {
                     transform: scale(0.5) translateY(-35px);
                 }
@@ -95,7 +96,7 @@ aside {
         font-size: 2.5em;
         font-weight: 700;
         position: relative;
-        padding-left: 50px;
+        padding-left: 30px;
         
         &:before {
             content: "";
@@ -104,13 +105,13 @@ aside {
             top: 0;
             width: 50px;
             height: 100%;
+            margin-left: -20px;
             background-image: url(img/icon.svg);
             background-size: 1em;
         }
     }
     
     form {
-        padding: 0 20px;
         font-size: 1.5em;
     }
     
@@ -119,6 +120,19 @@ aside {
         background: rgba(127, 127, 127, .2);
         border-radius: 4px;
         padding: 10px 15px;
+    }
+    
+    ol, ul {
+        list-style: none;
+        
+        li {
+            display: block;
+            padding: 5px 0;
+            
+            &.user-self {
+                font-weight: 700;
+            }
+        }
     }
 }
 
