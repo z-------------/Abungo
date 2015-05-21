@@ -189,7 +189,7 @@ socket.on("login_accepted", function(data) {
     
     sendbarFileInput.addEventListener("change", function(){
         var file = this.files[0];
-        if (file.size < 10000000) { // 10 mb
+        if (file && file.size < 10000000) { // 10 mb
             socket.emit("message", {
                 nick: abungoState.nick,
                 userID: abungoState.userID,
@@ -198,7 +198,7 @@ socket.on("login_accepted", function(data) {
                 type: file.type,
                 mediaName: file.name
             });
-        } else {
+        } else if (file) {
             alert("That file is too big. You can only upload files less than 10 megabytes in size.");
         }
     });
