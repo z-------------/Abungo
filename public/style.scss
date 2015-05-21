@@ -255,6 +255,10 @@ aside {
         float: right;
         animation-name: messageAppearRight;
         
+        h3 {
+            display: none;
+        }
+        
         &:after {
             border-width: 15px 15px 0 0;
             border-color: #ffffff transparent transparent transparent;
