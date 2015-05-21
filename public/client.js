@@ -101,6 +101,16 @@ var updateUsersList = function() {
     });
 };
 
+var updateTypingIndicators = function(nick, direction) {
+    var methodName = ["remove", "add"][direction];
+    var userElems = $$(".userlist_list li");
+    each(userElems, function(elem) {
+        if (elem.textContent === nick) {
+            elem.classList[methodName]("typing");
+        }
+    });
+};
+
 var showNotification = function(nick, text) {
     if(window.Notification && Notification.permission !== "denied") {
         Notification.requestPermission(function(status) {
@@ -246,6 +256,38 @@ socket.on("login_accepted", function(data) {
     socket.on("user_left", function(data) {
         abungoState.users.remove(data.nick);
         messagesElem.appendChild(makeJoinElem(data, "left"));
+    });
+    
+    /* send and receive typing status */
+    
+    (function(){
+        var typingOld = false;
+        sendbarComposeInput.addEventListener("keyup", function() {
+            var typing;
+            if (this.textContent.length > 0) {
+                typing = true;
+            } else {
+                typing = false;
+            }
+            if (typing !== typingOld) {
+                if (typing) {
+                    socket.emit("typing_start");
+                } else {
+                    socket.emit("typing_stop");
+                }
+                typingOld = typing;
+            }
+        });
+    })();
+    
+    socket.on("typing_start", function(data) {
+        console.log("typing_start", data.nick);
+        updateTypingIndicators(data.nick, 1);
+    });
+    
+    socket.on("typing_stop", function(data) {
+        console.log("typing_stop", data.nick);
+        updateTypingIndicators(data.nick, 0);
     });
     
     /* update users list */

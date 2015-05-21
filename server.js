@@ -109,7 +109,8 @@ var server = app.listen(PORT, function() {
                 var userID = "" + new Date().getTime() + Math.round(Math.random() * 10000);
                 room.users[data.nick] = {
                     socket: socket,
-                    userID: userID
+                    userID: userID,
+                    nick: data.nick
                 };
                 var user = room.users[data.nick];
                 console.log("login accepted");
@@ -151,6 +152,24 @@ var server = app.listen(PORT, function() {
                     Object.keys(room.users).forEach(function(userNick) {
                         var user = room.users[userNick];
                         user.socket.emit("message_incoming", sendableMessageData);
+                    });
+                });
+                
+                socket.on("typing_start", function(data) {
+                    Object.keys(room.users).forEach(function(userNick) {
+                        var tuser = room.users[userNick];
+                        tuser.socket.emit("typing_start", {
+                            nick: user.nick
+                        });
+                    });
+                });
+                
+                socket.on("typing_stop", function(data) {
+                    Object.keys(room.users).forEach(function(userNick) {
+                        var tuser = room.users[userNick];
+                        tuser.socket.emit("typing_stop", {
+                            nick: user.nick
+                        });
                     });
                 });
                 
