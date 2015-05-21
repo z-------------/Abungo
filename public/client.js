@@ -182,13 +182,15 @@ socket.on("login_accepted", function(data) {
     sendbarComposeInput.addEventListener("keydown", function(e){
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault();
-            socket.emit("message", {
-                message: this.textContent,
-                nick: abungoState.nick,
-                room: abungoState.room,
-                userID: abungoState.userID
-            });
-            this.innerHTML = "";
+            if (this.textContent.length > 0) {
+                socket.emit("message", {
+                    message: this.textContent,
+                    nick: abungoState.nick,
+                    room: abungoState.room,
+                    userID: abungoState.userID
+                });
+                this.innerHTML = "";
+            }
         }
     });
     
