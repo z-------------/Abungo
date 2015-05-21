@@ -52,10 +52,24 @@ window.addEventListener("keyup", function(e){
     
 var makeMessageElem = function(data, type) {
     var elem = document.createElement("div");
-
-    var bodyContent = (data.mediaID
-                       ? "<a target='_blank' href='/file/" + data.mediaID + "/" + cleanseHTML(data.mediaName) + "'>" + cleanseHTML(data.mediaName) + "</a>"
-                       : cleanseHTML(data.message).replace(/\n/gi, "<br>"));
+    
+    var bodyContent;
+    
+    if (data.mediaID) {
+        var mediaURL = "/file/" + data.mediaID + "/" + data.mediaName;
+        
+        if (data.mediaType.match(/image\/*/gi)) { // image/*
+            bodyContent = "<img src='" + mediaURL + "'>";
+        } else if (data.mediaType.match(/video\/*/gi)) { // video/*
+            bodyContent = "<video controls autoplay src='" + mediaURL + "'></video>";
+        } else if (data.mediaType.match(/audio\/*/gi)) { // audio/*
+            bodyContent = "<audio controls src='" + mediaURL + "'></audio>";
+        } else {
+            bodyContent = "<a target='_blank' href='" + mediaURL + "'>" + cleanseHTML(data.mediaName) + "</a>";
+        }
+    } else {
+        bodyContent = cleanseHTML(data.message).replace(/\n/gi, "<br>");
+    }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
     elem.classList.add("message");
