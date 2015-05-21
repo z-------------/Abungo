@@ -41,11 +41,11 @@ window.addEventListener("keyup", function(e){
 /* socket.io shenanigans */
 
 var socket = io();
-var socketInfo = {};
+var abungoState = {};
 
 socket.on("connected", function(data) {
-    socketInfo.connected = true;
-    socketInfo.connectedDate = new Date(data.date);
+    abungoState.connected = true;
+    abungoState.connectedDate = new Date(data.date);
 });
 
 /* login */
@@ -61,7 +61,7 @@ loginForm.addEventListener("submit", function(e){
         socket.emit("login", {
             nick: loginNickInput.value,
             room: loginRoomInput.value,
-            userID: socketInfo.userID
+            userID: abungoState.userID
         });
     }
 });
@@ -69,10 +69,10 @@ loginForm.addEventListener("submit", function(e){
 loginNickInput.focus();
 
 socket.on("login_accepted", function(data) {
-    socketInfo.userID = data.userID;
-    socketInfo.nick = data.nick;
-    socketInfo.room = data.room;
-    socketInfo.users = data.users;
+    abungoState.userID = data.userID;
+    abungoState.nick = data.nick;
+    abungoState.room = data.room;
+    abungoState.users = data.users;
     
     console.log("login_accepted", data);
     
@@ -108,11 +108,11 @@ socket.on("login_accepted", function(data) {
     
     var updateUsersList = function() {
         $(".userlist_list").innerHTML = "";
-        socketInfo.users.forEach(function(nick) {
+        abungoState.users.forEach(function(nick) {
             var elem = document.createElement("li");
             elem.classList.add("user");
             elem.textContent = nick;
-            if (nick === socketInfo.nick) {
+            if (nick === abungoState.nick) {
                 elem.classList.add("user-self");
             }
             $(".userlist_list").appendChild(elem);
@@ -124,39 +124,60 @@ socket.on("login_accepted", function(data) {
             e.preventDefault();
             socket.emit("message", {
                 message: this.textContent,
-                nick: socketInfo.nick,
-                room: socketInfo.room,
-                userID: socketInfo.userID
+                nick: abungoState.nick,
+                room: abungoState.room,
+                userID: abungoState.userID
             });
             this.innerHTML = "";
         }
     });
     
     socket.on("message_incoming", function(data) {
+        var isAtBottom = ($(".messages").scrollTop + $(".messages").offsetHeight === $(".messages").scrollHeight);
+        
         var type = "received";
-        if (data.nick === socketInfo.nick) {
+        if (data.nick === abungoState.nick) {
             type = "self";
         }
         $(".messages").appendChild(makeMessageElem(data, type));
+        
+        if (isAtBottom) {
+            $(".messages").scrollTop = $(".messages").offsetHeight + $(".messages").scrollHeight;
+        }
     });
     
     socket.on("user_joined", function(data) {
-        if (socketInfo.users.indexOf(data.nick) === -1) {
-            socketInfo.users.push(data.nick);
+        if (abungoState.users.indexOf(data.nick) === -1) {
+            abungoState.users.push(data.nick);
         }
         $(".messages").appendChild(makeJoinElem(data, "joined"));
     });
     
     socket.on("user_left", function(data) {
-        socketInfo.users.remove(data.nick);
+        abungoState.users.remove(data.nick);
         $(".messages").appendChild(makeJoinElem(data, "left"));
     });
     
-    Object.observe(socketInfo.users, function() {
-        socketInfo.users.sort();
+    Object.observe(abungoState.users, function() {
+        abungoState.users.sort();
         updateUsersList();
     });
     updateUsersList();
+    
+    /* ping the server to determine connectivity */
+    
+    (function(){
+        socket.on("pong", function(data) {
+            console.log("pong", data);
+            
+            setTimeout(ping, 10000);
+        });
+        var ping = function() {
+            socket.emit("ping");
+            console.log("ping");
+        };
+        ping();
+    })();
 });
 
 socket.on("login_rejected", function(data) {

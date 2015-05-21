@@ -56,6 +56,19 @@ var server = app.listen(PORT, function() {
         }
         return null;
     };
+    var disconnectUser = function(room, nick) {
+        var user = room.users[nick];
+        if (user) {
+            delete room.users[nick];
+            Object.keys(room.users).forEach(function(userNick) {
+                var rUser = room.users[userNick];
+                rUser.socket.emit("user_left", {
+                    nick: nick
+                });
+            });
+            console.log("disconnected", nick);
+        }
+    };
 
     io.on("connection", function(socket){
         socket.emit("connected", {
@@ -92,6 +105,7 @@ var server = app.listen(PORT, function() {
                     socket: socket,
                     userID: userID
                 };
+                var user = room.users[data.nick];
                 console.log("login accepted");
                 
                 socket.emit("login_accepted", {
@@ -118,14 +132,29 @@ var server = app.listen(PORT, function() {
                     });
                 });
                 
+                socket.on("ping", function(data) {
+                    socket.emit("pong");
+                    user.lastPing = new Date();
+                });
+                var pingInterval = setInterval(function(){
+                    if (room.users[data.nick]) {
+                        if (!user.lastPing) {
+                            user.lastPing = new Date();
+                        }
+                        var delta = new Date() - user.lastPing;
+
+                        if (delta >= 30000) {
+                            disconnectUser(room, data.nick);
+                        }
+
+                        console.log(data.nick, delta);
+                    } else {
+                        clearInterval(pingInterval);
+                    }
+                }, 10000);
+                
                 socket.on("disconnect", function() {
-                    delete room.users[data.nick];
-                    Object.keys(room.users).forEach(function(userNick) {
-                        var user = room.users[userNick];
-                        user.socket.emit("user_left", {
-                            nick: data.nick
-                        });
-                    });
+                    disconnectUser(room, data.nick);
                 });
             } else {
                 console.log("login rejected");
