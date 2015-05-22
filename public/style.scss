@@ -222,6 +222,40 @@ aside {
     }
 }
 
+.sendbar_attach {
+    margin: 10px;
+}
+
+.sendbar_attach label {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    
+    transition-property: box-shadow, background;
+    
+    &:hover, &:focus {
+        background-color: #fff;
+        @include material-shadow(2);
+        
+        svg g path {
+            fill: $green;
+        }
+    }
+    
+    > * {
+        display: none;
+    }
+    
+    svg {
+        display: block;
+        width: 30px;
+        height: 30px;
+        margin: 10px;
+    }
+}
+
 .messages {
     position: absolute;
     top: 0;
