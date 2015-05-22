@@ -62,7 +62,7 @@ var makeMessageElem = function(data, type) {
         if (data.mediaType.match(/^image\//gi)) { // image/*
             bodyContent = "<img src='" + mediaURL + "'>";
         } else if (data.mediaType.match(/^video\//gi)) { // video/*
-            bodyContent = "<video controls autoplay loop src='" + mediaURL + "'></video>";
+            bodyContent = "<video controls src='" + mediaURL + "'></video>";
         } else if (data.mediaType.match(/^audio\//gi)) { // audio/*
             bodyContent = "<audio controls src='" + mediaURL + "'></audio>";
         } else {
