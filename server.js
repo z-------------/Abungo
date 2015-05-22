@@ -220,5 +220,14 @@ var server = app.listen(PORT, function() {
                 socket.emit("login_rejected");
             }
         });
+        
+        socket.on("login_resume", function(data) {
+            var room = rooms[data.room];
+            if (room.users.indexOf(data.nick) !== -1 && room.users[data.nick].userID === data.userID) {
+                room.users[data.nick].socket = socket;
+            } else {
+                socket.emit("login_resume_rejected");
+            }
+        });
     });
 });

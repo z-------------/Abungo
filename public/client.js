@@ -188,6 +188,16 @@ socket.on("login_accepted", function(data) {
     });
     sendbarComposeInput.focus();
     
+    /* try resume connection */
+    
+    socket.on("connected", function() {
+        socket.emit("login_resume", {
+            nick: abungoState.nick,
+            userID: abungoState.userID,
+            room: abungoState.room
+        });
+    });
+    
     /* send messages */
     
     sendbarComposeInput.addEventListener("keydown", function(e){
