@@ -68,7 +68,7 @@ var makeMessageElem = function(data, type) {
             bodyContent = "<a target='_blank' href='" + mediaURL + "'>" + cleanseHTML(data.mediaName) + "</a>";
         }
     } else {
-        bodyContent = cleanseHTML(data.message).replace(/\n/gi, "<br>");
+        bodyContent = data.message;
     }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
@@ -194,7 +194,7 @@ socket.on("login_accepted", function(data) {
             e.preventDefault();
             if (this.textContent.length > 0) {
                 socket.emit("message", {
-                    message: this.innerHTML.replace(/<br>/gi, "\n"),
+                    message: this.innerHTML,
                     nick: abungoState.nick,
                     room: abungoState.room,
                     userID: abungoState.userID
