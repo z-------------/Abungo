@@ -178,11 +178,12 @@ socket.on("login_accepted", function(data) {
     var sendbarFileInput = $("#fileinput");
     var messagesElem = $(".messages");
     
+    var sidebarHideBtn = $("#sidebar_collapse");
+    var sidebarLogoutBtn = $("#logout_button");
+    
     loginButton.textContent = "Connected.";
     loginForm.classList.add("notouch");
-    each($$(".showonlogin"), function(elem) {
-        elem.classList.add("visible");
-    });
+    document.body.classList.add("loggedin");
     each($$(".notouch input"), function(elem) {
         elem.setAttribute("readonly", "true");
     });
@@ -333,6 +334,18 @@ socket.on("login_accepted", function(data) {
         };
         ping();
     })();
+    
+    /* show/hide sidebar */
+
+    sidebarHideBtn.addEventListener("click", function() {
+        document.body.classList.toggle("sidebarhidden");
+    });
+
+    /* logout button */
+    
+    sidebarLogoutBtn.addEventListener("click", function() {
+        window.location.reload();
+    });
 });
 
 socket.on("login_rejected", function(data) {

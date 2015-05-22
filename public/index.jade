@@ -6,7 +6,7 @@ html
         
         link(rel="stylesheet", href="style.css")
     body
-        aside
+        aside.sidebar
             header
                 h1.logo Abungo
             form#login
@@ -21,11 +21,18 @@ html
             .userlist.showonlogin
                 h2 Online users
                 ol.userlist_list
+            .sidebar_controls.showonlogin
+                .left
+                    label.button.green#logout_button
+                        include ./img/exit.svg
+                .right
+                    label.button.green#sidebar_collapse
+                        include ./img/chevron-left.svg
         
         .messages.showonlogin
             .sendbar
                 .sendbar_attach
-                    label
+                    label.button
                         include ./img/attachment.svg
                         input(type="file", id="fileinput", data-icon="attachment")
                 .sendbar_compose
