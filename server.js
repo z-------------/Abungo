@@ -127,10 +127,11 @@ var server = app.listen(PORT, function() {
                 room.users[data.nick] = {
                     socket: socket,
                     userID: userID,
-                    nick: data.nick
+                    nick: data.nick,
+                    ip: socket.handshake.address
                 };
                 var user = room.users[data.nick];
-                console.log("login accepted");
+                console.log("%s (%s) joined room '%s'", user.nick, user.ip, data.room);
                 
                 socket.emit("login_accepted", {
                     userID: userID,
@@ -163,8 +164,12 @@ var server = app.listen(PORT, function() {
                         sendableMessageData.mediaID = mediaID;
                         sendableMessageData.mediaName = data.mediaName;
                         sendableMessageData.mediaType = data.type;
+                        
+                        console.log("%s (%s) sent file: %s (%s)", user.nick, user.ip, data.mediaName, data.type);
                     } else {
                         sendableMessageData.message = data.message;
+                        
+                        console.log("%s (%s) said: %s", user.nick, user.ip, data.message);
                     }
                     
                     Object.keys(room.users).forEach(function(userNick) {
@@ -223,7 +228,7 @@ var server = app.listen(PORT, function() {
         
         socket.on("login_resume", function(data) {
             var room = rooms[data.room];
-            if (room.users.indexOf(data.nick) !== -1 && room.users[data.nick].userID === data.userID) {
+            if (room && room.users.indexOf(data.nick) !== -1 && room.users[data.nick].userID === data.userID) {
                 room.users[data.nick].socket = socket;
             } else {
                 socket.emit("login_resume_rejected");
