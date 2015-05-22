@@ -194,7 +194,7 @@ socket.on("login_accepted", function(data) {
             e.preventDefault();
             if (this.textContent.length > 0) {
                 socket.emit("message", {
-                    message: this.textContent,
+                    message: this.innerHTML.replace(/<br>/gi, "\n"),
                     nick: abungoState.nick,
                     room: abungoState.room,
                     userID: abungoState.userID
