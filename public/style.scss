@@ -187,8 +187,10 @@ aside {
     height: 70px;
     background-color: $green;
     
+    @include material-shadow(1, -1);
+    
     &.float {
-        box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.16), 0 -3px 6px rgba(0, 0, 0, 0.23);
+        @include material-shadow(2, -1);
     }
 }
 
@@ -207,7 +209,7 @@ aside {
     
     @include material-shadow(1);
     
-    &:focus {
+    &:hover, &:focus {
         @include material-shadow(2);
     }
     
