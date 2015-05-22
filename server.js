@@ -75,6 +75,23 @@ var server = app.listen(PORT, function() {
             console.log("disconnected", nick);
         }
     };
+    
+    /* delete files that have expired */
+    
+    setInterval(function() {
+        Object.keys(files).forEach(function(mediaID) {
+            var file = files[mediaID];
+            var now = new Date();
+            var delta = now - file.uploadedDate;
+            console.log(mediaID, delta, 600000 - delta);
+            if (delta > 600000) { // 10 minutes
+                delete files[mediaID];
+                console.log("deleted" + mediaID, files);
+            }
+        });
+    }, 5000);
+    
+    /* socket messages (the actual stuff) */
 
     io.on("connection", function(socket){
         socket.emit("connected", {
@@ -140,7 +157,8 @@ var server = app.listen(PORT, function() {
                         var mediaID = "" + Math.round(Math.random() * 100000) + new Date().getTime();
                         files[mediaID] = {
                             file: data.upload,
-                            type: data.type
+                            type: data.type,
+                            uploadedDate: new Date()
                         };
                         sendableMessageData.mediaID = mediaID;
                         sendableMessageData.mediaName = data.mediaName;

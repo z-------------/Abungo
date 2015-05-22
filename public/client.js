@@ -57,6 +57,7 @@ var makeMessageElem = function(data, type) {
     
     if (data.mediaID) {
         var mediaURL = "/file/" + data.mediaID + "/" + data.mediaName;
+        elem.dataset.mediaId = data.mediaID;
         
         if (data.mediaType.match(/image\/*/gi)) { // image/*
             bodyContent = "<img src='" + mediaURL + "'>";
