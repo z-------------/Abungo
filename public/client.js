@@ -59,11 +59,11 @@ var makeMessageElem = function(data, type) {
         var mediaURL = "/file/" + data.mediaID + "/" + data.mediaName;
         elem.dataset.mediaId = data.mediaID;
         
-        if (data.mediaType.match(/image\/*/gi)) { // image/*
+        if (data.mediaType.match(/^image\//gi)) { // image/*
             bodyContent = "<img src='" + mediaURL + "'>";
-        } else if (data.mediaType.match(/video\/*/gi)) { // video/*
+        } else if (data.mediaType.match(/^video\//gi)) { // video/*
             bodyContent = "<video controls autoplay loop src='" + mediaURL + "'></video>";
-        } else if (data.mediaType.match(/audio\/*/gi)) { // audio/*
+        } else if (data.mediaType.match(/^audio\//gi)) { // audio/*
             bodyContent = "<audio controls src='" + mediaURL + "'></audio>";
         } else {
             bodyContent = "<a target='_blank' href='" + mediaURL + "'>" + cleanseHTML(data.mediaName) + "</a>";
