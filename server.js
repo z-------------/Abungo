@@ -185,7 +185,7 @@ var server = app.listen(PORT, function() {
                         var delta = new Date() - user.lastPing;
 
                         if (delta > 30000) {
-                            disconnectUser(room, data.nick);
+                            socket.disconnect();
                         }
 
                         console.log(data.nick, delta);
