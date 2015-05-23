@@ -186,8 +186,12 @@ socket.on("connected", function() {
             socket.on("login_rejoin_accepted", function(data) {
                 console.log("login_rejoin_accepted");
                 abungoState.userID = data.userID;
-                abungoState.users = data.users;
-                updateUsersList();
+                
+                // update users list without removing Object.observe listener
+                abungoState.users.length = 0;
+                data.users.forEach(function(nick) {
+                    abungoState.users.push(nick);
+                });
             });
         });
     }
@@ -345,7 +349,7 @@ socket.on("login_accepted", function(data) {
     /* update users list */
     
     Object.observe(abungoState.users, function() {
-        abungoState.users.sort();
+        console.log("users list changed", abungoState.users);
         updateUsersList();
     });
     updateUsersList();
