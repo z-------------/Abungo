@@ -163,6 +163,49 @@ loginForm.addEventListener("submit", function(e){
 
 loginNickInput.focus();
 
+/* try resume connection */
+
+socket.on("connected", function() {
+    if (abungoState && abungoState.userID && abungoState.nick && abungoState.room) {
+        socket.emit("login_resume", {
+            nick: abungoState.nick,
+            userID: abungoState.userID,
+            room: abungoState.room
+        });
+        console.log("sending login_resume");
+
+        socket.on("login_resume_rejected", function() {
+            console.log("login_resume_rejected");
+            socket.emit("login", {
+                nick: abungoState.nick,
+                room: abungoState.room,
+                userID: abungoState.userID,
+                rejoin: true
+            });
+            console.log("sending login { rejoin: true }");
+            socket.on("login_rejoin_accepted", function(data) {
+                console.log("login_rejoin_accepted");
+                abungoState.userID = data.userID;
+                abungoState.users = data.users;
+                updateUsersList();
+            });
+        });
+    }
+});
+
+/* ping the server to determine connectivity */
+
+(function(){
+    socket.on("pong", function(data) {
+        console.log("pong");
+    });
+    var ping = function() {
+        socket.emit("ping");
+        console.log("ping");
+    };
+    setInterval(ping, 5000);
+})();
+
 /* forming in a straight line */
 
 socket.on("login_accepted", function(data) {
@@ -188,16 +231,6 @@ socket.on("login_accepted", function(data) {
         elem.setAttribute("readonly", "true");
     });
     sendbarComposeInput.focus();
-    
-    /* try resume connection */
-    
-    socket.on("connected", function() {
-        socket.emit("login_resume", {
-            nick: abungoState.nick,
-            userID: abungoState.userID,
-            room: abungoState.room
-        });
-    });
     
     /* send messages */
     
@@ -326,21 +359,6 @@ socket.on("login_accepted", function(data) {
             sendbarElem.classList.add("float");
         }
     });
-
-    /* ping the server to determine connectivity */
-    
-    (function(){
-        socket.on("pong", function(data) {
-            console.log("pong", data);
-            
-            setTimeout(ping, 5000);
-        });
-        var ping = function() {
-            socket.emit("ping");
-            console.log("ping");
-        };
-        ping();
-    })();
     
     /* show/hide sidebar */
 

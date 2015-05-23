@@ -102,20 +102,12 @@ var server = app.listen(PORT, function() {
         
         socket.on("login", function(data){
             var nickTaken = false;
-            var userIDExists = false;
             
             if (rooms[data.room] && rooms[data.room].users.hasOwnProperty(data.nick)) {
                 nickTaken = true;
-                if (rooms[data.room].users[data.nick].userID === data.userID) {
-                    userIDExists = true;
-                } else {
-                    console.log("user id doesnt exist");
-                }
-            } else {
-                console.log("user id doesnt exist");
             }
             
-            if (!nickTaken && !userIDExists) {
+            if (!nickTaken) {
                 if (!rooms[data.room]) {
                     rooms[data.room] = {
                         users: {}
@@ -123,7 +115,7 @@ var server = app.listen(PORT, function() {
                 }
                 
                 var room = rooms[data.room];
-                var userID = "" + new Date().getTime() + Math.round(Math.random() * 10000);
+                var userID = data.userID || ("" + new Date().getTime() + Math.round(Math.random() * 10000));
                 room.users[data.nick] = {
                     socket: socket,
                     userID: userID,
@@ -133,12 +125,21 @@ var server = app.listen(PORT, function() {
                 var user = room.users[data.nick];
                 console.log("%s (%s) joined room '%s'", user.nick, user.ip, data.room);
                 
-                socket.emit("login_accepted", {
-                    userID: userID,
-                    nick: data.nick,
-                    room: data.room,
-                    users: Object.keys(room.users)
-                });
+                if (data.rejoin) {
+                    socket.emit("login_rejoin_accepted", {
+                        userID: userID,
+                        nick: data.nick,
+                        room: data.room,
+                        users: Object.keys(room.users)
+                    });
+                } else {
+                    socket.emit("login_accepted", {
+                        userID: userID,
+                        nick: data.nick,
+                        room: data.room,
+                        users: Object.keys(room.users)
+                    });
+                }
                 
                 Object.keys(room.users).forEach(function(userNick) {
                     var user = room.users[userNick];
@@ -221,14 +222,17 @@ var server = app.listen(PORT, function() {
                     disconnectUser(room, data.nick);
                 });
             } else {
-                console.log("login rejected");
-                socket.emit("login_rejected");
+                var nickTakenUser = rooms[data.room].users[data.nick];
+                if (nickTakenUser.userID !== data.userID) {
+                    socket.emit("login_rejected");
+                    console.log("login rejected");
+                }
             }
         });
         
         socket.on("login_resume", function(data) {
             var room = rooms[data.room];
-            if (room && room.users.indexOf(data.nick) !== -1 && room.users[data.nick].userID === data.userID) {
+            if (room && room.users && room.users.hasOwnProperty(data.nick) && room.users[data.nick].userID === data.userID) {
                 room.users[data.nick].socket = socket;
             } else {
                 socket.emit("login_resume_rejected");
