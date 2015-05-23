@@ -216,6 +216,13 @@ socket.on("login_accepted", function(data) {
         }
     });
     
+    sendbarComposeInput.addEventListener("input", function() {
+        var elems = this.querySelectorAll(":not(br)");
+        each(elems, function(elem) {
+            elem.outerHTML = elem.textContent;
+        });
+    });
+    
     /* receive messages (including files) */
     
     socket.on("message_incoming", function(data) {
