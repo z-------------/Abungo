@@ -33,6 +33,12 @@ var cleanseHTML = function(str) {
     return elem.innerHTML;
 };
 
+var textifyHTML = function(str) {
+    var elem = document.createElement("div");
+    elem.innerHTML = str.replace(/<br>/gi, "\n");
+    return elem.textContent;
+};
+
 /* track pressed keys */
 
 var pressedKeys = [];
@@ -300,11 +306,13 @@ socket.on("login_accepted", function(data) {
         }
         messagesElem.appendChild(makeMessageElem(data, type));
         
-        var notifText = data.message;
+        var notifText;
         if (data.mediaID) {
             notifText = "File: " + data.mediaName;
         } else if (data.sticker) {
             notifText = ":" + data.sticker + ":";
+        } else {
+            notifText = textifyHTML(data.message);
         }
         showNotification(data.nick, notifText);
         
