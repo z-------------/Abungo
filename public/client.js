@@ -308,7 +308,7 @@ socket.on("login_accepted", function(data) {
         }
         showNotification(data.nick, notifText);
         
-        if (isAtBottom) { // scroll to bottom if previously at bottom
+        if (isAtBottom || type === "self") { // scroll to bottom if previously at bottom
             messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
         }
     });
