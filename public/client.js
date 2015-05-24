@@ -165,7 +165,7 @@ loginNickInput.focus();
 
 /* try resume connection */
 
-socket.on("connected", function() {
+var tryReconnect = function() {
     if (abungoState && abungoState.userID && abungoState.nick && abungoState.room) {
         socket.emit("login_resume", {
             nick: abungoState.nick,
@@ -195,7 +195,9 @@ socket.on("connected", function() {
             });
         });
     }
-});
+};
+
+socket.on("connected", tryReconnect);
 
 /* ping the server to determine connectivity */
 
@@ -390,9 +392,23 @@ socket.on("login_accepted", function(data) {
             this.classList.toggle("popup-opened");
         });
     });
+    
+    /* send reconnect requests when socket conection lost */
+    
+    setInterval(function() {
+        if (!socket.connected || socket.disconnected) {
+            socket.connect(function() {
+                tryReconnect();
+            });
+        }
+    }, 5000);
 });
 
 socket.on("login_rejected", function(data) {
     console.log("login_rejected");
     alert("That username is taken. Please choose another or join a different room.");
 });
+
+setInterval(function() {
+    console.log("socket.connected", socket.connected);
+}, 5000);
