@@ -271,6 +271,8 @@ socket.on("login_accepted", function(data) {
     });
     sendbarComposeInput.focus();
     
+    document.title = abungoState.room + " - " + document.title;
+    
     /* send messages */
     
     sendbarComposeInput.addEventListener("keydown", function(e){
