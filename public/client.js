@@ -382,6 +382,11 @@ socket.on("login_accepted", function(data) {
     
     each($$("label.button.popup"), function(elem) {
         elem.addEventListener("click", function() {
+            if (!this.classList.contains("popup-opened")) {
+                each($$("label.button.popup-opened"), function(elemOpened) {
+                    elemOpened.classList.remove("popup-opened");
+                });
+            }
             this.classList.toggle("popup-opened");
         });
     });
