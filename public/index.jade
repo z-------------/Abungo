@@ -41,8 +41,12 @@ html
                             h3 Hello! This is the camera popup.
                     label.button.popup
                         include ./img/smiley.svg
-                        div.popup_popup.popup_popup-camera
-                            h3 Hello! This is the stickers popup.
+                        div.popup_popup.popup_popup-stickers
+                            div.popup_scroller.y
+                                ul.popup_popup-stickers_list
+                                    each sticker in stickers
+                                        li
+                                            img.popup_popup-stickers_sticker(src="img/stickers/#{sticker}.svg", title="#{sticker}")
                         
                 .sendbar_compose
                     .sendbar_compose_input(contenteditable="true", placeholder="Type your message...")

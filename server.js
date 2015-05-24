@@ -6,6 +6,14 @@ var sass = require("node-sass");
 
 var PORT = process.env.PORT || 3000;
 
+/* make a list of emoji */
+
+var stickers = [];
+
+fs.readdirSync(__dirname + "/public/img/stickers/").forEach(function(filename) {
+    stickers.push(filename.slice(0, -4));
+});
+
 /* set up express */
 
 app.use(express.static("public"));
@@ -14,11 +22,15 @@ app.set("views", __dirname + "/public");
 app.set("view engine", "jade");
 
 app.get("/", function(req, res) {
-    res.render("index.jade");
+    res.render("index.jade", {
+        stickers: stickers
+    });
 });
 
 app.get("/:path.html", function(req, res) {
-    res.render(req.params.path + ".jade");
+    res.render(req.params.path + ".jade", {
+        stickers: stickers
+    });
 });
 
 app.get("/:path.css", function(req, res) {
