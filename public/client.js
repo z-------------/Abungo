@@ -68,6 +68,8 @@ var makeMessageElem = function(data, type) {
         } else {
             bodyContent = "<a target='_blank' href='" + mediaURL + "'>" + cleanseHTML(data.mediaName) + "</a>";
         }
+    } else if (data.sticker) {
+        bodyContent = "<img class='message_sticker' src='img/stickers/" + data.sticker + ".svg'>";
     } else {
         bodyContent = Autolinker.link(data.message);
     }
@@ -287,7 +289,7 @@ socket.on("login_accepted", function(data) {
         });
     });
     
-    /* receive messages (including files) */
+    /* receive messages (including files and stickers) */
     
     socket.on("message_incoming", function(data) {
         var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
@@ -324,6 +326,19 @@ socket.on("login_accepted", function(data) {
             });
         } else if (file) {
             alert("That file is too big. You can only upload files less than 10 megabytes in size.");
+        }
+    });
+    
+    /* send stickers */
+    
+    $(".popup_popup-stickers").addEventListener("click", function(e) {
+        if (e.target.classList.contains("popup_popup-stickers_sticker")) {
+            socket.emit("message", {
+                nick: abungoState.nick,
+                userID: abungoState.userID,
+                room: abungoState.room,
+                sticker: e.target.getAttribute("title")
+            });
         }
     });
     

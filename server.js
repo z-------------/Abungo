@@ -162,6 +162,7 @@ var server = app.listen(PORT, function() {
                 
                 socket.on("message", function(data) {
                     var isFile = !!data.upload;
+                    var isSticker = !!data.sticker;
                     
                     var sendableMessageData = {
                         nick: data.nick
@@ -179,6 +180,10 @@ var server = app.listen(PORT, function() {
                         sendableMessageData.mediaType = data.type;
                         
                         console.log("%s (%s) sent file: %s (%s)", user.nick, user.ip, data.mediaName, data.type);
+                    } else if (isSticker) {
+                        sendableMessageData.sticker = data.sticker;
+                        
+                        console.log("%s (%s) sent sticker '%s'", user.nick, user.ip, data.sticker);
                     } else {
                         sendableMessageData.message = data.message;
                         

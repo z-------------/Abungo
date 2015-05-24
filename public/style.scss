@@ -473,4 +473,10 @@ label.button {
         color: $green;
         border-bottom: solid 1px $green;
     }
+    
+    .message_sticker {
+        $message_sticker_width: 200px;
+        width: $message_sticker_width;
+        height: $message_sticker_width;
+    }
 }
