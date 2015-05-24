@@ -202,7 +202,7 @@ var server = app.listen(PORT, function() {
                     user.lastPing = new Date();
                 });
                 var pingInterval = setInterval(function(){
-                    if (room.users[data.nick]) {
+                    if (room.users[data.nick] && room.users[data.nick].userID === user.userID) {
                         if (!user.lastPing) {
                             user.lastPing = new Date();
                         }
