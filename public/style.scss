@@ -25,7 +25,7 @@ $green: #58b69b;
     color: inherit;
     margin: 0;
     padding: 0;
-    
+    text-decoration: none;
     max-width: 100%;
     
     background-repeat: no-repeat;
@@ -432,5 +432,10 @@ label.button {
     
     h3 {
         font-weight: 700;
+    }
+    
+    a {
+        color: $green;
+        border-bottom: solid 1px $green;
     }
 }
