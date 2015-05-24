@@ -69,7 +69,7 @@ var makeMessageElem = function(data, type) {
             bodyContent = "<a target='_blank' href='" + mediaURL + "'>" + cleanseHTML(data.mediaName) + "</a>";
         }
     } else {
-        bodyContent = data.message;
+        bodyContent = Autolinker.link(data.message);
     }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
