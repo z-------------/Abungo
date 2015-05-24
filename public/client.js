@@ -373,7 +373,17 @@ socket.on("login_accepted", function(data) {
     /* logout button */
     
     sidebarLogoutBtn.addEventListener("click", function() {
-        window.location.reload();
+        if (confirm("Are you sure you want to leave? Your chat history will be lost.")) {
+            window.location.reload();
+        }
+    });
+    
+    /* popup buttons */
+    
+    each($$("label.button.popup"), function(elem) {
+        elem.addEventListener("click", function() {
+            this.classList.toggle("popup-opened");
+        });
     });
 });
 

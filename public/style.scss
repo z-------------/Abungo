@@ -267,6 +267,10 @@ aside {
 
 .sendbar_attach {
     margin: 10px;
+    
+    label.button {
+        margin-right: 10px;
+    }
 }
 
 label.button {
@@ -275,14 +279,15 @@ label.button {
     height: 50px;
     border-radius: 50%;
     cursor: pointer;
+    position: relative;
     
     transition-property: box-shadow, background;
     
-    &:hover, &:focus {
+    &:hover, &:focus, &.popup-opened {
         background-color: #fff;
         @include material-shadow(2);
         
-        svg g path {
+        svg g > * {
             fill: $green;
         }
     }
@@ -291,13 +296,13 @@ label.button {
         &:hover, &:focus {
             background-color: $green;
             
-            svg g path {
+            svg g > *{
                 fill: #fff;
             }
         }
     }
     
-    > * {
+    input {
         display: none;
     }
     
@@ -306,6 +311,51 @@ label.button {
         width: 30px;
         height: 30px;
         margin: 10px;
+    }
+    
+    .popup_popup {
+        $popup_width: 300px;
+        $popup_height: $popup_width * 9 / 16;
+        
+        position: absolute;
+        max-width: none;
+        width: $popup_width;
+        height: $popup_height;
+        left: 50%;
+        top: 0;
+        margin-top: -30px;
+        opacity: 0;
+        background-color: #fff;
+        color: $black;
+        transform: translateY(calc(-100% + 50px)) translateX(-50%);
+        pointer-events: none;
+        border-radius: 4px;
+        
+        transition-property: transform, opacity, box-shadow;
+        
+        &:after {
+            content: "";
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 10px 0 10px;
+            border-color: #ffffff transparent transparent transparent;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            margin-left: -10px;
+            margin-bottom: -10px;
+        }
+    }
+    
+    &.popup-opened {
+        .popup_popup {
+            pointer-events: auto;
+            opacity: 1;
+            transform: translateY(-100%) translateX(-50%);
+            
+            @include material-shadow(2);
+        }
     }
 }
 
