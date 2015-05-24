@@ -133,6 +133,29 @@ var showNotification = function(nick, text) {
     }
 };
 
+var updateConnectionStatusIndicator = function(statusi) {
+    var statuses = [{
+        string: "Connected.", 
+        classList: {
+            action: "remove",
+            class: "problem"
+        }
+    }, {
+        string: "Reconnecting...",
+        classList: {
+            action: "add",
+            class: "problem"
+        }
+    }];
+    var status = statuses[statusi];
+    var statusString = status.string;
+    var classListMethod = status.classList.action;
+    var classListClass = status.classList.class;
+    
+    loginButton.classList[classListMethod](classListClass);
+    loginButton.textContent = statusString;
+};
+
 /* socket.io shenanigans */
 
 var socket = io();
@@ -192,6 +215,8 @@ var tryReconnect = function() {
                 data.users.forEach(function(nick) {
                     abungoState.users.push(nick);
                 });
+                
+                updateConnectionStatusIndicator(0);
             });
         });
     }
@@ -397,9 +422,13 @@ socket.on("login_accepted", function(data) {
     
     setInterval(function() {
         if (!socket.connected || socket.disconnected) {
+            updateConnectionStatusIndicator(1);
+            
             socket.connect(function() {
                 tryReconnect();
             });
+        } else {
+            updateConnectionStatusIndicator(0);
         }
     }, 5000);
 });
