@@ -444,15 +444,16 @@ socket.on("login_accepted", function(data) {
     
     /* popup buttons */
     
-    each($$("label.button.popup svg"), function(elem) {
+    each($$("label.button.popup"), function(elem) {
         elem.addEventListener("click", function(e) {
-            var label = elem.parentElement;
-            if (!label.classList.contains("popup-opened")) {
-                each($$("label.button.popup-opened"), function(elemOpened) {
-                    label.classList.remove("popup-opened");
-                });
+            if (e.target === this) {
+                if (!this.classList.contains("popup-opened")) {
+                    each($$("label.button.popup-opened"), function(elemOpened) {
+                        this.classList.remove("popup-opened");
+                    });
+                }
+                this.classList.toggle("popup-opened");
             }
-            label.classList.toggle("popup-opened");
         });
     });
     
