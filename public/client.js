@@ -347,15 +347,27 @@ socket.on("login_accepted", function(data) {
     /* user join/leave */
     
     socket.on("user_joined", function(data) {
+        var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
+        
         if (abungoState.users.indexOf(data.nick) === -1) {
             abungoState.users.push(data.nick);
         }
         messagesElem.appendChild(makeJoinElem(data, "joined"));
+        
+        if (isAtBottom) { // scroll to bottom if previously at bottom
+            messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
+        }
     });
     
     socket.on("user_left", function(data) {
+        var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
+        
         abungoState.users.remove(data.nick);
         messagesElem.appendChild(makeJoinElem(data, "left"));
+        
+        if (isAtBottom) { // scroll to bottom if previously at bottom
+            messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
+        }
     });
     
     /* send and receive typing status */
