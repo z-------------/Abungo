@@ -303,6 +303,8 @@ socket.on("login_accepted", function(data) {
         var notifText = data.message;
         if (data.mediaID) {
             notifText = "File: " + data.mediaName;
+        } else if (data.sticker) {
+            notifText = ":" + data.sticker + ":";
         }
         showNotification(data.nick, notifText);
         
