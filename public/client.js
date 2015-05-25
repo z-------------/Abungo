@@ -39,6 +39,10 @@ var textifyHTML = function(str) {
     return elem.textContent;
 };
 
+var HTMLify = function(str) {
+    return str.replace(/\n/gi, "<br>");
+};
+
 /* track pressed keys */
 
 var pressedKeys = [];
@@ -77,7 +81,7 @@ var makeMessageElem = function(data, type) {
     } else if (data.sticker) {
         bodyContent = "<img class='message_sticker' src='img/stickers/" + data.sticker + ".svg'>";
     } else {
-        bodyContent = Autolinker.link(data.message);
+        bodyContent = Autolinker.link(HTMLify(data.message));
     }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
@@ -280,7 +284,7 @@ socket.on("login_accepted", function(data) {
             e.preventDefault();
             if (this.textContent.length > 0) {
                 socket.emit("message", {
-                    message: this.innerHTML,
+                    message: textifyHTML(this.innerHTML),
                     nick: abungoState.nick,
                     room: abungoState.room,
                     userID: abungoState.userID
@@ -314,7 +318,7 @@ socket.on("login_accepted", function(data) {
         } else if (data.sticker) {
             notifText = ":" + data.sticker + ":";
         } else {
-            notifText = textifyHTML(data.message);
+            notifText = data.message;
         }
         showNotification(data.nick, notifText);
         
