@@ -182,6 +182,7 @@ var server = app.listen(PORT, function() {
                         console.log("%s (%s) sent file: %s (%s)", user.nick, user.ip, data.mediaName, data.type);
                     } else if (isSticker) {
                         sendableMessageData.sticker = data.sticker;
+                        sendableMessageData.stickerSize = data.stickerSize;
                         
                         console.log("%s (%s) sent sticker '%s'", user.nick, user.ip, data.sticker);
                     } else {

@@ -61,6 +61,11 @@ var dataURItoBlob = function(dataURI) { // by user Stoive on StackOverflow http:
     return new Blob([ia], { type: mimeString });
 };
 
+var clamp = function(n, max){
+    if (n <= max) return n;
+    else return max
+};
+
 /* track pressed keys */
 
 var pressedKeys = [];
@@ -97,7 +102,7 @@ var makeMessageElem = function(data, type) {
             bodyContent = "<a target='_blank' href='" + mediaURL + "'>" + cleanseHTML(data.mediaName) + "</a>";
         }
     } else if (data.sticker) {
-        bodyContent = "<img class='message_sticker' src='img/stickers/" + data.sticker + ".svg'>";
+        bodyContent = "<img class='message_sticker message_sticker-" + data.stickerSize + "' src='img/stickers/" + data.sticker + ".svg'>";
     } else {
         // replace inline stickers with image
         if (!abungoState.stickerNames) {
@@ -411,14 +416,29 @@ socket.on("login_accepted", function(data) {
     
     /* send stickers */
     
-    $(".popup_popup-stickers").addEventListener("click", function(e) {
+    $(".popup_popup-stickers").addEventListener("mousedown", function(e) {
         if (e.target.classList.contains("popup_popup-stickers_sticker")) {
-            socket.emit("message", {
-                nick: abungoState.nick,
-                userID: abungoState.userID,
-                room: abungoState.room,
-                sticker: e.target.getAttribute("title")
-            });
+            var mousedownDate = new Date();
+            
+            e.target.onmouseup = function() {
+                var mouseupDate = new Date();
+                var delta = mouseupDate - mousedownDate;
+                
+                var sizesCount = 3;
+                var maxTime = 2000;
+                
+                var size = Math.round((sizesCount - 1) * delta/maxTime);
+                
+                if (size <= 2) {
+                    socket.emit("message", {
+                        nick: abungoState.nick,
+                        userID: abungoState.userID,
+                        room: abungoState.room,
+                        sticker: e.target.getAttribute("title"),
+                        stickerSize: size
+                    });
+                }
+            };
         }
     });
     
