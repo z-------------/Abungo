@@ -398,21 +398,54 @@ socket.on("login_accepted", function(data) {
     
     /* send files */
     
+    // file input
+    
     sendbarFileInput.addEventListener("change", function(){
-        var file = this.files[0];
-        if (file && file.size < 10000000) { // 10 mb
-            socket.emit("message", {
-                nick: abungoState.nick,
-                userID: abungoState.userID,
-                room: abungoState.room,
-                upload: file,
-                type: file.type,
-                mediaName: file.name
-            });
-        } else if (file) {
-            alert("That file is too big. You can only upload files less than 10 megabytes in size.");
-        }
+        [].forEach.call(this.files, function(file) {
+            if (file && file.size < 10000000) { // 10 mb
+                socket.emit("message", {
+                    nick: abungoState.nick,
+                    userID: abungoState.userID,
+                    room: abungoState.room,
+                    upload: file,
+                    type: file.type,
+                    mediaName: file.name
+                });
+            } else if (file) {
+                alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
+            }
+        });
     });
+    
+    // drag and drop
+    
+    window.addEventListener("dragover", function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "copy";
+    }, false);
+    
+    window.addEventListener("drop", function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        var files = e.dataTransfer.files;
+        
+        [].forEach.call(files, function(file) {
+            if (file && file.size < 10000000) { // 10 mb
+                socket.emit("message", {
+                    nick: abungoState.nick,
+                    userID: abungoState.userID,
+                    room: abungoState.room,
+                    upload: file,
+                    type: file.type,
+                    mediaName: file.name
+                });
+            } else if (file) {
+                alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
+            }
+        })
+    }, false);
     
     /* send stickers */
     
