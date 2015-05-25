@@ -43,6 +43,24 @@ var HTMLify = function(str) {
     return str.replace(/\n/gi, "<br>");
 };
 
+var dataURItoBlob = function(dataURI) { // by user Stoive on StackOverflow http://stackoverflow.com/a/5100158/3234159
+    var byteString;
+    if (dataURI.split(",")[0].indexOf("base64") >= 0) {
+        byteString = atob(dataURI.split(",")[1]);
+    } else {
+        byteString = unescape(dataURI.split(",")[1]);
+    }
+
+    var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+
+    var ia = new Uint8Array(byteString.length);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([ia], { type: mimeString });
+};
+
 /* track pressed keys */
 
 var pressedKeys = [];
@@ -376,33 +394,59 @@ socket.on("login_accepted", function(data) {
     (function() {
         var videoStream;
         
-        $("label.button.popup-camera").addEventListener("click", function() {
-            var videoElem = $(".popup_popup-camera_preview");
-            if (!videoElem.src || videoElem.src.length < 1) {
-                navigator.getUserMedia({ video: true }, function(stream) {
-                    videoStream = stream;
-                    
-                    videoElem.src = window.URL.createObjectURL(stream);
-                    videoElem.onloadeddata = function(e) {
-                        var dimensionCheckInterval = setInterval(function() {
-                            if (videoElem.offsetWidth !== 0 && videoElem.offsetWidth !== 0) {
-                                clearInterval(dimensionCheckInterval);
-                                console.log("found dimensions", videoElem.offsetWidth, videoElem.offsetHeight);
-                                $(".popup_popup-camera").style.height = videoElem.offsetHeight + "px";
-                            } else {
-                                console.log("waiting for dimensions");
-                            }
-                        });
-                    };
-                }, function() {
-                    alert("Please allow webcam access in order to use the photo booth.");
-                });
-            } else if (this.classList.contains("popup-opened")) {
-                videoElem.removeAttribute("src");
-                videoStream.stop();
+        $("label.button.popup-camera").addEventListener("click", function(e) {
+            if (e.target === this) {
+                var videoElem = $(".popup_popup-camera_preview");
+                if (!videoElem.src || videoElem.src.length < 1) {
+                    navigator.getUserMedia({ video: true }, function(stream) {
+                        videoStream = stream;
+
+                        videoElem.src = window.URL.createObjectURL(stream);
+                        videoElem.onloadeddata = function(e) {
+                            var dimensionCheckInterval = setInterval(function() {
+                                if (videoElem.offsetWidth !== 0 && videoElem.offsetWidth !== 0) {
+                                    clearInterval(dimensionCheckInterval);
+                                    console.log("found dimensions", videoElem.offsetWidth, videoElem.offsetHeight);
+                                    $(".popup_popup-camera").style.height = videoElem.offsetHeight + "px";
+                                } else {
+                                    console.log("waiting for dimensions");
+                                }
+                            });
+                        };
+                    }, function() {
+                        alert("Please allow webcam access in order to use the photo booth.");
+                    });
+                } else if (this.classList.contains("popup-opened")) {
+                    videoElem.removeAttribute("src");
+                    videoStream.stop();
+                }
             }
         });
     })();
+    
+    $(".popup_popup-camera label.button").addEventListener("click", function() {
+        var videoElem = $(".popup_popup-camera_preview");
+        if (videoElem.src && videoElem.src.length >= 1) {
+            var canvas = document.createElement("canvas");
+            var ctx = canvas.getContext("2d");
+            canvas.width = videoElem.offsetWidth;
+            canvas.height = videoElem.offsetHeight;
+            ctx.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
+            
+            var dataURI = canvas.toDataURL();
+            var blob = dataURItoBlob(dataURI);
+            var now = new Date();
+            
+            socket.emit("message", {
+                nick: abungoState.nick,
+                userID: abungoState.userID,
+                room: abungoState.room,
+                upload: blob,
+                type: "image/png",
+                mediaName: "Abungo snap at " + now.toDateString() + " " + now.toTimeString() + ".png"
+            });
+        }
+    });
     
     /* user join/leave */
     

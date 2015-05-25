@@ -291,12 +291,26 @@ label.button {
         background-color: #fff;
         @include material-shadow(2);
         
-        svg g > * {
+        > svg g > * {
             fill: $green;
         }
     }
     
-    &.green {
+    @each $depth in 1, 2, 3, 4, 5 {
+        &.shadow#{$depth} {
+            @include material-shadow($depth);
+        }
+    }
+    
+    &.white {
+        background-color: #fff;
+        
+        svg g > * {
+            fill: $black;
+        }
+    }
+    
+    &.green, &.white {
         &:hover, &:focus {
             background-color: $green;
             
@@ -366,6 +380,15 @@ label.button {
                 display: inline-block;
                 width: 75px;
                 height: 75px;
+                margin: 10px;
+            }
+        }
+        
+        &.popup_popup-camera {
+            .popup_popup-camera_capture {
+                position: absolute;
+                right: 0;
+                bottom: 0;
                 margin: 10px;
             }
         }
