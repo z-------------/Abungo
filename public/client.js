@@ -369,6 +369,41 @@ socket.on("login_accepted", function(data) {
         }
     });
     
+    /* photo booth */
+    
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    
+    (function() {
+        var videoStream;
+        
+        $("label.button.popup-camera").addEventListener("click", function() {
+            var videoElem = $(".popup_popup-camera_preview");
+            if (!videoElem.src || videoElem.src.length < 1) {
+                navigator.getUserMedia({ video: true }, function(stream) {
+                    videoStream = stream;
+                    
+                    videoElem.src = window.URL.createObjectURL(stream);
+                    videoElem.onloadeddata = function(e) {
+                        var dimensionCheckInterval = setInterval(function() {
+                            if (videoElem.offsetWidth !== 0 && videoElem.offsetWidth !== 0) {
+                                clearInterval(dimensionCheckInterval);
+                                console.log("found dimensions", videoElem.offsetWidth, videoElem.offsetHeight);
+                                $(".popup_popup-camera").style.height = videoElem.offsetHeight + "px";
+                            } else {
+                                console.log("waiting for dimensions");
+                            }
+                        });
+                    };
+                }, function() {
+                    alert("Please allow webcam access in order to use the photo booth.");
+                });
+            } else if (this.classList.contains("popup-opened")) {
+                videoElem.removeAttribute("src");
+                videoStream.stop();
+            }
+        });
+    })();
+    
     /* user join/leave */
     
     socket.on("user_joined", function(data) {

@@ -35,11 +35,11 @@ html
                     label.button
                         include ./img/attachment.svg
                         input(type="file", id="fileinput", data-icon="attachment")
-                    label.button.popup
+                    label.button.popup.popup-camera
                         include ./img/camera.svg
                         div.popup_popup.popup_popup-camera
-                            h3 Hello! This is the camera popup.
-                    label.button.popup
+                            video.popup_popup-camera_preview(autoplay="true")
+                    label.button.popup.popup-stickers
                         include ./img/smiley.svg
                         div.popup_popup.popup_popup-stickers
                             div.popup_scroller.y
