@@ -197,6 +197,41 @@ var updateConnectionStatusIndicator = function(statusi) {
     loginButton.textContent = statusString;
 };
 
+/* audio recorder functions from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio/ */
+
+var mergeBuffers = function(channelBuffer, recordingLength) {
+    var result = new Float32Array(recordingLength);
+    var offset = 0;
+    var lng = channelBuffer.length;
+    for (var i = 0; i < lng; i++){
+        var buffer = channelBuffer[i];
+        result.set(buffer, offset);
+        offset += buffer.length;
+    }
+    return result;
+};
+
+var interleave = function(leftChannel, rightChannel) {
+    var length = leftChannel.length + rightChannel.length;
+    var result = new Float32Array(length);
+
+    var inputIndex = 0;
+
+    for (var index = 0; index < length; ){
+        result[index++] = leftChannel[inputIndex];
+        result[index++] = rightChannel[inputIndex];
+        inputIndex++;
+    }
+    return result;
+};
+
+var writeUTFBytes = function(view, offset, string) { 
+    var lng = string.length;
+    for (var i = 0; i < lng; i++){
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
+};
+
 /* socket.io shenanigans */
 
 var socket = io();
@@ -447,6 +482,133 @@ socket.on("login_accepted", function(data) {
             });
         }
     });
+    
+    /* record audio */
+    
+    (function() {
+        var audioStream;
+
+        var leftchannel = [];
+        var rightchannel = [];
+        var recordingLength = 0;
+        var sampleRate;
+        
+        $(".popup_popup-voice_record").addEventListener("click", function(e) {
+            var that = this;
+            
+            if (!that.classList.contains("recording")) {
+                navigator.getUserMedia({ audio: true }, function(stream) { // adapted from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio
+                    audioStream = stream;
+                    
+                    // create audio context
+                    var AudioContext = window.AudioContext || window.webkitAudioContext;
+                    var context = new AudioContext();
+
+                    // retrieve sample rate to be used for wav packaging
+                    sampleRate = context.sampleRate;
+
+                    // create gain node
+                    var volume = context.createGain();
+
+                    // create audio node from stream
+                    var audioInput = context.createMediaStreamSource(stream);
+
+                    // connect stream to gain node
+                    audioInput.connect(volume);
+
+                    // lower values result in lower latency. 
+                    // higher values needed to avoid audio breakup and glitches
+                    var bufferSize = 2048;
+                    var recorder = context.createScriptProcessor(bufferSize, 2, 2);
+
+                    recorder.onaudioprocess = function(e){
+                        if (!stream.ended) {
+                            var left = e.inputBuffer.getChannelData(0);
+                            var right = e.inputBuffer.getChannelData(1);
+                            // clone samples
+                            leftchannel.push(new Float32Array(left));
+                            rightchannel.push(new Float32Array(right));
+                            recordingLength += bufferSize;
+                        } else {
+                            recorder.onaudioprocess = null;
+                        }
+                    };
+
+                    // connect recorder
+                    volume.connect(recorder);
+                    recorder.connect(context.destination);
+                    
+                    // add class
+                    that.classList.add("recording");
+                }, function() {
+                    alert("Please allow microphone access in order to use the audio recorder.");
+                });
+            } else {
+                // stop the stream
+                audioStream.stop();
+                
+                // flatten left and right channels
+                var leftBuffer = mergeBuffers(leftchannel, recordingLength);
+                var rightBuffer = mergeBuffers(rightchannel, recordingLength);
+                // interleave channels together
+                var interleaved = interleave(leftBuffer, rightBuffer);
+
+                // create buffer and view to create wav file
+                var buffer = new ArrayBuffer(44 + interleaved.length * 2);
+                var view = new DataView(buffer);
+
+                // write wav container
+                // riff chunk descriptor
+                writeUTFBytes(view, 0, "RIFF");
+                view.setUint32(4, 44 + interleaved.length * 2, true);
+                writeUTFBytes(view, 8, "WAVE");
+                // fmt subchunk
+                writeUTFBytes(view, 12, "fmt ");
+                view.setUint32(16, 16, true);
+                view.setUint16(20, 1, true);
+                // stereo
+                view.setUint16(22, 2, true);
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, sampleRate * 4, true);
+                view.setUint16(32, 4, true);
+                view.setUint16(34, 16, true);
+                // data subchunk
+                writeUTFBytes(view, 36, "data");
+                view.setUint32(40, interleaved.length * 2, true);
+
+                // write pcm samples
+                var lng = interleaved.length;
+                var index = 44;
+                var volume = 1;
+                for (var i = 0; i < lng; i++){
+                    view.setInt16(index, interleaved[i] * (0x7FFF * volume), true);
+                    index += 2;
+                }
+
+                // final blob
+                var blob = new Blob([view], { type : "audio/wav" } );
+                
+                // clear the stuff
+                leftchannel.length = 0;
+                rightchannel.length = 0;
+                recordingLength = 0;
+                
+                // send the blob
+                var now = new Date();
+                
+                socket.emit("message", {
+                    nick: abungoState.nick,
+                    userID: abungoState.userID,
+                    room: abungoState.room,
+                    upload: blob,
+                    type: "audio/wav",
+                    mediaName: "Abungo audio at " + now.toDateString() + " " + now.toTimeString() + ".wav"
+                });
+                
+                that.classList.remove("recording");
+            }
+        });
+    })();
     
     /* user join/leave */
     
