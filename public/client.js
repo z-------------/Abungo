@@ -81,7 +81,18 @@ var makeMessageElem = function(data, type) {
     } else if (data.sticker) {
         bodyContent = "<img class='message_sticker' src='img/stickers/" + data.sticker + ".svg'>";
     } else {
-        bodyContent = Autolinker.link(HTMLify(data.message));
+        // replace inline stickers with image
+        if (!abungoState.stickerNames) {
+            abungoState.stickerNames = [].slice.call($$(".popup_popup-stickers_sticker")).map(function(elem) {
+                return elem.getAttribute("title");
+            });
+        }
+        var stickerNames = abungoState.stickerNames;
+        var message = data.message;
+        stickerNames.forEach(function(stickerName) {
+            message = message.replace(new RegExp(":" + stickerName + ":|\\(" + stickerName + "\\)", "g"), "<img class='message_sticker message_sticker-small' src='img/stickers/" + stickerName + ".svg'>");
+        });
+        bodyContent = Autolinker.link(HTMLify(message));
     }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
