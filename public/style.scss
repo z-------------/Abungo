@@ -1,6 +1,7 @@
 @import "mixins.scss";
 
 $black: #333;
+$lightgrey: #ddd;
 $grey: #777;
 $darkgrey: #555;
 $green: #58b69b;
@@ -302,7 +303,7 @@ label.button {
         }
     }
     
-    &.white {
+    &.white, &.lightgrey {
         background-color: #fff;
         
         svg g > * {
@@ -310,7 +311,11 @@ label.button {
         }
     }
     
-    &.green, &.white {
+    &.lightgrey {
+        background-color: $lightgrey;
+    }
+    
+    &.green, &.white, &.lightgrey {
         &:hover, &:focus {
             background-color: $green;
             
@@ -390,6 +395,17 @@ label.button {
                 right: 0;
                 bottom: 0;
                 margin: 10px;
+            }
+        }
+        
+        &.popup_popup-voice {
+            height: 100px;
+            
+            .popup_popup-voice_record {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translateX(-50%) translateY(-50%);
             }
         }
         
