@@ -9,9 +9,19 @@ var PORT = process.env.PORT || 3000;
 /* make a list of emoji */
 
 var stickers = [];
+var STICKERS_DIRNAME = __dirname + "/public/img/stickers/";
 
-fs.readdirSync(__dirname + "/public/img/stickers/").forEach(function(filename) {
-    stickers.push(filename.slice(0, -4));
+function makeStickersList(filenames) {
+    stickers.length = 0;
+    filenames.forEach(function(filename) {
+        stickers.push(filename.slice(0, -4));
+    });
+}
+
+makeStickersList(fs.readdirSync(STICKERS_DIRNAME));
+
+fs.watch(STICKERS_DIRNAME, function() {
+    makeStickersList(fs.readdirSync(STICKERS_DIRNAME));
 });
 
 /* set up express */
