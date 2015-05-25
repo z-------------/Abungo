@@ -406,6 +406,34 @@ label.button {
                 left: 50%;
                 top: 50%;
                 transform: translateX(-50%) translateY(-50%);
+                
+                svg {
+                    circle, rect {
+                        transition: opacity .3s;
+                    }
+
+                    rect {
+                        opacity: 0;
+                    }
+                }
+                
+                &.recording {
+                    background-color: $green;
+                    
+                    svg g {
+                        > * {
+                            fill: #fff;
+                        }
+                        
+                        circle {
+                            opacity: 0;
+                        }
+
+                        rect {
+                            opacity: 1;
+                        }
+                    }
+                }
             }
         }
         
