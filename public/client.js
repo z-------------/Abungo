@@ -485,7 +485,7 @@ socket.on("login_accepted", function(data) {
     
     /* record audio */
     
-    (function() {
+    (function() { // adapted from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio
         var audioStream;
 
         var leftchannel = [];
@@ -497,7 +497,7 @@ socket.on("login_accepted", function(data) {
             var that = this;
             
             if (!that.classList.contains("recording")) {
-                navigator.getUserMedia({ audio: true }, function(stream) { // adapted from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio
+                navigator.getUserMedia({ audio: true }, function(stream) {
                     audioStream = stream;
                     
                     // create audio context
