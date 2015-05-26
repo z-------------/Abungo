@@ -124,6 +124,10 @@ var makeMessageElem = function(data, type) {
     if (data.mediaID) {
         elem.classList.add("message-file");
     }
+    if (type === "self") {
+        elem.dataset.messageId = data.messageID;
+        elem.classList.add("message-notdelivered");
+    }
     return elem;
 };
 
@@ -352,10 +356,13 @@ socket.on("login_accepted", function(data) {
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault();
             if (this.textContent.length > 0) {
-                socket.emit("message", {
+                var messageData = {
                     message: textifyHTML(this.innerHTML),
-                    userID: abungoState.userID
-                });
+                    userID: abungoState.userID,
+                    messageID: "" + Math.round(Math.random() * 100000) + new Date().getTime() + Math.round(Math.random() * 100000)
+                };
+                socket.emit("message", messageData);
+                messagesElem.appendChild(makeMessageElem(messageData, "self"));
                 this.innerHTML = "";
             }
         }
@@ -373,11 +380,14 @@ socket.on("login_accepted", function(data) {
     socket.on("message_incoming", function(data) {
         var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
         
-        var type = "received";
-        if (data.nick === abungoState.nick) {
-            type = "self";
+        if (data.nick === abungoState.nick) { // self
+            var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
+            if (messageElem) {
+                messageElem.classList.remove("message-notdelivered");
+            }
+        } else { // received
+            messagesElem.appendChild(makeMessageElem(data, "received"));
         }
-        messagesElem.appendChild(makeMessageElem(data, type));
         
         var notifText;
         if (data.mediaID) {

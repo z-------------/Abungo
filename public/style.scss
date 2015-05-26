@@ -560,6 +560,10 @@ label.button {
             border-color: #ffffff transparent transparent transparent;
             right: -15px;
         }
+        
+        &.message-notdelivered {
+            opacity: 0.5;
+        }
     }
     
     &.message-join {

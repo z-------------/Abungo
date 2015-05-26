@@ -197,6 +197,7 @@ var server = app.listen(PORT, function() {
                         console.log("%s (%s) sent sticker '%s'", user.nick, user.ip, data.sticker);
                     } else {
                         sendableMessageData.message = data.message;
+                        sendableMessageData.messageID = data.messageID; // for sender client use only
                         
                         console.log("%s (%s) said: %s", user.nick, user.ip, data.message);
                     }
