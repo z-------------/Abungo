@@ -83,7 +83,7 @@ window.addEventListener("keyup", function(e){
 
 /* convenience functions */
     
-var makeMessageElem = function(data, type) {
+var makeMessageElem = function(data, type, scrollToBottom) {
     var elem = document.createElement("div");
     
     var bodyContent;
@@ -136,7 +136,10 @@ var makeMessageElem = function(data, type) {
         elem.dataset.messageId = data.messageID;
         elem.classList.add("message-notdelivered");
     }
-    return elem;
+    messagesElem.appendChild(elem);
+    if (scrollToBottom) {
+        messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
+    }
 };
 
 var makeJoinElem = function(data, action) {
@@ -212,6 +215,14 @@ var updateConnectionStatusIndicator = function(statusi) {
     
     loginButton.classList[classListMethod](classListClass);
     loginButton.textContent = statusString;
+};
+
+var isAtBottom = function() {
+    return (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
+};
+
+var makeMessageID = function() {
+    return "" + Math.round(Math.random() * 100000) + new Date().getTime() + Math.round(Math.random() * 100000);
 };
 
 /* audio recorder functions from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio/ */
@@ -332,6 +343,8 @@ socket.on("connected", tryReconnect);
 
 /* forming in a straight line */
 
+var messagesElem;
+
 socket.on("login_accepted", function(data) {
     abungoState.userID = data.userID;
     abungoState.nick = data.nick;
@@ -340,10 +353,10 @@ socket.on("login_accepted", function(data) {
     
     console.log("login_accepted", data);
     
+    messagesElem = $(".messages");
     var sendbarElem = $(".sendbar");
     var sendbarComposeInput = $(".sendbar_compose_input");
     var sendbarFileInput = $("#fileinput");
-    var messagesElem = $(".messages");
     
     var sidebarHideBtn = $("#sidebar_collapse");
     var sidebarLogoutBtn = $("#logout_button");
@@ -367,10 +380,10 @@ socket.on("login_accepted", function(data) {
                 var messageData = {
                     message: textifyHTML(this.innerHTML),
                     userID: abungoState.userID,
-                    messageID: "" + Math.round(Math.random() * 100000) + new Date().getTime() + Math.round(Math.random() * 100000)
+                    messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
-                messagesElem.appendChild(makeMessageElem(messageData, "self"));
+                makeMessageElem(messageData, "self", isAtBottom());
                 this.innerHTML = "";
             }
         }
@@ -386,16 +399,16 @@ socket.on("login_accepted", function(data) {
     /* receive messages (including files and stickers) */
     
     socket.on("message_incoming", function(data) {
-        var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
         var type;
         
         if (data.nick === abungoState.nick) {
             type = "self";
             var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
+            console.log(messageElem, data.messageID);
             messageElem.classList.remove("message-notdelivered");
         } else {
             type = "received";
-            messagesElem.appendChild(makeMessageElem(data, type));
+            makeMessageElem(data, type, isAtBottom());
         }
         
         var notifText;
@@ -407,10 +420,6 @@ socket.on("login_accepted", function(data) {
             notifText = data.message;
         }
         showNotification(data.nick, notifText);
-        
-        if (isAtBottom || type === "self") { // scroll to bottom if previously at bottom
-            messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
-        }
     });
     
     /* send files */
@@ -424,10 +433,11 @@ socket.on("login_accepted", function(data) {
                     userID: abungoState.userID,
                     mediaUpload: file,
                     mediaType: file.type,
-                    mediaName: file.name
+                    mediaName: file.name,
+                    messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
-                messagesElem.appendChild(makeMessageElem(messageData, "self"));
+                makeMessageElem(messageData, "self", isAtBottom());
             } else if (file) {
                 alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
             }
@@ -454,10 +464,11 @@ socket.on("login_accepted", function(data) {
                     userID: abungoState.userID,
                     mediaUpload: file,
                     mediaType: file.type,
-                    mediaName: file.name
+                    mediaName: file.name,
+                    messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
-                messagesElem.appendChild(makeMessageElem(messageData, "self"));
+                makeMessageElem(messageData, "self", isAtBottom());
             } else if (file) {
                 alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
             }
@@ -483,10 +494,11 @@ socket.on("login_accepted", function(data) {
                     var messageData = {
                         userID: abungoState.userID,
                         sticker: e.target.getAttribute("title"),
-                        stickerSize: size
+                        stickerSize: size,
+                        messageID: makeMessageID()
                     };
                     socket.emit("message", messageData);
-                    messagesElem.appendChild(makeMessageElem(messageData, "self"));
+                    makeMessageElem(messageData, "self", isAtBottom());
                 }
             };
         }
@@ -546,10 +558,11 @@ socket.on("login_accepted", function(data) {
                 userID: abungoState.userID,
                 mediaUpload: blob,
                 mediaType: "image/png",
-                mediaName: "Abungo snap at " + now.toDateString() + " " + now.toTimeString() + ".png"
+                mediaName: "Abungo snap at " + now.toDateString() + " " + now.toTimeString() + ".png",
+                messageID: makeMessageID()
             };
             socket.emit("message", messageData);
-            messagesElem.appendChild(makeMessageElem(messageData, "self"));
+            makeMessageElem(messageData, "self", isAtBottom());
         }
     });
     
@@ -700,10 +713,11 @@ socket.on("login_accepted", function(data) {
                     userID: abungoState.userID,
                     mediaUpload: blob,
                     mediaType: "audio/wav",
-                    mediaName: "Abungo audio at " + now.toDateString() + " " + now.toTimeString() + ".wav"
+                    mediaName: "Abungo audio at " + now.toDateString() + " " + now.toTimeString() + ".wav",
+                    messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
-                messagesElem.appendChild(makeMessageElem(messageData, "self"));
+                makeMessageElem(messageData, "self", isAtBottom());
                 
                 that.classList.remove("recording");
             }
@@ -713,27 +727,15 @@ socket.on("login_accepted", function(data) {
     /* user join/leave */
     
     socket.on("user_joined", function(data) {
-        var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
-        
         if (abungoState.users.indexOf(data.nick) === -1) {
             abungoState.users.push(data.nick);
         }
-        messagesElem.appendChild(makeJoinElem(data, "joined"));
-        
-        if (isAtBottom) { // scroll to bottom if previously at bottom
-            messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
-        }
+        messagesElem.appendChild(makeJoinElem(data, "joined", isAtBottom()));
     });
     
     socket.on("user_left", function(data) {
-        var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
-        
         abungoState.users.remove(data.nick);
-        messagesElem.appendChild(makeJoinElem(data, "left"));
-        
-        if (isAtBottom) { // scroll to bottom if previously at bottom
-            messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
-        }
+        messagesElem.appendChild(makeJoinElem(data, "left", isAtBottom()));
     });
     
     /* send and receive typing status */

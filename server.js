@@ -171,7 +171,7 @@ var server = app.listen(PORT, function() {
                 });
                 
                 socket.on("message", function(data) {
-                    setTimeout(function(){
+                    //setTimeout(function(){
                     var isFile = !!data.mediaUpload;
                     var isSticker = !!data.sticker;
                     
@@ -207,7 +207,7 @@ var server = app.listen(PORT, function() {
                         var user = room.users[userNick];
                         user.socket.emit("message_incoming", sendableMessageData);
                     });
-                    }, 2000);
+                    //}, 2000);
                 });
                 
                 socket.on("typing_start", function(data) {
