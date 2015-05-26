@@ -383,7 +383,7 @@ socket.on("login_accepted", function(data) {
                     messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
-                makeMessageElem(messageData, "self", isAtBottom());
+                makeMessageElem(messageData, "self", true);
                 this.innerHTML = "";
             }
         }
