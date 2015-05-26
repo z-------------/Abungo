@@ -88,7 +88,11 @@ var makeMessageElem = function(data, type) {
     
     var bodyContent;
     
-    if (data.mediaID) {
+    var isFile = !!data.mediaID;
+    var isSticker = !!data.sticker;
+    var isMessage;
+    
+    if (isFile) {
         var mediaURL = "/file/" + data.mediaID + "/" + data.mediaName;
         elem.dataset.mediaId = data.mediaID;
         
@@ -101,9 +105,10 @@ var makeMessageElem = function(data, type) {
         } else {
             bodyContent = "<a target='_blank' href='" + mediaURL + "'>" + cleanseHTML(data.mediaName) + "</a>";
         }
-    } else if (data.sticker) {
+    } else if (isSticker) {
         bodyContent = "<img class='message_sticker message_sticker-" + data.stickerSize + "' src='img/stickers/" + data.sticker + ".svg'>";
     } else {
+        isMessage = true;
         // replace inline stickers with image
         if (!abungoState.stickerNames) {
             abungoState.stickerNames = [].slice.call($$(".popup_popup-stickers_sticker")).map(function(elem) {
@@ -121,10 +126,13 @@ var makeMessageElem = function(data, type) {
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
     elem.classList.add("message");
     elem.classList.add("message-" + type);
-    if (data.mediaID) {
+    if (isFile) {
         elem.classList.add("message-file");
     }
-    if (type === "self") {
+    if (isSticker) {
+        elem.classList.add("message-sticker");
+    }
+    if (type === "self" && isMessage) {
         elem.dataset.messageId = data.messageID;
         elem.classList.add("message-notdelivered");
     }
@@ -379,14 +387,19 @@ socket.on("login_accepted", function(data) {
     
     socket.on("message_incoming", function(data) {
         var isAtBottom = (messagesElem.scrollTop + messagesElem.offsetHeight === messagesElem.scrollHeight);
+        var type;
         
-        if (data.nick === abungoState.nick) { // self
-            var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
-            if (messageElem) {
+        if (data.nick === abungoState.nick) {
+            type = "self";
+            if (!data.sticker && !data.mediaID) {
+                var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
                 messageElem.classList.remove("message-notdelivered");
+            } else {
+                messagesElem.appendChild(makeMessageElem(data, type));
             }
-        } else { // received
-            messagesElem.appendChild(makeMessageElem(data, "received"));
+        } else {
+            type = "received";
+            messagesElem.appendChild(makeMessageElem(data, type));
         }
         
         var notifText;

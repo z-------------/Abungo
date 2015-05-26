@@ -171,11 +171,13 @@ var server = app.listen(PORT, function() {
                 });
                 
                 socket.on("message", function(data) {
+                    //setTimeout(function(){
                     var isFile = !!data.upload;
                     var isSticker = !!data.sticker;
                     
                     var sendableMessageData = {
-                        nick: user.nick
+                        nick: user.nick,
+                        messageID: data.messageID // for sender client use only
                     };
                     
                     if (isFile) {
@@ -197,7 +199,6 @@ var server = app.listen(PORT, function() {
                         console.log("%s (%s) sent sticker '%s'", user.nick, user.ip, data.sticker);
                     } else {
                         sendableMessageData.message = data.message;
-                        sendableMessageData.messageID = data.messageID; // for sender client use only
                         
                         console.log("%s (%s) said: %s", user.nick, user.ip, data.message);
                     }
@@ -206,6 +207,7 @@ var server = app.listen(PORT, function() {
                         var user = room.users[userNick];
                         user.socket.emit("message_incoming", sendableMessageData);
                     });
+                    //}, 2000);
                 });
                 
                 socket.on("typing_start", function(data) {
