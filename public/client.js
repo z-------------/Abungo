@@ -88,12 +88,12 @@ var makeMessageElem = function(data, type) {
     
     var bodyContent;
     
-    var isFile = !!data.mediaID;
+    var isFile = !!(data.mediaID || data.mediaUpload);
     var isSticker = !!data.sticker;
     var isMessage;
     
     if (isFile) {
-        var mediaURL = "/file/" + data.mediaID + "/" + data.mediaName;
+        var mediaURL = (data.mediaID ? "/file/" + data.mediaID + "/" + data.mediaName : window.URL.createObjectURL(data.mediaUpload));
         elem.dataset.mediaId = data.mediaID;
         
         if (data.mediaType.match(/^image\//gi)) { // image/*
@@ -132,7 +132,7 @@ var makeMessageElem = function(data, type) {
     if (isSticker) {
         elem.classList.add("message-sticker");
     }
-    if (type === "self" && isMessage) {
+    if (type === "self") {
         elem.dataset.messageId = data.messageID;
         elem.classList.add("message-notdelivered");
     }
@@ -391,12 +391,8 @@ socket.on("login_accepted", function(data) {
         
         if (data.nick === abungoState.nick) {
             type = "self";
-            if (!data.sticker && !data.mediaID) {
-                var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
-                messageElem.classList.remove("message-notdelivered");
-            } else {
-                messagesElem.appendChild(makeMessageElem(data, type));
-            }
+            var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
+            messageElem.classList.remove("message-notdelivered");
         } else {
             type = "received";
             messagesElem.appendChild(makeMessageElem(data, type));
@@ -424,12 +420,14 @@ socket.on("login_accepted", function(data) {
     sendbarFileInput.addEventListener("change", function(){
         [].forEach.call(this.files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
-                socket.emit("message", {
+                var messageData = {
                     userID: abungoState.userID,
-                    upload: file,
-                    type: file.type,
+                    mediaUpload: file,
+                    mediaType: file.type,
                     mediaName: file.name
-                });
+                };
+                socket.emit("message", messageData);
+                messagesElem.appendChild(makeMessageElem(messageData, "self"));
             } else if (file) {
                 alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
             }
@@ -452,12 +450,14 @@ socket.on("login_accepted", function(data) {
         
         [].forEach.call(files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
-                socket.emit("message", {
+                var messageData = {
                     userID: abungoState.userID,
-                    upload: file,
-                    type: file.type,
+                    mediaUpload: file,
+                    mediaType: file.type,
                     mediaName: file.name
-                });
+                };
+                socket.emit("message", messageData);
+                messagesElem.appendChild(makeMessageElem(messageData, "self"));
             } else if (file) {
                 alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
             }
@@ -480,11 +480,13 @@ socket.on("login_accepted", function(data) {
                 var size = Math.round((sizesCount - 1) * delta/maxTime);
                 
                 if (size <= 2) {
-                    socket.emit("message", {
+                    var messageData = {
                         userID: abungoState.userID,
                         sticker: e.target.getAttribute("title"),
                         stickerSize: size
-                    });
+                    };
+                    socket.emit("message", messageData);
+                    messagesElem.appendChild(makeMessageElem(messageData, "self"));
                 }
             };
         }
@@ -540,12 +542,14 @@ socket.on("login_accepted", function(data) {
             var blob = dataURItoBlob(dataURI);
             var now = new Date();
             
-            socket.emit("message", {
+            var messageData = {
                 userID: abungoState.userID,
-                upload: blob,
-                type: "image/png",
+                mediaUpload: blob,
+                mediaType: "image/png",
                 mediaName: "Abungo snap at " + now.toDateString() + " " + now.toTimeString() + ".png"
-            });
+            };
+            socket.emit("message", messageData);
+            messagesElem.appendChild(makeMessageElem(messageData, "self"));
         }
     });
     
@@ -692,12 +696,14 @@ socket.on("login_accepted", function(data) {
                 // send the blob
                 var now = new Date();
                 
-                socket.emit("message", {
+                var messageData = {
                     userID: abungoState.userID,
-                    upload: blob,
-                    type: "audio/wav",
+                    mediaUpload: blob,
+                    mediaType: "audio/wav",
                     mediaName: "Abungo audio at " + now.toDateString() + " " + now.toTimeString() + ".wav"
-                });
+                };
+                socket.emit("message", messageData);
+                messagesElem.appendChild(makeMessageElem(messageData, "self"));
                 
                 that.classList.remove("recording");
             }

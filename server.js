@@ -171,8 +171,8 @@ var server = app.listen(PORT, function() {
                 });
                 
                 socket.on("message", function(data) {
-                    //setTimeout(function(){
-                    var isFile = !!data.upload;
+                    setTimeout(function(){
+                    var isFile = !!data.mediaUpload;
                     var isSticker = !!data.sticker;
                     
                     var sendableMessageData = {
@@ -183,15 +183,15 @@ var server = app.listen(PORT, function() {
                     if (isFile) {
                         var mediaID = "" + Math.round(Math.random() * 100000) + new Date().getTime();
                         files[mediaID] = {
-                            file: data.upload,
-                            type: data.type,
+                            file: data.mediaUpload,
+                            type: data.mediaType,
                             uploadedDate: new Date()
                         };
                         sendableMessageData.mediaID = mediaID;
                         sendableMessageData.mediaName = data.mediaName;
-                        sendableMessageData.mediaType = data.type;
+                        sendableMessageData.mediaType = data.mediaType;
                         
-                        console.log("%s (%s) sent file: %s (%s)", user.nick, user.ip, data.mediaName, data.type);
+                        console.log("%s (%s) sent file: %s (%s)", user.nick, user.ip, data.mediaName, data.mediaType);
                     } else if (isSticker) {
                         sendableMessageData.sticker = data.sticker;
                         sendableMessageData.stickerSize = data.stickerSize;
@@ -207,7 +207,7 @@ var server = app.listen(PORT, function() {
                         var user = room.users[userNick];
                         user.socket.emit("message_incoming", sendableMessageData);
                     });
-                    //}, 2000);
+                    }, 2000);
                 });
                 
                 socket.on("typing_start", function(data) {
