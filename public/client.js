@@ -354,8 +354,6 @@ socket.on("login_accepted", function(data) {
             if (this.textContent.length > 0) {
                 socket.emit("message", {
                     message: textifyHTML(this.innerHTML),
-                    nick: abungoState.nick,
-                    room: abungoState.room,
                     userID: abungoState.userID
                 });
                 this.innerHTML = "";
@@ -404,9 +402,7 @@ socket.on("login_accepted", function(data) {
         [].forEach.call(this.files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
                 socket.emit("message", {
-                    nick: abungoState.nick,
                     userID: abungoState.userID,
-                    room: abungoState.room,
                     upload: file,
                     type: file.type,
                     mediaName: file.name
@@ -434,9 +430,7 @@ socket.on("login_accepted", function(data) {
         [].forEach.call(files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
                 socket.emit("message", {
-                    nick: abungoState.nick,
                     userID: abungoState.userID,
-                    room: abungoState.room,
                     upload: file,
                     type: file.type,
                     mediaName: file.name
@@ -464,9 +458,7 @@ socket.on("login_accepted", function(data) {
                 
                 if (size <= 2) {
                     socket.emit("message", {
-                        nick: abungoState.nick,
                         userID: abungoState.userID,
-                        room: abungoState.room,
                         sticker: e.target.getAttribute("title"),
                         stickerSize: size
                     });
@@ -526,9 +518,7 @@ socket.on("login_accepted", function(data) {
             var now = new Date();
             
             socket.emit("message", {
-                nick: abungoState.nick,
                 userID: abungoState.userID,
-                room: abungoState.room,
                 upload: blob,
                 type: "image/png",
                 mediaName: "Abungo snap at " + now.toDateString() + " " + now.toTimeString() + ".png"
@@ -650,9 +640,7 @@ socket.on("login_accepted", function(data) {
                 var now = new Date();
                 
                 socket.emit("message", {
-                    nick: abungoState.nick,
                     userID: abungoState.userID,
-                    room: abungoState.room,
                     upload: blob,
                     type: "audio/wav",
                     mediaName: "Abungo audio at " + now.toDateString() + " " + now.toTimeString() + ".wav"

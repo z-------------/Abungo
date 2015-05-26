@@ -175,7 +175,7 @@ var server = app.listen(PORT, function() {
                     var isSticker = !!data.sticker;
                     
                     var sendableMessageData = {
-                        nick: data.nick
+                        nick: user.nick
                     };
                     
                     if (isFile) {
@@ -247,7 +247,7 @@ var server = app.listen(PORT, function() {
                 }, 5000);
                 
                 socket.on("disconnect", function() {
-                    disconnectUser(room, data.nick);
+                    disconnectUser(room, user.nick);
                 });
             } else {
                 var nickTakenUser = rooms[data.room].users[data.nick];
