@@ -535,8 +535,19 @@ socket.on("login_accepted", function(data) {
         var rightchannel = [];
         var recordingLength = 0;
         var sampleRate;
+        var audioVolume = 0;
         
-        $(".popup_popup-voice_record").addEventListener("click", function(e) {
+        var recordBtn = $(".popup_popup-voice_record");
+        var volumeElem = $(".popup_popup-voice_volumecircle");
+        
+        setInterval(function() {
+            if (recordBtn.classList.contains("recording")) {
+                var scale = audioVolume / 2000;
+                volumeElem.style.transform = "scale(" + scale + ")";
+            }
+        }, 50);
+        
+        recordBtn.addEventListener("click", function(e) {
             var that = this;
             
             if (!that.classList.contains("recording")) {
@@ -544,20 +555,26 @@ socket.on("login_accepted", function(data) {
                     audioStream = stream;
                     
                     // create audio context
-                    var AudioContext = window.AudioContext || window.webkitAudioContext;
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
                     var context = new AudioContext();
 
                     // retrieve sample rate to be used for wav packaging
                     sampleRate = context.sampleRate;
 
-                    // create gain node
+                    // create gain node and analyser
                     var volume = context.createGain();
+                    
+                    var analyser = context.createAnalyser();
+                    analyser.fftSize = 256;
 
                     // create audio node from stream
                     var audioInput = context.createMediaStreamSource(stream);
 
-                    // connect stream to gain node
+                    // connect nodes
                     audioInput.connect(volume);
+                    volume.connect(analyser);
+                    
+                    var streamData = new Uint8Array(analyser.fftSize / 2);
 
                     // lower values result in lower latency. 
                     // higher values needed to avoid audio breakup and glitches
@@ -572,8 +589,17 @@ socket.on("login_accepted", function(data) {
                             leftchannel.push(new Float32Array(left));
                             rightchannel.push(new Float32Array(right));
                             recordingLength += bufferSize;
+                            
+                            // get volume
+                            analyser.getByteFrequencyData(streamData);
+                            var total = 0;
+                            for (var i = 0; i < 80; i++) { // get the volume from the first 80 bins, else it gets too loud with treble
+                                total += streamData[i];
+                            }
+                            audioVolume = total;
                         } else {
                             recorder.onaudioprocess = null;
+                            audioVolume = 0;
                         }
                     };
 
