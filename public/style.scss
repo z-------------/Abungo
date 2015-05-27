@@ -613,3 +613,35 @@ label.button {
         }
     }
 }
+
+@media only screen and (max-width: 720px) {
+    aside, .messages, .sendbar {
+        width: 100%;
+    }
+    
+    .messages {
+        left: 0;
+    }
+    
+    .loggedin aside {
+        transform: translateX(-100%);
+    }
+    
+    .popup-camera {
+        display: none !important;
+    }
+    
+    .sendbar {
+        label.button {
+            margin-right: 0;
+        }
+    }
+    
+    .sendbar_compose_input {
+        width: calc(100% - 180px);
+        
+        &:focus {
+            width: calc(100% - 20px);
+        }
+    }
+}
