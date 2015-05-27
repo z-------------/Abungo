@@ -50,8 +50,7 @@ body {
     font-family: "Lato", sans-serif;
     background-color: $green;
     color: #fff;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 input, textarea, button {
@@ -518,7 +517,8 @@ label.button {
     height: calc(100% - 70px);
     padding: 20px;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
+    background-color: $green;
 }
 
 .message {
