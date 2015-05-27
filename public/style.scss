@@ -398,6 +398,7 @@ label.button {
                 height: 100%;
                 cursor: pointer;
                 border-radius: 4px;
+                background-size: contain;
                 
                 &:active {
                     animation: stickerEnergyFillup 2s linear;

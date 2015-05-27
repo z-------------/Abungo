@@ -56,7 +56,7 @@ html
                                 ul.popup_popup-stickers_list
                                     each sticker in stickers
                                         li
-                                            img.popup_popup-stickers_sticker(src="img/stickers/#{sticker}.svg", title="#{sticker}")
+                                            div.popup_popup-stickers_sticker(style="background-image: url(img/stickers/#{sticker}.svg)", title="#{sticker}")
                         
                 .sendbar_compose
                     .sendbar_compose_input(contenteditable="true", placeholder="Type your message...")
