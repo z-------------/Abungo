@@ -144,7 +144,7 @@ var makeMessageElem = function(data, type, scrollToBottom) {
 
 var makeJoinElem = function(data, action) {
     var elem = document.createElement("div");
-    elem.innerHTML = "<p>" + cleanseHTML(data.nick) + " " + action + ".</p>";
+    elem.innerHTML = "<p><strong>" + cleanseHTML(data.nick) + "</strong> " + action + ".</p>";
     elem.classList.add("message");
     elem.classList.add("message-join");
     return elem;
