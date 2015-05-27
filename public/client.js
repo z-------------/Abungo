@@ -142,12 +142,15 @@ var makeMessageElem = function(data, type, scrollToBottom) {
     }
 };
 
-var makeJoinElem = function(data, action) {
+var makeJoinElem = function(data, action, scrollToBottom) {
     var elem = document.createElement("div");
     elem.innerHTML = "<p><strong>" + cleanseHTML(data.nick) + "</strong> " + action + ".</p>";
     elem.classList.add("message");
     elem.classList.add("message-join");
-    return elem;
+    messagesElem.appendChild(elem);
+    if (scrollToBottom) {
+        messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
+    }
 };
 
 var updateUsersList = function() {
@@ -730,12 +733,12 @@ socket.on("login_accepted", function(data) {
         if (abungoState.users.indexOf(data.nick) === -1) {
             abungoState.users.push(data.nick);
         }
-        messagesElem.appendChild(makeJoinElem(data, "joined", isAtBottom()));
+        makeJoinElem(data, "joined", isAtBottom());
     });
     
     socket.on("user_left", function(data) {
         abungoState.users.remove(data.nick);
-        messagesElem.appendChild(makeJoinElem(data, "left", isAtBottom()));
+        makeJoinElem(data, "left", isAtBottom());
     });
     
     /* send and receive typing status */
