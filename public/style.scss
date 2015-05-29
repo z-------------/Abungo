@@ -102,7 +102,6 @@ aside {
     padding: 0 20px;
     background-color: $black;
     color: #fff;
-    z-index: 2;
     
     label {
         position: relative;
@@ -626,6 +625,7 @@ label.button {
     
     aside {
         padding-top: 70px;
+        z-index: 2;
     }
     
     .sidebar_controls {
@@ -634,6 +634,10 @@ label.button {
     }
     
     .sidebarhidden {
+        aside {
+            z-index: 1;
+        }
+        
         .sidebar_controls {
             label.button {
                 background-color: $black;
