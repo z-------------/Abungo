@@ -181,17 +181,22 @@ var server = app.listen(PORT, function() {
                     };
                     
                     if (isFile) {
-                        var mediaID = "" + Math.round(Math.random() * 100000) + new Date().getTime();
-                        files[mediaID] = {
-                            file: data.mediaUpload,
-                            type: data.mediaType,
-                            uploadedDate: new Date()
-                        };
-                        sendableMessageData.mediaID = mediaID;
-                        sendableMessageData.mediaName = data.mediaName;
-                        sendableMessageData.mediaType = data.mediaType;
-                        
-                        console.log("%s (%s) sent file: %s (%s)", user.nick, user.ip, data.mediaName, data.mediaType);
+                        if (data.mediaUpload.length < 10000000) { // 10 mb
+                            var mediaID = "" + Math.round(Math.random() * 100000) + new Date().getTime();
+                            files[mediaID] = {
+                                file: data.mediaUpload,
+                                type: data.mediaType,
+                                uploadedDate: new Date()
+                            };
+                            sendableMessageData.mediaID = mediaID;
+                            sendableMessageData.mediaName = data.mediaName;
+                            sendableMessageData.mediaType = data.mediaType;
+
+                            console.log("%s (%s) sent file: %s (%s)", user.nick, user.ip, data.mediaName, data.mediaType);
+                        } else {
+                            sendableMessageData = null;
+                            console.log("%s (%s) tried to send huge file: %s (%s)", user.nick, user.ip, data.mediaName, data.mediaType);
+                        }
                     } else if (isSticker) {
                         sendableMessageData.sticker = data.sticker;
                         sendableMessageData.stickerSize = data.stickerSize;
@@ -203,10 +208,12 @@ var server = app.listen(PORT, function() {
                         console.log("%s (%s) said: %s", user.nick, user.ip, data.message);
                     }
                     
-                    Object.keys(room.users).forEach(function(userNick) {
-                        var user = room.users[userNick];
-                        user.socket.emit("message_incoming", sendableMessageData);
-                    });
+                    if (sendableMessageData) {
+                        Object.keys(room.users).forEach(function(userNick) {
+                            var user = room.users[userNick];
+                            user.socket.emit("message_incoming", sendableMessageData);
+                        });
+                    }
                     //}, 2000);
                 });
                 
