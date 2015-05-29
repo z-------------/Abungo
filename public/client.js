@@ -244,6 +244,16 @@ var imageShrinkedDimensions = function(a, b, m) {
     }
 };
 
+var isMobile = function() {
+    if (window.hasOwnProperty("isMobileCached")) {
+        return window.isMobileCached;
+    } else {
+        var ismob = (navigator.userAgent.indexOf("Mobile") !== -1);
+        window.isMobileCached = ismob;
+        return ismob;
+    }
+};
+
 /* audio recorder functions from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio/ */
 
 var mergeBuffers = function(channelBuffer, recordingLength) {
@@ -386,7 +396,12 @@ socket.on("login_accepted", function(data) {
     each($$(".notouch input"), function(elem) {
         elem.setAttribute("readonly", "true");
     });
-    sendbarComposeInput.focus();
+    if (!isMobile()) {
+        sendbarComposeInput.focus();
+    }
+    if (isMobile()) {
+        document.body.classList.add("sidebarhidden");
+    }
     
     document.title = abungoState.room + " - " + document.title;
     
