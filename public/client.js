@@ -177,23 +177,31 @@ var updateTypingIndicators = function(nick, direction) {
 };
 
 var showNotification = function(nick, text) {
-    if(window.Notification && Notification.permission !== "denied") {
-        Notification.requestPermission(function(status) {
-            if (status === "granted" && !document.hasFocus()) {
-                var n = new Notification(nick + " on #" + abungoState.room, {
-                    body: text,
-                    icon: "/img/icon196.png"
-                });
-                window.addEventListener("focus", function(){
-                    if (n) {
-                        n.close();
-                    }
-                });
-                n.addEventListener("click", function(){
-                    window.focus();
-                });
-            }
-        });
+    if (!document.hasFocus()) {
+        if (!abungoState.hasOwnProperty("unreadMessagesCount")) {
+            abungoState.unreadMessagesCount = 0;
+        }
+        abungoState.unreadMessagesCount += 1;
+        document.title = "[" + abungoState.unreadMessagesCount + "] " + abungoState.room + " - Abungo";
+        
+        if (window.Notification && Notification.permission !== "denied") {
+            Notification.requestPermission(function(status) {
+                if (status === "granted") {
+                    var n = new Notification(nick + " on #" + abungoState.room, {
+                        body: text,
+                        icon: "/img/icon196.png"
+                    });
+                    window.addEventListener("focus", function(){
+                        if (n) {
+                            n.close();
+                        }
+                    });
+                    n.addEventListener("click", function(){
+                        window.focus();
+                    });
+                }
+            });
+        }
     }
 };
 
@@ -814,6 +822,13 @@ socket.on("login_accepted", function(data) {
         updateUsersList();
     });
     updateUsersList();
+    
+    /* clear unread count on focus */
+    
+    window.addEventListener("focus", function() {
+        abungoState.unreadMessagesCount = 0;
+        document.title = abungoState.room + " - Abungo";
+    });
     
     /* show/hide sendbar box-shadow */
 
