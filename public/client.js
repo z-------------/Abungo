@@ -228,6 +228,22 @@ var makeMessageID = function() {
     return "" + Math.round(Math.random() * 100000) + new Date().getTime() + Math.round(Math.random() * 100000);
 };
 
+var imageShrinkedDimensions = function(a, b, m) {
+    if (a * b > m) {
+        var k = a/b; // a = bk , b = a/k
+        var A, B;
+        // let ab = m
+        // b^2 * k = m
+        // b^2 = m/k
+        B = Math.sqrt(m/k);
+        // a = bk
+        A = B * k;
+        return [A, B];
+    } else {
+        return [a, b];
+    }
+};
+
 /* audio recorder functions from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio/ */
 
 var mergeBuffers = function(channelBuffer, recordingLength) {
@@ -549,8 +565,11 @@ socket.on("login_accepted", function(data) {
         if (videoElem.src && videoElem.src.length >= 1) {
             var canvas = document.createElement("canvas");
             var ctx = canvas.getContext("2d");
-            canvas.width = videoElem.offsetWidth;
-            canvas.height = videoElem.offsetHeight;
+            
+            var dims = imageShrinkedDimensions(videoElem.offsetWidth, videoElem.offsetHeight, 1000 * 1000); // array [w, h]
+            
+            canvas.width = dims[0];
+            canvas.height = dims[1];
             ctx.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
             
             var dataURI = canvas.toDataURL();
