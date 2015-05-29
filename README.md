@@ -5,8 +5,13 @@ Simple anonymous chat.
 ## Screenshots
 
 ![Screenshot 1](http://i.imgur.com/LU2rNX7.png)
-![Screenshot 2](http://i.imgur.com/urKeGAd.png)
+
+![Screenshot 2 - Still frame from Big Buck Bunny. (c) copyright 2008, Blender Foundation / www.bigbuckbunny.org](http://i.imgur.com/urKeGAd.png)
+
+Still frame from Big Buck Bunny. (c) copyright 2008, Blender Foundation / www.bigbuckbunny.org
+
 ![Screenshot 3](http://i.imgur.com/Z73xJ1n.png)
+
 ![Screenshot 4](http://i.imgur.com/zznCaxe.png)
 
 ## Install
