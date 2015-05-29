@@ -515,7 +515,7 @@ socket.on("login_accepted", function(data) {
         if (e.target.classList.contains("popup_popup-stickers_sticker")) {
             var mousedownDate = new Date();
             
-            e.target.onmouseup = function() {
+            e.target.onmouseup = e.target.ontouchend = function() {
                 var mouseupDate = new Date();
                 var delta = mouseupDate - mousedownDate;
                 

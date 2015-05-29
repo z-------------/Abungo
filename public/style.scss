@@ -390,6 +390,12 @@ label.button {
         }
         
         &.popup_popup-stickers {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            
             .popup_popup-stickers_sticker {
                 display: block;
                 width: 100%;
