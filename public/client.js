@@ -195,15 +195,16 @@ var showNotification = function(nick, text) {
                     });
                     abungoState.notifications.push(n);
                     
-                    window.addEventListener("focus", function(){
+                    window.addEventListener("focus", function() {
                         if (n) {
                             n.close();
                             abungoState.notifications.remove(n);
                         }
                     });
-                    n.addEventListener("click", function(){
+                    n.addEventListener("click", function() {
                         window.focus();
                         scrollToBottom();
+                        abungoState.notifications.remove(n);
                     });
                 }
             });
