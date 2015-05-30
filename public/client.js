@@ -82,8 +82,12 @@ window.addEventListener("keyup", function(e){
 });
 
 /* convenience functions */
+
+var scrollToBottom = function() {
+    messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
+};
     
-var makeMessageElem = function(data, type, scrollToBottom) {
+var makeMessageElem = function(data, type, scroll) {
     var elem = document.createElement("div");
     
     var bodyContent;
@@ -137,19 +141,19 @@ var makeMessageElem = function(data, type, scrollToBottom) {
         elem.classList.add("message-notdelivered");
     }
     messagesElem.appendChild(elem);
-    if (scrollToBottom) {
-        messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
+    if (scroll) {
+        scrollToBottom();
     }
 };
 
-var makeJoinElem = function(data, action, scrollToBottom) {
+var makeJoinElem = function(data, action, scroll) {
     var elem = document.createElement("div");
     elem.innerHTML = "<p><strong>" + cleanseHTML(data.nick) + "</strong> " + action + ".</p>";
     elem.classList.add("message");
     elem.classList.add("message-join");
     messagesElem.appendChild(elem);
-    if (scrollToBottom) {
-        messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
+    if (scroll) {
+        scrollToBottom();
     }
 };
 
@@ -177,27 +181,29 @@ var updateTypingIndicators = function(nick, direction) {
 };
 
 var showNotification = function(nick, text) {
-    if (!document.hasFocus()) {
-        if (!abungoState.hasOwnProperty("unreadMessagesCount")) {
-            abungoState.unreadMessagesCount = 0;
-        }
-        abungoState.unreadMessagesCount += 1;
-        document.title = "[" + abungoState.unreadMessagesCount + "] " + abungoState.room + " - Abungo";
-        
+    if (!document.hasFocus() || !isAtBottom()) {
         if (window.Notification && Notification.permission !== "denied") {
             Notification.requestPermission(function(status) {
                 if (status === "granted") {
+                    if (!abungoState.hasOwnProperty("notifications")) {
+                        abungoState.notifications = [];
+                    }
+                    
                     var n = new Notification(nick + " on #" + abungoState.room, {
                         body: text,
                         icon: "/img/icon196.png"
                     });
+                    abungoState.notifications.push(n);
+                    
                     window.addEventListener("focus", function(){
                         if (n) {
                             n.close();
+                            abungoState.notifications.remove(n);
                         }
                     });
                     n.addEventListener("click", function(){
                         window.focus();
+                        scrollToBottom();
                     });
                 }
             });
@@ -297,10 +303,13 @@ var writeUTFBytes = function(view, offset, string) {
     }
 };
 
+/* abungoState object for storing Abungo-related stuff */
+
+var abungoState = {};
+
 /* socket.io shenanigans */
 
 var socket = io();
-var abungoState = {};
 
 socket.on("connected", function(data) {
     abungoState.connected = true;
@@ -823,11 +832,19 @@ socket.on("login_accepted", function(data) {
     });
     updateUsersList();
     
-    /* clear unread count on focus */
+    /* listen for unread count changes */
     
-    window.addEventListener("focus", function() {
-        abungoState.unreadMessagesCount = 0;
-        document.title = abungoState.room + " - Abungo";
+    if (!abungoState.hasOwnProperty("notifications")) {
+        abungoState.notifications = [];
+    }
+    
+    Object.observe(abungoState.notifications, function() {
+        var unreadCount = abungoState.notifications.length;
+        if (unreadCount > 0) {
+            document.title = "[" + unreadCount + "] " + abungoState.room + " - Abungo";
+        } else {
+            document.title = abungoState.room + " - Abungo";
+        }
     });
     
     /* show/hide sendbar box-shadow */
