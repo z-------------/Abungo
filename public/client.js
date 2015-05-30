@@ -66,6 +66,20 @@ var clamp = function(n, max){
     else return max
 };
 
+var throttle = function(type, name, obj) { // throttle function from MDN https://developer.mozilla.org/en-US/docs/Web/Events/resize
+    var obj = obj || window;
+    var running = false;
+    var func = function() {
+        if (running) { return; }
+        running = true;
+        requestAnimationFrame(function() {
+            obj.dispatchEvent(new CustomEvent(name));
+            running = false;
+        });
+    };
+    obj.addEventListener(type, func);
+};
+
 /* track pressed keys */
 
 var pressedKeys = [];
@@ -846,6 +860,25 @@ socket.on("login_accepted", function(data) {
         } else {
             document.title = abungoState.room + " - Abungo";
         }
+    });
+    
+    /* scroll to bottom on resize if previously at bottom */
+    
+    throttle("resize", "sResize"); // s for sane
+    throttle("scroll", "sScroll", messagesElem);
+    abungoState.wasAtBottom = true;
+    messagesElem.addEventListener("sScroll", function() {
+        if (isAtBottom()) {
+            abungoState.wasAtBottom = true;
+        } else {
+            abungoState.wasAtBottom = false;
+        }
+    });
+    window.addEventListener("sResize", function() {
+        if (abungoState.wasAtBottom) {
+            scrollToBottom();
+        }
+        abungoState.wasAtBottom = isAtBottom();
     });
     
     /* show/hide sendbar box-shadow */
