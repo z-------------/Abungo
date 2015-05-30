@@ -389,17 +389,21 @@ var tryReconnect = function() {
 
 socket.on("connected", tryReconnect);
 
-/* ping the server to determine connectivity (only for server-side; client uses socket.connected) */
+/* ping the server to determine connectivity */
 
 (function(){
-    socket.on("pong", function(data) {
-        console.log("pong");
-    });
     var ping = function() {
         socket.emit("ping");
         console.log("ping");
     };
-    setInterval(ping, 5000);
+    socket.on("pong", function(data) {
+        abungoState.lastPongDate = new Date();
+        console.log("pong");
+    });
+    setInterval(function() {
+        ping();
+        abungoState.lastPingDate = new Date();
+    }, 5000);
 })();
 
 /* forming in a straight line */
@@ -923,7 +927,7 @@ socket.on("login_accepted", function(data) {
     /* send reconnect requests when socket conection lost */
     
     setInterval(function() {
-        if (!socket.connected || socket.disconnected) {
+        if (!socket.connected || socket.disconnected || (abungoState.lastPingDate - abungoState.lastPongDate > 15000)) {
             updateConnectionStatusIndicator(1);
             
             socket.connect(function() {
