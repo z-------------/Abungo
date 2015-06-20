@@ -16,7 +16,7 @@ var each = function(list, func) {
     if (!Array.isArray(list)) {
         list = [].slice.call(list);
     }
-    
+
     list.forEach(func);
 };
 
@@ -100,20 +100,20 @@ window.addEventListener("keyup", function(e){
 var scrollToBottom = function() {
     messagesElem.scrollTop = messagesElem.offsetHeight + messagesElem.scrollHeight;
 };
-    
+
 var makeMessageElem = function(data, type, scroll) {
     var elem = document.createElement("div");
-    
+
     var bodyContent;
-    
+
     var isFile = !!(data.mediaID || data.mediaUpload);
     var isSticker = !!data.sticker;
     var isMessage;
-    
+
     if (isFile) {
         var mediaURL = (data.mediaID ? "/file/" + data.mediaID + "/" + data.mediaName : window.URL.createObjectURL(data.mediaUpload));
         elem.dataset.mediaId = data.mediaID;
-        
+
         if (data.mediaType.match(/^image\//gi)) { // image/*
             bodyContent = "<img src='" + mediaURL + "'>";
         } else if (data.mediaType.match(/^video\//gi)) { // video/*
@@ -202,13 +202,13 @@ var showNotification = function(nick, text) {
                     if (!abungoState.hasOwnProperty("notifications")) {
                         abungoState.notifications = [];
                     }
-                    
+
                     var n = new Notification(nick + " on #" + abungoState.room, {
                         body: text,
                         icon: "/img/icon196.png"
                     });
                     abungoState.notifications.push(n);
-                    
+
                     window.addEventListener("focus", function() {
                         if (n) {
                             n.close();
@@ -228,7 +228,7 @@ var showNotification = function(nick, text) {
 
 var updateConnectionStatusIndicator = function(statusi) {
     var statuses = [{
-        string: "Connected.", 
+        string: "Connected.",
         classList: {
             action: "remove",
             class: "problem"
@@ -244,7 +244,7 @@ var updateConnectionStatusIndicator = function(statusi) {
     var statusString = status.string;
     var classListMethod = status.classList.action;
     var classListClass = status.classList.class;
-    
+
     loginButton.classList[classListMethod](classListClass);
     loginButton.textContent = statusString;
 };
@@ -311,7 +311,7 @@ var interleave = function(leftChannel, rightChannel) {
     return result;
 };
 
-var writeUTFBytes = function(view, offset, string) { 
+var writeUTFBytes = function(view, offset, string) {
     var lng = string.length;
     for (var i = 0; i < lng; i++){
         view.setUint8(offset + i, string.charCodeAt(i));
@@ -374,13 +374,13 @@ var tryReconnect = function() {
             socket.on("login_rejoin_accepted", function(data) {
                 console.log("login_rejoin_accepted");
                 abungoState.userID = data.userID;
-                
+
                 // update users list without removing Object.observe listener
                 abungoState.users.length = 0;
                 data.users.forEach(function(nick) {
                     abungoState.users.push(nick);
                 });
-                
+
                 updateConnectionStatusIndicator(0);
             });
         });
@@ -415,17 +415,17 @@ socket.on("login_accepted", function(data) {
     abungoState.nick = data.nick;
     abungoState.room = data.room;
     abungoState.users = data.users;
-    
+
     console.log("login_accepted", data);
-    
+
     messagesElem = $(".messages");
     var sendbarElem = $(".sendbar");
     var sendbarComposeInput = $(".sendbar_compose_input");
     var sendbarFileInput = $("#fileinput");
-    
+
     var sidebarHideBtn = $("#sidebar_collapse");
     var sidebarLogoutBtn = $("#logout_button");
-    
+
     loginButton.textContent = "Connected.";
     loginForm.classList.add("notouch");
     document.body.classList.add("loggedin");
@@ -438,11 +438,11 @@ socket.on("login_accepted", function(data) {
     if (isMobile()) {
         document.body.classList.add("sidebarhidden");
     }
-    
+
     document.title = abungoState.room + " - " + document.title;
-    
+
     /* send messages */
-    
+
     sendbarComposeInput.addEventListener("keydown", function(e){
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault();
@@ -458,19 +458,19 @@ socket.on("login_accepted", function(data) {
             }
         }
     });
-    
+
     sendbarComposeInput.addEventListener("input", function() {
         var elems = this.querySelectorAll(":not(br)");
         each(elems, function(elem) {
             elem.outerHTML = elem.textContent;
         });
     });
-    
+
     /* receive messages (including files and stickers) */
-    
+
     socket.on("message_incoming", function(data) {
         var type;
-        
+
         if (data.nick === abungoState.nick) {
             type = "self";
             var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
@@ -480,7 +480,7 @@ socket.on("login_accepted", function(data) {
             type = "received";
             makeMessageElem(data, type, isAtBottom());
         }
-        
+
         var notifText;
         if (data.mediaID) {
             notifText = "File: " + data.mediaName;
@@ -491,11 +491,11 @@ socket.on("login_accepted", function(data) {
         }
         showNotification(data.nick, notifText);
     });
-    
+
     /* send files */
-    
+
     // file input
-    
+
     sendbarFileInput.addEventListener("change", function(){
         [].forEach.call(this.files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
@@ -513,21 +513,21 @@ socket.on("login_accepted", function(data) {
             }
         });
     });
-    
+
     // drag and drop
-    
+
     window.addEventListener("dragover", function(e) {
         e.stopPropagation();
         e.preventDefault();
         e.dataTransfer.dropEffect = "copy";
     }, false);
-    
+
     window.addEventListener("drop", function(e) {
         e.stopPropagation();
         e.preventDefault();
 
         var files = e.dataTransfer.files;
-        
+
         [].forEach.call(files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
                 var messageData = {
@@ -544,22 +544,22 @@ socket.on("login_accepted", function(data) {
             }
         })
     }, false);
-    
+
     /* send stickers */
-    
+
     $(".popup_popup-stickers").addEventListener("mousedown", function(e) {
         if (e.target.classList.contains("popup_popup-stickers_sticker")) {
             var mousedownDate = new Date();
-            
+
             e.target.onmouseup = e.target.ontouchend = function() {
                 var mouseupDate = new Date();
                 var delta = mouseupDate - mousedownDate;
-                
+
                 var sizesCount = 3;
                 var maxTime = 2000;
-                
+
                 var size = Math.round((sizesCount - 1) * delta/maxTime);
-                
+
                 if (size <= 2) {
                     var messageData = {
                         userID: abungoState.userID,
@@ -573,14 +573,14 @@ socket.on("login_accepted", function(data) {
             };
         }
     });
-    
+
     /* photo booth */
-    
+
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-    
+
     (function() {
         var videoStream;
-        
+
         $("label.button.popup-camera").addEventListener("click", function(e) {
             if (e.target === this) {
                 var videoElem = $(".popup_popup-camera_preview");
@@ -610,23 +610,23 @@ socket.on("login_accepted", function(data) {
             }
         });
     })();
-    
+
     $(".popup_popup-camera label.button").addEventListener("click", function() {
         var videoElem = $(".popup_popup-camera_preview");
         if (videoElem.src && videoElem.src.length >= 1) {
             var canvas = document.createElement("canvas");
             var ctx = canvas.getContext("2d");
-            
+
             var dims = imageShrinkedDimensions(videoElem.offsetWidth, videoElem.offsetHeight, 1000 * 1000); // array [w, h]
-            
+
             canvas.width = dims[0];
             canvas.height = dims[1];
             ctx.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
-            
+
             var dataURI = canvas.toDataURL();
             var blob = dataURItoBlob(dataURI);
             var now = new Date();
-            
+
             var messageData = {
                 userID: abungoState.userID,
                 mediaUpload: blob,
@@ -638,9 +638,9 @@ socket.on("login_accepted", function(data) {
             makeMessageElem(messageData, "self", isAtBottom());
         }
     });
-    
+
     /* record audio */
-    
+
     (function() { // adapted from http://typedarray.org/from-microphone-to-wav-with-getusermedia-and-web-audio
         var audioStream;
 
@@ -649,19 +649,19 @@ socket.on("login_accepted", function(data) {
         var recordingLength = 0;
         var sampleRate;
         var audioVolume = 0;
-        
+
         var recordBtn = $(".popup_popup-voice_record");
         var volumeElem = $(".popup_popup-voice_volumecircle");
-        
+
         var volumeInterval;
-        
+
         recordBtn.addEventListener("click", function(e) {
             var that = this;
-            
+
             if (!that.classList.contains("recording")) {
                 navigator.getUserMedia({ audio: true }, function(stream) {
                     audioStream = stream;
-                    
+
                     // create audio context
                     window.AudioContext = window.AudioContext || window.webkitAudioContext;
                     var context = new AudioContext();
@@ -671,7 +671,7 @@ socket.on("login_accepted", function(data) {
 
                     // create gain node and analyser
                     var volume = context.createGain();
-                    
+
                     var analyser = context.createAnalyser();
                     analyser.fftSize = 256;
 
@@ -681,10 +681,10 @@ socket.on("login_accepted", function(data) {
                     // connect nodes
                     audioInput.connect(volume);
                     volume.connect(analyser);
-                    
+
                     var streamData = new Uint8Array(analyser.fftSize / 2);
 
-                    // lower values result in lower latency. 
+                    // lower values result in lower latency.
                     // higher values needed to avoid audio breakup and glitches
                     var bufferSize = 2048;
                     var recorder = context.createScriptProcessor(bufferSize, 2, 2);
@@ -697,7 +697,7 @@ socket.on("login_accepted", function(data) {
                             leftchannel.push(new Float32Array(left));
                             rightchannel.push(new Float32Array(right));
                             recordingLength += bufferSize;
-                            
+
                             // get volume
                             analyser.getByteFrequencyData(streamData);
                             var total = 0;
@@ -711,7 +711,7 @@ socket.on("login_accepted", function(data) {
                             clearInterval(volumeInterval);
                         }
                     };
-                    
+
                     // volume display interval
                     volumeInterval = setInterval(function() {
                         if (recordBtn.classList.contains("recording")) {
@@ -723,7 +723,7 @@ socket.on("login_accepted", function(data) {
                     // connect recorder
                     volume.connect(recorder);
                     recorder.connect(context.destination);
-                    
+
                     // add class
                     that.classList.add("recording");
                 }, function() {
@@ -732,7 +732,7 @@ socket.on("login_accepted", function(data) {
             } else {
                 // stop the stream
                 audioStream.stop();
-                
+
                 // flatten left and right channels
                 var leftBuffer = mergeBuffers(leftchannel, recordingLength);
                 var rightBuffer = mergeBuffers(rightchannel, recordingLength);
@@ -773,15 +773,15 @@ socket.on("login_accepted", function(data) {
 
                 // final blob
                 var blob = new Blob([view], { type : "audio/wav" } );
-                
+
                 // clear the stuff
                 leftchannel.length = 0;
                 rightchannel.length = 0;
                 recordingLength = 0;
-                
+
                 // send the blob
                 var now = new Date();
-                
+
                 var messageData = {
                     userID: abungoState.userID,
                     mediaUpload: blob,
@@ -791,28 +791,28 @@ socket.on("login_accepted", function(data) {
                 };
                 socket.emit("message", messageData);
                 makeMessageElem(messageData, "self", isAtBottom());
-                
+
                 that.classList.remove("recording");
             }
         });
     })();
-    
+
     /* user join/leave */
-    
+
     socket.on("user_joined", function(data) {
         if (abungoState.users.indexOf(data.nick) === -1) {
             abungoState.users.push(data.nick);
         }
         makeJoinElem(data, "joined", isAtBottom());
     });
-    
+
     socket.on("user_left", function(data) {
         abungoState.users.remove(data.nick);
         makeJoinElem(data, "left", isAtBottom());
     });
-    
+
     /* send and receive typing status */
-    
+
     (function(){
         var typingOld = false;
         sendbarComposeInput.addEventListener("keyup", function() {
@@ -832,31 +832,31 @@ socket.on("login_accepted", function(data) {
             }
         });
     })();
-    
+
     socket.on("typing_start", function(data) {
         console.log("typing_start", data.nick);
         updateTypingIndicators(data.nick, 1);
     });
-    
+
     socket.on("typing_stop", function(data) {
         console.log("typing_stop", data.nick);
         updateTypingIndicators(data.nick, 0);
     });
-    
+
     /* update users list */
-    
+
     Object.observe(abungoState.users, function() {
         console.log("users list changed", abungoState.users);
         updateUsersList();
     });
     updateUsersList();
-    
+
     /* listen for unread count changes */
-    
+
     if (!abungoState.hasOwnProperty("notifications")) {
         abungoState.notifications = [];
     }
-    
+
     Object.observe(abungoState.notifications, function() {
         var unreadCount = abungoState.notifications.length;
         if (unreadCount > 0) {
@@ -865,9 +865,9 @@ socket.on("login_accepted", function(data) {
             document.title = abungoState.room + " - Abungo";
         }
     });
-    
+
     /* scroll to bottom on resize if previously at bottom */
-    
+
     throttle("resize", "sResize"); // s for sane
     throttle("scroll", "sScroll", messagesElem);
     abungoState.wasAtBottom = true;
@@ -884,7 +884,7 @@ socket.on("login_accepted", function(data) {
         }
         abungoState.wasAtBottom = isAtBottom();
     });
-    
+
     /* show/hide sendbar box-shadow */
 
     setInterval(function() {
@@ -894,7 +894,7 @@ socket.on("login_accepted", function(data) {
             sendbarElem.classList.add("float");
         }
     });
-    
+
     /* show/hide sidebar */
 
     sidebarHideBtn.addEventListener("click", function() {
@@ -902,15 +902,15 @@ socket.on("login_accepted", function(data) {
     });
 
     /* logout button */
-    
+
     sidebarLogoutBtn.addEventListener("click", function() {
         if (confirm("Are you sure you want to leave? Your chat history will be lost.")) {
             window.location.reload();
         }
     });
-    
+
     /* popup buttons */
-    
+
     each($$("label.button.popup"), function(elem) {
         elem.addEventListener("click", function(e) {
             if (e.target === this) {
@@ -923,13 +923,13 @@ socket.on("login_accepted", function(data) {
             }
         });
     });
-    
+
     /* send reconnect requests when socket conection lost */
-    
+
     setInterval(function() {
         if (!socket.connected || socket.disconnected || (abungoState.lastPingDate - abungoState.lastPongDate > 15000)) {
             updateConnectionStatusIndicator(1);
-            
+
             socket.connect(function() {
                 tryReconnect();
             });
@@ -947,3 +947,8 @@ socket.on("login_rejected", function(data) {
 setInterval(function() {
     console.log("socket.connected", socket.connected);
 }, 5000);
+
+/* add mobile class to body if on mobile device (not just small screen) */
+if (isMobile()) {
+    document.body.classList.add("mobile");
+}

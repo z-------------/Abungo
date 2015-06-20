@@ -24,7 +24,7 @@ $green: #58b69b;
     from {
         background-color: transparent;
     }
-    
+
     to {
         background-color: $green;
     }
@@ -38,10 +38,10 @@ $green: #58b69b;
     padding: 0;
     text-decoration: none;
     max-width: 100%;
-    
+
     background-repeat: no-repeat;
     background-position: center;
-    
+
     transition-duration: .3s;
 }
 
@@ -102,23 +102,23 @@ aside {
     padding: 0 20px;
     background-color: $black;
     color: #fff;
-    
+
     label {
         position: relative;
-        
+
         input {
             background: none;
             display: block;
             margin: 10px 0;
             padding: 10px 0;
-            
+
             &:focus, &:valid, &[readonly] {
                 + div {
                     transform: scale(0.5) translateY(-35px);
                 }
             }
         }
-        
+
         div {
             position: absolute;
             left: 0;
@@ -128,18 +128,18 @@ aside {
             color: $grey;
         }
     }
-    
+
     header {
         padding: 20px;
     }
-    
+
     .logo {
         color: $green;
         font-size: 2.5em;
         font-weight: 700;
         position: relative;
         padding-left: 30px;
-        
+
         &:before {
             content: "";
             position: absolute;
@@ -152,33 +152,33 @@ aside {
             background-size: 1em;
         }
     }
-    
+
     form {
         font-size: 1.5em;
     }
-    
+
     button {
         font-size: 0.7em;
         background: rgba(127, 127, 127, .2);
         border-radius: 4px;
         padding: 10px 15px;
-        
+
         &.problem {
             background-color: #b65858;
         }
     }
-    
+
     ol, ul {
         list-style: none;
-        
+
         li {
             display: block;
             padding: 5px 0;
-            
+
             &.user-self {
                 font-weight: 700;
             }
-            
+
             &.typing:after {
                 content: "...";
                 display: inline-block;
@@ -192,12 +192,12 @@ aside {
             }
         }
     }
-    
+
     h2 {
         color: rgba(255, 255, 255, .8);
         margin-bottom: 10px;
     }
-    
+
     .sidebar_controls {
         position: absolute;
         left: 0;
@@ -207,11 +207,11 @@ aside {
         background-color: inherit;
         height: 70px;
         padding: 10px;
-        
+
         .left {
             float: left;
         }
-        
+
         .right {
             float: right;
         }
@@ -221,20 +221,20 @@ aside {
 .sidebarhidden {
     aside {
         transform: translateX(-100%);
-        
+
         .sidebar_controls {
             transform: translateX(70px);
         }
     }
-    
+
     .messages {
         width: 100%;
     }
-    
+
     .sendbar {
         width: calc(100% - 70px);
     }
-    
+
     #sidebar_collapse svg {
         transform: rotate(0.5turn);
     }
@@ -248,9 +248,9 @@ aside {
     width: calc(100% - 250px);
     height: 70px;
     background-color: $green;
-    
+
     @include material-shadow(1, -1);
-    
+
     &.float {
         @include material-shadow(2, -1);
     }
@@ -263,18 +263,18 @@ aside {
     right: 0;
     width: 400px;
     margin: 10px;
-    
+
     background-color: #fff;
     color: $black;
     padding: 10px;
     transition-property: box-shadow;
-    
+
     @include material-shadow(1);
-    
+
     &:hover, &:focus {
         @include material-shadow(2);
     }
-    
+
     &:empty:before {
         content: attr(placeholder);
         position: absolute;
@@ -288,7 +288,7 @@ aside {
 
 .sendbar_attach {
     margin: 10px;
-    
+
     label.button {
         margin-right: 10px;
     }
@@ -301,50 +301,50 @@ label.button {
     border-radius: 50%;
     cursor: pointer;
     position: relative;
-    
+
     transition-property: box-shadow, background;
-    
+
     &:hover, &:focus, &.popup-opened {
         background-color: #fff;
         @include material-shadow(2);
-        
+
         > svg g > * {
             fill: $green;
         }
     }
-    
+
     @each $depth in 1, 2, 3, 4, 5 {
         &.shadow#{$depth} {
             @include material-shadow($depth);
         }
     }
-    
+
     &.white, &.lightgrey {
         background-color: #fff;
-        
+
         svg g > * {
             fill: $black;
         }
     }
-    
+
     &.lightgrey {
         background-color: $lightgrey;
     }
-    
+
     &.green, &.white, &.lightgrey {
         &:hover, &:focus {
             background-color: $green;
-            
+
             svg g > *{
                 fill: #fff;
             }
         }
     }
-    
+
     input {
         display: none;
     }
-    
+
     svg {
         display: block;
         width: 30px;
@@ -352,11 +352,11 @@ label.button {
         margin: 10px;
         pointer-events: none;
     }
-    
+
     .popup_popup {
         $popup_width: 300px;
         $popup_height: $popup_width * 3 / 4;
-        
+
         position: absolute;
         max-width: none;
         width: $popup_width;
@@ -372,9 +372,9 @@ label.button {
         border-radius: 4px;
         cursor: auto;
         overflow: hidden;
-        
+
         transition-property: transform, opacity, box-shadow;
-        
+
         &:after {
             content: "";
             width: 0;
@@ -388,14 +388,14 @@ label.button {
             margin-left: -10px;
             margin-bottom: -10px;
         }
-        
+
         &.popup_popup-stickers {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            
+
             .popup_popup-stickers_sticker {
                 display: block;
                 width: 100%;
@@ -403,12 +403,12 @@ label.button {
                 cursor: pointer;
                 border-radius: 4px;
                 background-size: contain;
-                
+
                 &:active {
                     animation: stickerEnergyFillup 2s linear;
                 }
             }
-            
+
             .popup_popup-stickers_list li {
                 display: inline-block;
                 width: 75px;
@@ -416,7 +416,7 @@ label.button {
                 margin: 10px;
             }
         }
-        
+
         &.popup_popup-camera {
             .popup_popup-camera_capture {
                 position: absolute;
@@ -425,17 +425,17 @@ label.button {
                 margin: 10px;
             }
         }
-        
+
         &.popup_popup-voice {
             height: 100px;
-            
+
             .popup_popup-voice_record {
                 position: absolute;
                 left: 50%;
                 top: 50%;
                 transform: translateX(-50%) translateY(-50%);
                 z-index: 1;
-                
+
                 svg {
                     circle, rect {
                         transition: opacity .3s;
@@ -445,15 +445,15 @@ label.button {
                         opacity: 0;
                     }
                 }
-                
+
                 &.recording {
                     background-color: $green;
-                    
+
                     svg g {
                         > * {
                             fill: #fff;
                         }
-                        
+
                         circle {
                             opacity: 0;
                         }
@@ -463,14 +463,14 @@ label.button {
                         }
                     }
                 }
-                
+
                 &:not(.recording) {
                     + .popup_popup-voice_volumecircle {
                         transform: scale(0) !important;
                     }
                 }
             }
-            
+
             .popup_popup-voice_volumecircle {
                 position: absolute;
                 top: 50%;
@@ -484,7 +484,7 @@ label.button {
                 transition: transform 50ms;
             }
         }
-        
+
         .popup_scroller {
             position: absolute;
             left: 0;
@@ -492,23 +492,23 @@ label.button {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            
+
             &.x {
                 overflow-x: auto;
             }
-            
+
             &.y {
                 overflow-y: auto;
             }
         }
     }
-    
+
     &.popup-opened {
         .popup_popup {
             pointer-events: auto;
             opacity: 1;
             transform: translateY(-100%) translateX(-50%);
-            
+
             @include material-shadow(2);
         }
     }
@@ -531,7 +531,7 @@ label.button {
     clear: both;
     word-wrap: break-word;
     position: relative;
-    
+
     &.message-received, &.message-self {
         max-width: 400px;
         color: $black;
@@ -539,7 +539,7 @@ label.button {
         padding: 10px 15px;
         @include material-shadow(1);
         animation-duration: .3s;
-        
+
         &:after {
             content: "";
             width: 0;
@@ -549,11 +549,11 @@ label.button {
             top: 0;
         }
     }
-    
+
     &.message-received {
         float: left;
         animation-name: messageAppearLeft;
-        
+
         &:after {
             border-width: 0 15px 15px 0;
             border-color: transparent #ffffff transparent transparent;
@@ -564,52 +564,52 @@ label.button {
     &.message-self {
         float: right;
         animation-name: messageAppearRight;
-        
+
         h3 {
             display: none;
         }
-        
+
         &:after {
             border-width: 15px 15px 0 0;
             border-color: #ffffff transparent transparent transparent;
             right: -15px;
         }
-        
+
         &.message-notdelivered {
             opacity: 0.5;
         }
     }
-    
+
     &.message-join {
         text-align: center;
         padding: 5px 0;
         font-style: italic;
     }
-    
+
     h3 {
         font-weight: 700;
     }
-    
+
     a {
         color: $green;
         border-bottom: solid 1px $green;
     }
-    
+
     .message_sticker {
         $message_sticker_width: 200px;
         width: $message_sticker_width;
         height: $message_sticker_width;
-        
+
         &.message_sticker-1 {
             width: $message_sticker_width / 2;
             height: $message_sticker_width / 2;
         }
-        
+
         &.message_sticker-0 {
             width: $message_sticker_width / 4;
             height: $message_sticker_width / 4;
         }
-        
+
         &.message_sticker-small {
             $message_sticker_small_width: 1em;
             width: $message_sticker_small_width;
@@ -619,31 +619,37 @@ label.button {
     }
 }
 
+.mobile {
+    .popup-camera {
+        display: none !important;
+    }
+}
+
 @media only screen and (max-width: 720px) {
     *, :before, :after {
         transition: none !important;
     }
-    
+
     aside, .messages, .sendbar {
         width: 100% !important;
         left: 0;
     }
-    
+
     aside {
         padding-top: 70px;
         z-index: 2;
     }
-    
+
     .sidebar_controls {
         top: 0;
         background-color: transparent !important;
     }
-    
+
     .sidebarhidden {
         aside {
             z-index: 1;
         }
-        
+
         .sidebar_controls {
             label.button {
                 background-color: $black;
@@ -651,20 +657,16 @@ label.button {
             }
         }
     }
-    
-    .popup-camera {
-        display: none !important;
-    }
-    
+
     .sendbar {
         label.button {
             margin-right: 0;
         }
     }
-    
+
     .sendbar_compose_input {
         width: calc(100% - 180px);
-        
+
         &:focus {
             width: calc(100% - 20px);
         }
