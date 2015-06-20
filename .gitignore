@@ -29,3 +29,6 @@ node_modules
 
 # foreman environment variables file
 .env
+
+# sass cache directory
+.sass-cache
