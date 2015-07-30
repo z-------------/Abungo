@@ -205,7 +205,7 @@ var showNotification = function(nick, text) {
 
                     var n = new Notification(nick + " on #" + abungoState.room, {
                         body: text,
-                        icon: "/img/icon196.png"
+                        icon: "/img/logo/icon196.png"
                     });
                     abungoState.notifications.push(n);
 
