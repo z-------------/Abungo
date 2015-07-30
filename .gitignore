@@ -32,3 +32,6 @@ node_modules
 
 # sass cache directory
 .sass-cache
+
+# mac crap
+.DS_Store
