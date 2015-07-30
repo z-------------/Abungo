@@ -318,6 +318,10 @@ var writeUTFBytes = function(view, offset, string) {
     }
 };
 
+/* navigator.getUserMedia prefix support */
+
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
 /* abungoState object for storing Abungo-related stuff */
 
 var abungoState = {};
@@ -575,8 +579,6 @@ socket.on("login_accepted", function(data) {
     });
 
     /* photo booth */
-
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
     (function() {
         var videoStream;
@@ -951,4 +953,9 @@ setInterval(function() {
 /* add mobile class to body if on mobile device (not just small screen) */
 if (isMobile()) {
     document.body.classList.add("mobile");
+}
+
+/* add no-gum class to body if navigator.getUserMedia not supported (prefixed or otherwise) */
+if (!navigator.getUserMedia) {
+    document.body.classList.add("no-gum");
 }

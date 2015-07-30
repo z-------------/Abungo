@@ -637,6 +637,16 @@ label.button {
     }
 }
 
+.no-gum {
+    .popup-camera {
+        display: none !important;
+    }
+
+    .popup-voice {
+        display: none !important;
+    }
+}
+
 @media only screen and (max-width: 720px) {
     *, :before, :after {
         transition: none !important;
