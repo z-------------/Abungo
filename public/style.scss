@@ -681,16 +681,19 @@ label.button {
     }
 
     .sendbar {
+        height: 135px;
+
         label.button {
             margin-right: 0;
         }
     }
 
-    .sendbar_compose_input {
-        width: calc(100% - 180px);
+    .sendbar_attach {
+        display: flex;
+        justify-content: space-around;
+    }
 
-        &:focus {
-            width: calc(100% - 20px);
-        }
+    .sendbar_compose_input {
+        width: calc(100% - 20px);
     }
 }
