@@ -685,7 +685,7 @@ label.button {
     }
 
     .sendbar {
-        height: 135px;
+        height: auto;
 
         label.button {
             margin-right: 0;
@@ -695,9 +695,12 @@ label.button {
     .sendbar_attach {
         display: flex;
         justify-content: space-around;
+        margin: 5px;
     }
 
     .sendbar_compose_input {
-        width: calc(100% - 20px);
+        position: relative;
+        margin: 0;
+        width: 100%;
     }
 }
