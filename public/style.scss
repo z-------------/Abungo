@@ -448,7 +448,7 @@ label.button {
 
                 svg {
                     circle, rect {
-                        transition: opacity .3s;
+                        transition-property: opacity, fill;
                     }
 
                     rect {
