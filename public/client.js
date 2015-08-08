@@ -173,7 +173,14 @@ var makeJoinElem = function(data, action, scroll) {
 
 var updateUsersList = function() {
     $(".userlist_list").innerHTML = "";
-    abungoState.users.forEach(function(nick) {
+    abungoState.users.sort(function(a, b) {
+        var aLower = a.toLowerCase();
+        var bLower = b.toLowerCase();
+
+        if (aLower < bLower || a === abungoState.nick) return -1;
+        if (aLower > bLower || b === abungoState.nick) return 1;
+        return 0;
+    }).forEach(function(nick) {
         var elem = document.createElement("li");
         elem.classList.add("user");
         elem.textContent = nick;
