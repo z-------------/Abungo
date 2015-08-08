@@ -349,6 +349,9 @@ var loginNickInput = $("#login_nick");
 var loginRoomInput = $("#login_room");
 var loginButton = $("#login_button");
 
+loginNickInput.value = localStorage.getItem("abungo_nick") || "";
+loginRoomInput.value = localStorage.getItem("abungo_room") || "";
+
 loginForm.addEventListener("submit", function(e){
     e.preventDefault();
     if (this.checkValidity() && !this.classList.contains("notouch")) {
@@ -357,6 +360,9 @@ loginForm.addEventListener("submit", function(e){
             room: loginRoomInput.value,
             userID: abungoState.userID
         });
+
+        localStorage.setItem("abungo_nick", loginNickInput.value);
+        localStorage.setItem("abungo_room", loginRoomInput.value);
     }
 });
 
