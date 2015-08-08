@@ -448,6 +448,7 @@ label.button {
 
                 svg {
                     circle, rect {
+                        -webkit-transition-property: opacity, fill;
                         transition-property: opacity, fill;
                     }
 
