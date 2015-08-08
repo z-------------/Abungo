@@ -646,7 +646,7 @@ socket.on("login_accepted", function(data) {
                 userID: abungoState.userID,
                 mediaUpload: blob,
                 mediaType: "image/png",
-                mediaName: "Abungo snap at " + now.toDateString() + " " + now.toTimeString() + ".png",
+                mediaName: "Abungo snap.png",
                 messageID: makeMessageID()
             };
             socket.emit("message", messageData);
@@ -801,7 +801,7 @@ socket.on("login_accepted", function(data) {
                     userID: abungoState.userID,
                     mediaUpload: blob,
                     mediaType: "audio/wav",
-                    mediaName: "Abungo audio at " + now.toDateString() + " " + now.toTimeString() + ".wav",
+                    mediaName: "Abungo audio.wav",
                     messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
