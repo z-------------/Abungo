@@ -375,12 +375,15 @@ label.button {
         opacity: 0;
         background-color: #fff;
         color: $black;
-        -webkit-transform: translateY(calc(-100% + 50px)) translateX(-50%);
-        transform: translateY(calc(-100% + 50px)) translateX(-50%);
         pointer-events: none;
         border-radius: 4px;
         cursor: auto;
         overflow: hidden;
+
+        -webkit-transform: translateY(calc(-100% + 50px)) translateX(-50%) scale(0);
+        -webkit-transform-origin: bottom;
+        transform: translateY(calc(-100% + 50px)) translateX(-50%) scale(0);
+        transform-origin: bottom;
 
         transition-property: transform, opacity, box-shadow;
 
@@ -519,8 +522,9 @@ label.button {
         .popup_popup {
             pointer-events: auto;
             opacity: 1;
-            -webkit-transform: translateY(-100%) translateX(-50%);
-            transform: translateY(-100%) translateX(-50%);
+
+            -webkit-transform: translateY(-100%) translateX(-50%) scale(1);
+            transform: translateY(-100%) translateX(-50%) scale(1);
 
             @include material-shadow(2);
         }
