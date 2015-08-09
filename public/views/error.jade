@@ -1,0 +1,17 @@
+doctype html
+html
+    head
+        title #{status_text} - Abungo
+        meta(charset="utf-8")
+        
+        meta(name="viewport", content="width=device-width, height=device-height")
+        meta(name="theme-color", content="#58b69b")
+        
+        link(rel="stylesheet", href="//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic")
+        link(rel="stylesheet", href="/error.css")
+    body
+        h1.logo Abungo
+        h2 Error #{status_code}: 
+            strong #{status_text}
+        p
+            a(href="/") return to the main page

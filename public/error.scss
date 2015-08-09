@@ -1,0 +1,75 @@
+@import "mixins.scss";
+
+$black: #333;
+$lightgrey: #ddd;
+$grey: #777;
+$darkgrey: #555;
+$green: #58b69b;
+
+*, :before, :after {
+    box-sizing: inherit;
+    font: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    max-width: 100%;
+
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    box-sizing: border-box;
+    font-family: "Lato", sans-serif;
+    background-color: $darkgrey;
+    color: #fff;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    > * {
+        margin-bottom: 0.5em;
+    }
+}
+
+strong {
+    font-weight: 700;
+}
+
+a {
+    color: $green;
+}
+
+.logo {
+    color: $green;
+    font-size: 5em;
+    font-weight: 700;
+    position: relative;
+    padding-left: 1.3em;
+
+    &:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2em;
+        height: 100%;
+        margin-left: -0.3em;
+        background-image: url(img/logo/icon.svg);
+        background-size: 1em;
+    }
+}
+
+h2 {
+    font-size: 2em;
+    font-weight: 200;
+}

@@ -3,6 +3,7 @@ var express = require("express");
 var app = express();
 var socketio = require("socket.io");
 var sass = require("node-sass");
+var http = require("http");
 
 var PORT = process.env.PORT || 3000;
 
@@ -24,9 +25,17 @@ fs.watch(STICKERS_DIRNAME, function() {
     makeStickersList(fs.readdirSync(STICKERS_DIRNAME));
 });
 
-/* set up express */
+/* function for sending error page */
 
-app.use(express.static("public"));
+function sendError(res, code) {
+    var text = http.STATUS_CODES[code] || "Something went wrong";
+    res.render("views/error.jade", {
+        status_code: code,
+        status_text: text
+    });
+}
+
+/* set up express */
 
 app.set("views", __dirname + "/public");
 app.set("view engine", "jade");
@@ -65,9 +74,22 @@ app.get("/file/:id/*", function(req, res) {
         res.append("Content-Type", type || "text/plain");
         res.send(file);
     } else {
-        res.status(404);
-        res.send("<h1>Abungo</h1><p>The file you're looking for couldn't be found.</p>");
+        sendError(res, 404);
     }
+});
+
+app.get("/yeya", function(req, res) {
+    sendError(res, "418");
+});
+
+app.get("*", function(req, res) {
+    fs.exists(__dirname + "/public" + req.originalUrl, function(exists) {
+        if (exists) {
+            res.sendFile(__dirname + "/public" + req.originalUrl);
+        } else {
+            sendError(res, 404);
+        }
+    });
 });
 
 var files = {};
