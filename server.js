@@ -77,13 +77,13 @@ var server = app.listen(PORT, function() {
     var port = server.address().port;
 
     console.log("Abungo running on port %s", port);
-    
+
     /* hey ho, let's go */
-    
+
     var io = socketio(server);
-    
+
     var rooms = {};
-    
+
     var disconnectUser = function(room, nick) {
         var user = room.users[nick];
         if (user) {
@@ -97,9 +97,9 @@ var server = app.listen(PORT, function() {
             console.log("disconnected", nick);
         }
     };
-    
+
     /* delete files that have expired */
-    
+
     setInterval(function() {
         Object.keys(files).forEach(function(mediaID) {
             var file = files[mediaID];
@@ -112,30 +112,30 @@ var server = app.listen(PORT, function() {
             }
         });
     }, 5000);
-    
+
     /* socket messages (the actual stuff) */
 
     io.on("connection", function(socket){
         socket.emit("connected", {
             date: new Date()
         });
-        
+
         console.log("new connection");
-        
+
         socket.on("login", function(data){
             var nickTaken = false;
-            
+
             if (rooms[data.room] && rooms[data.room].users.hasOwnProperty(data.nick)) {
                 nickTaken = true;
             }
-            
+
             if (!nickTaken) {
                 if (!rooms[data.room]) {
                     rooms[data.room] = {
                         users: {}
                     };
                 }
-                
+
                 var room = rooms[data.room];
                 var userID = data.userID || ("" + new Date().getTime() + Math.round(Math.random() * 10000));
                 room.users[data.nick] = {
@@ -146,7 +146,7 @@ var server = app.listen(PORT, function() {
                 };
                 var user = room.users[data.nick];
                 console.log("%s (%s) joined room '%s'", user.nick, user.ip, data.room);
-                
+
                 if (data.rejoin) {
                     socket.emit("login_rejoin_accepted", {
                         userID: userID,
@@ -162,24 +162,24 @@ var server = app.listen(PORT, function() {
                         users: Object.keys(room.users)
                     });
                 }
-                
+
                 Object.keys(room.users).forEach(function(userNick) {
                     var user = room.users[userNick];
                     user.socket.emit("user_joined", {
                         nick: data.nick
                     });
                 });
-                
+
                 socket.on("message", function(data) {
                     //setTimeout(function(){
                     var isFile = !!data.mediaUpload;
                     var isSticker = !!data.sticker;
-                    
+
                     var sendableMessageData = {
                         nick: user.nick,
                         messageID: data.messageID // for sender client use only
                     };
-                    
+
                     if (isFile) {
                         if (data.mediaUpload.length < 10000000) { // 10 mb
                             var mediaID = "" + Math.round(Math.random() * 100000) + new Date().getTime();
@@ -200,14 +200,14 @@ var server = app.listen(PORT, function() {
                     } else if (isSticker) {
                         sendableMessageData.sticker = data.sticker;
                         sendableMessageData.stickerSize = data.stickerSize;
-                        
+
                         console.log("%s (%s) sent sticker '%s'", user.nick, user.ip, data.sticker);
                     } else {
                         sendableMessageData.message = data.message;
-                        
+
                         console.log("%s (%s) said: %s", user.nick, user.ip, data.message);
                     }
-                    
+
                     if (sendableMessageData) {
                         Object.keys(room.users).forEach(function(userNick) {
                             var user = room.users[userNick];
@@ -216,7 +216,7 @@ var server = app.listen(PORT, function() {
                     }
                     //}, 2000);
                 });
-                
+
                 socket.on("typing_start", function(data) {
                     Object.keys(room.users).forEach(function(userNick) {
                         var tuser = room.users[userNick];
@@ -225,7 +225,7 @@ var server = app.listen(PORT, function() {
                         });
                     });
                 });
-                
+
                 socket.on("typing_stop", function(data) {
                     Object.keys(room.users).forEach(function(userNick) {
                         var tuser = room.users[userNick];
@@ -234,7 +234,7 @@ var server = app.listen(PORT, function() {
                         });
                     });
                 });
-                
+
                 socket.on("ping", function(data) {
                     socket.emit("pong");
                     user.lastPing = new Date();
@@ -255,7 +255,7 @@ var server = app.listen(PORT, function() {
                         clearInterval(pingInterval);
                     }
                 }, 5000);
-                
+
                 socket.on("disconnect", function() {
                     disconnectUser(room, user.nick);
                 });
@@ -267,7 +267,7 @@ var server = app.listen(PORT, function() {
                 }
             }
         });
-        
+
         socket.on("login_resume", function(data) {
             var room = rooms[data.room];
             if (room && room.users && room.users.hasOwnProperty(data.nick) && room.users[data.nick].userID === data.userID) {
