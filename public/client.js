@@ -138,7 +138,7 @@ var makeMessageElem = function(data, type, scroll) {
         stickerNames.forEach(function(stickerName) {
             message = message.replace(new RegExp(":" + stickerName + ":|\\(" + stickerName + "\\)", "g"), "<img class='message_sticker message_sticker-small' src='img/stickers/" + stickerName + ".svg'>");
         });
-        bodyContent = Autolinker.link(HTMLify(message));
+        bodyContent = Autolinker.link(HTMLify(cleanseHTML(message)));
     }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
