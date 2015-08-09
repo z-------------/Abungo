@@ -8,7 +8,6 @@ $green: #58b69b;
 
 @keyframes messageAppearLeft {
     from {
-        -webkit-transform: translateX(-50px);
         transform: translateX(-50px);
         opacity: 0;
     }
@@ -16,13 +15,36 @@ $green: #58b69b;
 
 @keyframes messageAppearRight {
     from {
-        -webkit-transform: translateX(50px);
         transform: translateX(50px);
         opacity: 0;
     }
 }
 
 @keyframes stickerEnergyFillup {
+    from {
+        background-color: transparent;
+    }
+
+    to {
+        background-color: $green;
+    }
+}
+
+@-webkit-keyframes messageAppearLeft {
+    from {
+        -webkit-transform: translateX(-50px);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes messageAppearRight {
+    from {
+        -webkit-transform: translateX(50px);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes stickerEnergyFillup {
     from {
         background-color: transparent;
     }
@@ -417,6 +439,7 @@ label.button {
                 background-size: contain;
 
                 &:active {
+                    -webkit-animation: stickerEnergyFillup 2s linear;
                     animation: stickerEnergyFillup 2s linear;
                 }
             }
@@ -555,6 +578,8 @@ label.button {
         background-color: #fff;
         padding: 10px 15px;
         @include material-shadow(1);
+
+        -webkit-animation-duration: .3s;
         animation-duration: .3s;
 
         &:after {
@@ -569,6 +594,8 @@ label.button {
 
     &.message-received {
         float: left;
+
+        -webkit-animation-name: messageAppearLeft;
         animation-name: messageAppearLeft;
 
         &:after {
@@ -580,6 +607,8 @@ label.button {
 
     &.message-self {
         float: right;
+
+        -webkit-animation-name: messageAppearRight;
         animation-name: messageAppearRight;
 
         h3 {
