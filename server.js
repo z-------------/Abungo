@@ -127,7 +127,6 @@ var server = app.listen(PORT, function() {
             var file = files[mediaID];
             var now = new Date();
             var delta = now - file.uploadedDate;
-            console.log(mediaID, delta, 600000 - delta);
             if (delta > 600000) { // 10 minutes
                 delete files[mediaID];
                 console.log("deleted" + mediaID, files);
@@ -271,8 +270,6 @@ var server = app.listen(PORT, function() {
                         if (delta > 30000) {
                             socket.disconnect();
                         }
-
-                        console.log(data.nick, delta);
                     } else {
                         clearInterval(pingInterval);
                     }
