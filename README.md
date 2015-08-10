@@ -2,7 +2,7 @@
 
 Simple anonymous chat.
 
-## Screenshots
+---
 
 ![Screenshot 1](http://i.imgur.com/LU2rNX7.png)
 
@@ -30,10 +30,17 @@ Abungo is dependent on:
 
 ### Running
 
-`cd` to the directory in which you put Abungo and do `node server.js`.
+`cd` to the Abungo directory and do `node server.js`.
 
-You can also start it with something like [Foreman](https://github.com/ddollar/foreman) if you want to be able to set the `PORT` and other environment variables (not as useful in v1 as it used to be).
+You can also start it with something like [Foreman](https://github.com/ddollar/foreman) if you want to be able to set the `PORT` and other environment variables.
 
 ---
 
 You can also check it out online at https://abungo.herokuapp.com.
+
+### To-do
+
+This is a list of things that I plan to add to Abungo in the future. They may or may not ever happen.
+
++ Modular attachment plugin system
++ Video chat
