@@ -511,15 +511,12 @@ label.button {
 
             .popup_popup-voice_volumecircle {
                 position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 50px;
-                height: 50px;
-                margin-left: -25px;
-                margin-top: -25px;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                top: 0;
+                left: 0;
                 fill: #ddd;
-
-                transition: transform 50ms;
             }
         }
 

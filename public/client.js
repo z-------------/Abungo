@@ -667,8 +667,10 @@ socket.on("login_accepted", function(data) {
 
         var recordBtn = $(".popup_popup-voice_record");
         var volumeElem = $(".popup_popup-voice_volumecircle");
+        var volumeCircleElem = volumeElem.querySelector("circle");
 
         var volumeInterval;
+        var VOLUME_CIRCLE_ORIG_RADIUS = 12;
 
         recordBtn.addEventListener("click", function(e) {
             var that = this;
@@ -731,9 +733,9 @@ socket.on("login_accepted", function(data) {
                     volumeInterval = setInterval(function() {
                         if (recordBtn.classList.contains("recording")) {
                             var scale = audioVolume / 2000;
-                            volumeElem.style.transform = "scale(" + scale + ")";
+                            volumeCircleElem.setAttribute("r", VOLUME_CIRCLE_ORIG_RADIUS * scale);
                         }
-                    }, 50);
+                    }, 100);
 
                     // connect recorder
                     volume.connect(recorder);
