@@ -458,6 +458,10 @@ socket.on("login_accepted", function(data) {
 
     document.title = abungoState.room + " - " + document.title;
 
+    if (localStorage.getItem("abungo_sidebar_hidden") === "true") {
+        document.body.classList.add("sidebarhidden");
+    }
+
     /* send messages */
 
     sendbarComposeInput.addEventListener("keydown", function(e){
@@ -916,7 +920,15 @@ socket.on("login_accepted", function(data) {
     /* show/hide sidebar */
 
     sidebarHideBtn.addEventListener("click", function() {
-        document.body.classList.toggle("sidebarhidden");
+        var className = "sidebarhidden";
+
+        if (document.body.classList.contains(className)) {
+            document.body.classList.remove(className);
+            localStorage.setItem("abungo_sidebar_hidden", "false");
+        } else {
+            document.body.classList.add(className);
+            localStorage.setItem("abungo_sidebar_hidden", "true");
+        }
     });
 
     /* logout button */
