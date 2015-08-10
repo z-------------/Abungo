@@ -411,11 +411,9 @@ socket.on("connected", tryReconnect);
 (function(){
     var ping = function() {
         socket.emit("ping");
-        console.log("ping");
     };
     socket.on("pong", function(data) {
         abungoState.lastPongDate = new Date();
-        console.log("pong");
     });
     setInterval(function() {
         ping();
@@ -736,7 +734,6 @@ socket.on("login_accepted", function(data) {
                     // volume display interval
                     volumeInterval = setInterval(function() {
                         if (recordBtn.classList.contains("recording")) {
-                            console.log(audioVolume);
                             var scale = audioVolume / 4000;
                             volumeCircleElem.setAttribute("r", VOLUME_CIRCLE_ORIG_RADIUS * scale);
                         }
@@ -973,10 +970,6 @@ socket.on("login_rejected", function(data) {
     console.log("login_rejected");
     alert("That username is taken. Please choose another or join a different room.");
 });
-
-setInterval(function() {
-    console.log("socket.connected", socket.connected);
-}, 5000);
 
 /* add mobile class to body if on mobile device (not just small screen) */
 if (isMobile()) {
