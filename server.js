@@ -78,8 +78,9 @@ app.get("/file/:id/*", function(req, res) {
     }
 });
 
-app.get("/yeya", function(req, res) {
-    sendError(res, "418");
+app.get("/error/:code", function(req, res) {
+    var code = req.params.code || 418;
+    sendError(res, code);
 });
 
 app.get("*", function(req, res) {
