@@ -450,11 +450,17 @@ label.button {
                 }
             }
 
-            .popup_popup-stickers_list li {
-                display: inline-block;
-                width: 75px;
-                height: 75px;
-                margin: 10px;
+            .popup_popup-stickers_list {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+
+                li {
+                    display: inline-block;
+                    width: 75px;
+                    height: 75px;
+                    margin: 10px;
+                }
             }
         }
 
