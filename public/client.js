@@ -43,6 +43,20 @@ var HTMLify = function(str) {
     return str.replace(/\n/gi, "<br>");
 };
 
+var parseMDL = function(str) { // MarkDownLite (yeah, i just made that up)
+    var lines = str.split("<br>");
+    for (var j = 0; j < lines.length; j++) {
+        var matches = lines[j].match(/\*/g);
+        for (var i = 0; i < matches.length; i += 2) {
+            if (matches[i] && matches[i+1]) { // pair of '*'
+                lines[j] = lines[j].replace(/\*/, "<strong>").replace(/\*/, "</strong>");
+            }
+        }
+    }
+
+    return lines.join("<br>");
+};
+
 var dataURItoBlob = function(dataURI) { // by user Stoive on StackOverflow http://stackoverflow.com/a/5100158/3234159
     var byteString;
     if (dataURI.split(",")[0].indexOf("base64") >= 0) {
@@ -138,7 +152,7 @@ var makeMessageElem = function(data, type, scroll) {
         stickerNames.forEach(function(stickerName) {
             message = message.replace(new RegExp(":" + stickerName + ":|\\(" + stickerName + "\\)", "g"), "<img class='message_sticker message_sticker-small' src='img/stickers/" + stickerName + ".svg'>");
         });
-        bodyContent = Autolinker.link(HTMLify(cleanseHTML(message)));
+        bodyContent = parseMDL(Autolinker.link(HTMLify(cleanseHTML(message))));
     }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
