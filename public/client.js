@@ -96,16 +96,16 @@ var throttle = function(type, name, obj) { // throttle function from MDN https:/
 
 /* track pressed keys */
 
-var pressedKeys = [];
+abungo.state.pressedKeys = [];
 window.addEventListener("keydown", function(e){
-    if (pressedKeys.indexOf(e.keyCode) === -1) {
-        pressedKeys.push(e.keyCode);
+    if (abungo.state.pressedKeys.indexOf(e.keyCode) === -1) {
+        abungo.state.pressedKeys.push(e.keyCode);
     }
 });
 window.addEventListener("keyup", function(e){
-    if (pressedKeys.indexOf(e.keyCode) !== -1) {
-        var index = pressedKeys.indexOf(e.keyCode);
-        pressedKeys.splice(index, 1);
+    if (abungo.state.pressedKeys.indexOf(e.keyCode) !== -1) {
+        var index = abungo.state.pressedKeys.indexOf(e.keyCode);
+        abungo.state.pressedKeys.splice(index, 1);
     }
 });
 
@@ -142,12 +142,12 @@ var makeMessageElem = function(data, type, scroll) {
     } else {
         isMessage = true;
         // replace inline stickers with image
-        if (!abungoState.stickerNames) {
-            abungoState.stickerNames = [].slice.call($$(".popup_popup-stickers_sticker")).map(function(elem) {
+        if (!abungo.state.stickerNames) {
+            abungo.state.stickerNames = [].slice.call($$(".popup_popup-stickers_sticker")).map(function(elem) {
                 return elem.getAttribute("title");
             });
         }
-        var stickerNames = abungoState.stickerNames;
+        var stickerNames = abungo.state.stickerNames;
         var message = data.message;
         stickerNames.forEach(function(stickerName) {
             message = message.replace(new RegExp(":" + stickerName + ":|\\(" + stickerName + "\\)", "g"), "<img class='message_sticker message_sticker-small' src='img/stickers/" + stickerName + ".svg'>");
@@ -187,18 +187,18 @@ var makeJoinElem = function(data, action, scroll) {
 
 var updateUsersList = function() {
     $(".userlist_list").innerHTML = "";
-    abungoState.users.sort(function(a, b) {
+    abungo.state.users.sort(function(a, b) {
         var aLower = a.toLowerCase();
         var bLower = b.toLowerCase();
 
-        if (aLower < bLower || a === abungoState.nick) return -1;
-        if (aLower > bLower || b === abungoState.nick) return 1;
+        if (aLower < bLower || a === abungo.state.nick) return -1;
+        if (aLower > bLower || b === abungo.state.nick) return 1;
         return 0;
     }).forEach(function(nick) {
         var elem = document.createElement("li");
         elem.classList.add("user");
         elem.textContent = nick;
-        if (nick === abungoState.nick) {
+        if (nick === abungo.state.nick) {
             elem.classList.add("user-self");
         }
         $(".userlist_list").appendChild(elem);
@@ -220,26 +220,26 @@ var showNotification = function(nick, text) {
         if (window.Notification && Notification.permission !== "denied") {
             Notification.requestPermission(function(status) {
                 if (status === "granted") {
-                    if (!abungoState.hasOwnProperty("notifications")) {
-                        abungoState.notifications = [];
+                    if (!abungo.state.hasOwnProperty("notifications")) {
+                        abungo.state.notifications = [];
                     }
 
-                    var n = new Notification(nick + " on #" + abungoState.room, {
+                    var n = new Notification(nick + " on #" + abungo.state.room, {
                         body: text,
                         icon: "/img/logo/icon196.png"
                     });
-                    abungoState.notifications.push(n);
+                    abungo.state.notifications.push(n);
 
                     window.addEventListener("focus", function() {
                         if (n) {
                             n.close();
-                            abungoState.notifications.remove(n);
+                            abungo.state.notifications.remove(n);
                         }
                     });
                     n.addEventListener("click", function() {
                         window.focus();
                         scrollToBottom();
-                        abungoState.notifications.remove(n);
+                        abungo.state.notifications.remove(n);
                     });
                 }
             });
@@ -343,17 +343,27 @@ var writeUTFBytes = function(view, offset, string) {
 
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-/* abungoState object for storing Abungo-related stuff */
+/* abungo.state object for storing Abungo-related stuff */
 
-var abungoState = {};
+var abungo = {
+    state: {}
+};
+
+abungo.constants = {
+    MDL_MAPPING: {
+        // MDL: HTML
+        "_": "strong",
+        "*": "em"
+    }
+};
 
 /* socket.io shenanigans */
 
 var socket = io();
 
 socket.on("connected", function(data) {
-    abungoState.connected = true;
-    abungoState.connectedDate = new Date(data.date);
+    abungo.state.connected = true;
+    abungo.state.connectedDate = new Date(data.date);
 });
 
 /* login */
@@ -372,7 +382,7 @@ loginForm.addEventListener("submit", function(e){
         socket.emit("login", {
             nick: loginNickInput.value,
             room: loginRoomInput.value,
-            userID: abungoState.userID
+            userID: abungo.state.userID
         });
 
         localStorage.setItem("abungo_nick", loginNickInput.value);
@@ -385,31 +395,31 @@ loginNickInput.focus();
 /* try resume connection */
 
 var tryReconnect = function() {
-    if (abungoState && abungoState.userID && abungoState.nick && abungoState.room) {
+    if (abungo.state && abungo.state.userID && abungo.state.nick && abungo.state.room) {
         socket.emit("login_resume", {
-            nick: abungoState.nick,
-            userID: abungoState.userID,
-            room: abungoState.room
+            nick: abungo.state.nick,
+            userID: abungo.state.userID,
+            room: abungo.state.room
         });
         console.log("sending login_resume");
 
         socket.on("login_resume_rejected", function() {
             console.log("login_resume_rejected");
             socket.emit("login", {
-                nick: abungoState.nick,
-                room: abungoState.room,
-                userID: abungoState.userID,
+                nick: abungo.state.nick,
+                room: abungo.state.room,
+                userID: abungo.state.userID,
                 rejoin: true
             });
             console.log("sending login { rejoin: true }");
             socket.on("login_rejoin_accepted", function(data) {
                 console.log("login_rejoin_accepted");
-                abungoState.userID = data.userID;
+                abungo.state.userID = data.userID;
 
                 // update users list without removing Object.observe listener
-                abungoState.users.length = 0;
+                abungo.state.users.length = 0;
                 data.users.forEach(function(nick) {
-                    abungoState.users.push(nick);
+                    abungo.state.users.push(nick);
                 });
 
                 updateConnectionStatusIndicator(0);
@@ -427,11 +437,11 @@ socket.on("connected", tryReconnect);
         socket.emit("ping");
     };
     socket.on("pong", function(data) {
-        abungoState.lastPongDate = new Date();
+        abungo.state.lastPongDate = new Date();
     });
     setInterval(function() {
         ping();
-        abungoState.lastPingDate = new Date();
+        abungo.state.lastPingDate = new Date();
     }, 5000);
 })();
 
@@ -440,10 +450,10 @@ socket.on("connected", tryReconnect);
 var messagesElem;
 
 socket.on("login_accepted", function(data) {
-    abungoState.userID = data.userID;
-    abungoState.nick = data.nick;
-    abungoState.room = data.room;
-    abungoState.users = data.users;
+    abungo.state.userID = data.userID;
+    abungo.state.nick = data.nick;
+    abungo.state.room = data.room;
+    abungo.state.users = data.users;
 
     console.log("login_accepted", data);
 
@@ -468,7 +478,7 @@ socket.on("login_accepted", function(data) {
         document.body.classList.add("sidebarhidden");
     }
 
-    document.title = abungoState.room + " - " + document.title;
+    document.title = abungo.state.room + " - " + document.title;
 
     if (localStorage.getItem("abungo_sidebar_hidden") === "true") {
         document.body.classList.add("sidebarhidden");
@@ -482,7 +492,7 @@ socket.on("login_accepted", function(data) {
             if (this.textContent.length > 0) {
                 var messageData = {
                     message: textifyHTML(this.innerHTML),
-                    userID: abungoState.userID,
+                    userID: abungo.state.userID,
                     messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
@@ -504,7 +514,7 @@ socket.on("login_accepted", function(data) {
     socket.on("message_incoming", function(data) {
         var type;
 
-        if (data.nick === abungoState.nick) {
+        if (data.nick === abungo.state.nick) {
             type = "self";
             var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
             console.log(messageElem, data.messageID);
@@ -533,7 +543,7 @@ socket.on("login_accepted", function(data) {
         [].forEach.call(this.files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
                 var messageData = {
-                    userID: abungoState.userID,
+                    userID: abungo.state.userID,
                     mediaUpload: file,
                     mediaType: file.type,
                     mediaName: file.name,
@@ -564,7 +574,7 @@ socket.on("login_accepted", function(data) {
         [].forEach.call(files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
                 var messageData = {
-                    userID: abungoState.userID,
+                    userID: abungo.state.userID,
                     mediaUpload: file,
                     mediaType: file.type,
                     mediaName: file.name,
@@ -595,7 +605,7 @@ socket.on("login_accepted", function(data) {
 
                 if (size <= 2) {
                     var messageData = {
-                        userID: abungoState.userID,
+                        userID: abungo.state.userID,
                         sticker: e.target.getAttribute("title"),
                         stickerSize: size,
                         messageID: makeMessageID()
@@ -659,7 +669,7 @@ socket.on("login_accepted", function(data) {
             var now = new Date();
 
             var messageData = {
-                userID: abungoState.userID,
+                userID: abungo.state.userID,
                 mediaUpload: blob,
                 mediaType: "image/png",
                 mediaName: "Abungo snap.png",
@@ -816,7 +826,7 @@ socket.on("login_accepted", function(data) {
                 var now = new Date();
 
                 var messageData = {
-                    userID: abungoState.userID,
+                    userID: abungo.state.userID,
                     mediaUpload: blob,
                     mediaType: "audio/wav",
                     mediaName: "Abungo audio.wav",
@@ -833,14 +843,14 @@ socket.on("login_accepted", function(data) {
     /* user join/leave */
 
     socket.on("user_joined", function(data) {
-        if (abungoState.users.indexOf(data.nick) === -1) {
-            abungoState.users.push(data.nick);
+        if (abungo.state.users.indexOf(data.nick) === -1) {
+            abungo.state.users.push(data.nick);
         }
         makeJoinElem(data, "joined", isAtBottom());
     });
 
     socket.on("user_left", function(data) {
-        abungoState.users.remove(data.nick);
+        abungo.state.users.remove(data.nick);
         makeJoinElem(data, "left", isAtBottom());
     });
 
@@ -878,24 +888,24 @@ socket.on("login_accepted", function(data) {
 
     /* update users list */
 
-    Object.observe(abungoState.users, function() {
-        console.log("users list changed", abungoState.users);
+    Object.observe(abungo.state.users, function() {
+        console.log("users list changed", abungo.state.users);
         updateUsersList();
     });
     updateUsersList();
 
     /* listen for unread count changes */
 
-    if (!abungoState.hasOwnProperty("notifications")) {
-        abungoState.notifications = [];
+    if (!abungo.state.hasOwnProperty("notifications")) {
+        abungo.state.notifications = [];
     }
 
-    Object.observe(abungoState.notifications, function() {
-        var unreadCount = abungoState.notifications.length;
+    Object.observe(abungo.state.notifications, function() {
+        var unreadCount = abungo.state.notifications.length;
         if (unreadCount > 0) {
-            document.title = "[" + unreadCount + "] " + abungoState.room + " - Abungo";
+            document.title = "[" + unreadCount + "] " + abungo.state.room + " - Abungo";
         } else {
-            document.title = abungoState.room + " - Abungo";
+            document.title = abungo.state.room + " - Abungo";
         }
     });
 
@@ -903,19 +913,19 @@ socket.on("login_accepted", function(data) {
 
     throttle("resize", "sResize"); // s for sane
     throttle("scroll", "sScroll", messagesElem);
-    abungoState.wasAtBottom = true;
+    abungo.state.wasAtBottom = true;
     messagesElem.addEventListener("sScroll", function() {
         if (isAtBottom()) {
-            abungoState.wasAtBottom = true;
+            abungo.state.wasAtBottom = true;
         } else {
-            abungoState.wasAtBottom = false;
+            abungo.state.wasAtBottom = false;
         }
     });
     window.addEventListener("sResize", function() {
-        if (abungoState.wasAtBottom) {
+        if (abungo.state.wasAtBottom) {
             scrollToBottom();
         }
-        abungoState.wasAtBottom = isAtBottom();
+        abungo.state.wasAtBottom = isAtBottom();
     });
 
     /* show/hide sendbar box-shadow */
@@ -968,7 +978,7 @@ socket.on("login_accepted", function(data) {
     /* send reconnect requests when socket conection lost */
 
     setInterval(function() {
-        if (!socket.connected || socket.disconnected || (abungoState.lastPingDate - abungoState.lastPongDate > 15000)) {
+        if (!socket.connected || socket.disconnected || (abungo.state.lastPingDate - abungo.state.lastPongDate > 15000)) {
             updateConnectionStatusIndicator(1);
 
             socket.connect(function() {
