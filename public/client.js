@@ -703,7 +703,7 @@ socket.on("login_accepted", function(data) {
 
                     // lower values result in lower latency.
                     // higher values needed to avoid audio breakup and glitches
-                    var bufferSize = 2048;
+                    var bufferSize = 1024;
                     var recorder = context.createScriptProcessor(bufferSize, 2, 2);
 
                     recorder.onaudioprocess = function(e){
@@ -732,7 +732,8 @@ socket.on("login_accepted", function(data) {
                     // volume display interval
                     volumeInterval = setInterval(function() {
                         if (recordBtn.classList.contains("recording")) {
-                            var scale = audioVolume / 2000;
+                            console.log(audioVolume);
+                            var scale = audioVolume / 4000;
                             volumeCircleElem.setAttribute("r", VOLUME_CIRCLE_ORIG_RADIUS * scale);
                         }
                     }, 100);
