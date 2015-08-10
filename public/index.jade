@@ -11,20 +11,21 @@ html
         link(rel="stylesheet", href="style.css")
     body
         aside.sidebar
-            header
-                h1.logo Abungo
-            form#login
-                label
-                    input#login_nick(type="text", required="true")
-                    div Nick
-                label
-                    input#login_room(type="text", required="true")
-                    div Room
-                button#login_button Connect
-            .separator
-            .userlist.showonlogin
-                h2 Online users
-                ol.userlist_list
+            div
+                header
+                    h1.logo Abungo
+                form#login
+                    label
+                        input#login_nick(type="text", required="true")
+                        div Nick
+                    label
+                        input#login_room(type="text", required="true")
+                        div Room
+                    button#login_button Connect
+                .separator
+                .userlist.showonlogin
+                    h2 Online users
+                    ol.userlist_list
             .sidebar_controls.showonlogin
                 .left
                     label.button.green#logout_button

@@ -123,9 +123,14 @@ aside {
     top: 0;
     width: 250px;
     height: 100%;
-    padding: 0 20px;
     background-color: $black;
     color: #fff;
+
+    > div {
+        padding: 0 20px;
+        height: calc(100% - 70px);
+        overflow-y: auto;
+    }
 
     label {
         position: relative;
