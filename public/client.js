@@ -1,3 +1,17 @@
+/* abungo object for storing Abungo-related stuff */
+
+var abungo = {
+    state: {}
+};
+
+abungo.constants = {
+    MDL_MAPPING: {
+        // MDL: HTML
+        "_": "strong",
+        "*": "em"
+    }
+};
+
 /* basic, non specific functions */
 
 var $ = function(selector) {
@@ -46,10 +60,23 @@ var HTMLify = function(str) {
 var parseMDL = function(str) { // MarkDownLite (yeah, i just made that up)
     var lines = str.split("<br>");
     for (var j = 0; j < lines.length; j++) {
-        var matches = lines[j].match(/\*/g);
-        for (var i = 0; i < matches.length; i += 2) {
-            if (matches[i] && matches[i+1]) { // pair of '*'
-                lines[j] = lines[j].replace(/\*/, "<strong>").replace(/\*/, "</strong>");
+        for (var char in abungo.constants.MDL_MAPPING) {
+            if (abungo.constants.MDL_MAPPING.hasOwnProperty(char)) {
+                var tagName = abungo.constants.MDL_MAPPING[char];
+
+                if (char === "*") {
+                    char = "\\*"; // escape regex special chars
+                }
+
+                var matches = lines[j].match(new RegExp(char, "g")) || [];
+
+                for (var i = 0; i < matches.length; i += 2) {
+                    if (matches[i] && matches[i+1]) { // pair of specified char
+                        var pattern = new RegExp(char);
+                        lines[j] = lines[j].replace(pattern, "<" + tagName + ">")
+                            .replace(pattern, "</" + tagName + ">");
+                    }
+                }
             }
         }
     }
@@ -342,20 +369,6 @@ var writeUTFBytes = function(view, offset, string) {
 /* navigator.getUserMedia prefix support */
 
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-/* abungo.state object for storing Abungo-related stuff */
-
-var abungo = {
-    state: {}
-};
-
-abungo.constants = {
-    MDL_MAPPING: {
-        // MDL: HTML
-        "_": "strong",
-        "*": "em"
-    }
-};
 
 /* socket.io shenanigans */
 
