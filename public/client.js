@@ -159,6 +159,7 @@ var HTMLify = function(str) {
 };
 
 var parseMDL = function(str) { // MarkDownLite (yeah, i just made that up)
+    // formatting
     var lines = str.split("<br>");
     for (var j = 0; j < lines.length; j++) {
         for (var char in abungo.constants.MDL_MAPPING) {
@@ -182,7 +183,14 @@ var parseMDL = function(str) { // MarkDownLite (yeah, i just made that up)
         }
     }
 
-    return lines.join("<br>");
+    var string = lines.join("<br>");
+
+    // inline stickers
+    for (stickerName of abungo.constants.STICKER_NAMES) {
+        string = string.replace(new RegExp(":" + stickerName + ":|\\(" + stickerName + "\\)", "g"), "<img class='message_sticker message_sticker-small' src='img/stickers/" + stickerName + ".svg'>");
+    };
+
+    return string;
 };
 
 var dataURItoBlob = function(dataURI) { // by user Stoive on StackOverflow http://stackoverflow.com/a/5100158/3234159
@@ -269,18 +277,7 @@ var makeMessageElem = function(data, type, scroll) {
         bodyContent = "<img class='message_sticker message_sticker-" + data.stickerSize + "' src='img/stickers/" + data.sticker + ".svg'>";
     } else {
         isMessage = true;
-        // replace inline stickers with image
-        if (!abungo.state.stickerNames) {
-            abungo.state.stickerNames = [].slice.call($$(".popup_popup-stickers_sticker")).map(function(elem) {
-                return elem.getAttribute("title");
-            });
-        }
-        var stickerNames = abungo.state.stickerNames;
-        var message = data.message;
-        stickerNames.forEach(function(stickerName) {
-            message = message.replace(new RegExp(":" + stickerName + ":|\\(" + stickerName + "\\)", "g"), "<img class='message_sticker message_sticker-small' src='img/stickers/" + stickerName + ".svg'>");
-        });
-        bodyContent = parseMDL(Autolinker.link(HTMLify(cleanseHTML(message))));
+        bodyContent = parseMDL(Autolinker.link(HTMLify(cleanseHTML(data.message))));
     }
 
     elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";

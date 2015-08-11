@@ -69,3 +69,9 @@ html
         script(src="/socket.io/socket.io.js")
         script(src="/js/Autolinker.js/Autolinker.min.js")
         script(src="client.js")
+        
+        script
+            | abungo.constants.STICKER_NAMES = [
+            each sticker in stickers
+                | "#{sticker}",
+            | ]
