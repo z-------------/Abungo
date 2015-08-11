@@ -13,7 +13,11 @@ abungo.constants = {
     ATTACHMENT_PLUGIN_REQUIRED_KEYS: [
         "name", "icon", "id", "content",
         "onOpen", "onClose"
-    ]
+    ],
+
+    classes: {
+        ATTACHMENT_BAR: "sendbar_attach"
+    }
 };
 
 abungo.messages = {};
@@ -83,6 +87,11 @@ abungo.attachmentPlugins = {
     plugins: []
 };
 abungo.attachmentPlugins.add = function(config) {
+    if (!config || typeof config !== "object") {
+        throw new Error("Missing config object");
+        return;
+    }
+
     for (key of abungo.constants.ATTACHMENT_PLUGIN_REQUIRED_KEYS) {
         if (!config.hasOwnProperty(key)) {
             throw new Error("Missing key in config: " + key);
@@ -94,10 +103,11 @@ abungo.attachmentPlugins.add = function(config) {
     var elem = document.createElement("label");
 
     // add classes
-    elem.classList.append("button", "popup", "popup-" + config.id);
+    elem.classList.add("button", "popup", "popup-" + config.id);
 
     // insert html
-    elem.innerHTML = config.content;
+    elem.innerHTML = "<div class='popup_popup popup_popup-" + config.id + "'>" +
+        config.content + "</div>";
 
     // add listeners
     elem.addEventListener("click", function(e) {
@@ -105,12 +115,23 @@ abungo.attachmentPlugins.add = function(config) {
             if (!this.classList.contains("popup-opened")) {
                 each($$("label.button.popup-opened"), function(elemOpened) {
                     elemOpened.classList.remove("popup-opened");
-                    // TODO: fire custom "popupClose" event
+                    elemOpened.dispatchEvent(new CustomEvent("popupClosed"));
                 });
+                this.classList.add("popup-opened");
+                config.onOpen();
+            } else {
+                this.classList.remove("popup-opened");
+                config.onClose();
             }
-            this.classList.toggle("popup-opened");
         }
     });
+
+    elem.addEventListener("popupClosed", function() { // custom event fired on close
+        config.onClose();
+    });
+
+    document.querySelector("." + abungo.constants.classes.ATTACHMENT_BAR)
+        .appendChild(elem);
 };
 
 /* basic, non specific functions */
