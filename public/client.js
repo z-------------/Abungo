@@ -9,7 +9,108 @@ abungo.constants = {
         // MDL: HTML
         "_": "strong",
         "*": "em"
+    },
+    ATTACHMENT_PLUGIN_REQUIRED_KEYS: [
+        "name", "icon", "id", "content",
+        "onOpen", "onClose"
+    ]
+};
+
+abungo.messages = {};
+abungo.messages.send = function(content) {
+    if (!abungo.state.nick || !abungo.state.room || !abungo.state.userID) {
+        throw new Error("User isn't logged in");
+        return;
     }
+    if (!content || typeof content !== "object") {
+        throw new Error("Message content missing");
+        return;
+    }
+
+    var type;
+
+    if (content.message) {
+        type = "text";
+    } else if (content.sticker && content.sticker.name) {
+        type = "sticker";
+    } else if (content.file) {
+        type = "file";
+    } else {
+        throw new Error("Unknown message type");
+        return;
+    }
+
+    if (type === "file") {
+        if (content.file && content.file.size < 10000000) { // 10 mb
+            var messageData = {
+                userID: abungo.state.userID,
+                mediaUpload: content.file,
+                mediaType: content.file.type,
+                mediaName: content.file.name,
+                messageID: makeMessageID()
+            };
+            socket.emit("message", messageData);
+            makeMessageElem(messageData, "self", isAtBottom());
+        } else if (file) {
+            throw new Error("File (" + mediaName + ") is too big");
+        }
+    } else if (type === "sticker") {
+        var stickerSize = content.sticker.size || 0;
+        if (stickerSize <= 2) {
+            var messageData = {
+                userID: abungo.state.userID,
+                sticker: content.sticker.name,
+                stickerSize: stickerSize,
+                messageID: makeMessageID()
+            };
+            socket.emit("message", messageData);
+            makeMessageElem(messageData, "self", true);
+        } else {
+            throw new Error("Unsupported sticker size (" + stickerSize.toString() + ")");
+        }
+    } else if (type === "text") {
+        var messageData = {
+            message: textifyHTML(content.message),
+            userID: abungo.state.userID,
+            messageID: makeMessageID()
+        };
+        socket.emit("message", messageData);
+        makeMessageElem(messageData, "self", true);
+    }
+};
+
+abungo.attachmentPlugins = {
+    plugins: []
+};
+abungo.attachmentPlugins.add = function(config) {
+    for (key of abungo.constants.ATTACHMENT_PLUGIN_REQUIRED_KEYS) {
+        if (!config.hasOwnProperty(key)) {
+            throw new Error("Missing key in config: " + key);
+            return;
+        }
+    }
+
+    // create element
+    var elem = document.createElement("label");
+
+    // add classes
+    elem.classList.append("button", "popup", "popup-" + config.id);
+
+    // insert html
+    elem.innerHTML = config.content;
+
+    // add listeners
+    elem.addEventListener("click", function(e) {
+        if (e.target === this) {
+            if (!this.classList.contains("popup-opened")) {
+                each($$("label.button.popup-opened"), function(elemOpened) {
+                    elemOpened.classList.remove("popup-opened");
+                    // TODO: fire custom "popupClose" event
+                });
+            }
+            this.classList.toggle("popup-opened");
+        }
+    });
 };
 
 /* basic, non specific functions */
@@ -503,13 +604,9 @@ socket.on("login_accepted", function(data) {
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault();
             if (this.textContent.length > 0) {
-                var messageData = {
-                    message: textifyHTML(this.innerHTML),
-                    userID: abungo.state.userID,
-                    messageID: makeMessageID()
-                };
-                socket.emit("message", messageData);
-                makeMessageElem(messageData, "self", true);
+                abungo.messages.send({
+                    message: this.innerHTML
+                });
                 this.innerHTML = "";
             }
         }
@@ -555,15 +652,9 @@ socket.on("login_accepted", function(data) {
     sendbarFileInput.addEventListener("change", function(){
         [].forEach.call(this.files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
-                var messageData = {
-                    userID: abungo.state.userID,
-                    mediaUpload: file,
-                    mediaType: file.type,
-                    mediaName: file.name,
-                    messageID: makeMessageID()
-                };
-                socket.emit("message", messageData);
-                makeMessageElem(messageData, "self", isAtBottom());
+                abungo.messages.send({
+                    file: file
+                });
             } else if (file) {
                 alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
             }
@@ -586,15 +677,9 @@ socket.on("login_accepted", function(data) {
 
         [].forEach.call(files, function(file) {
             if (file && file.size < 10000000) { // 10 mb
-                var messageData = {
-                    userID: abungo.state.userID,
-                    mediaUpload: file,
-                    mediaType: file.type,
-                    mediaName: file.name,
-                    messageID: makeMessageID()
-                };
-                socket.emit("message", messageData);
-                makeMessageElem(messageData, "self", isAtBottom());
+                abungo.messages.send({
+                    file: file
+                });
             } else if (file) {
                 alert("'" + file.name + "' is too big. You can only upload files less than 10 megabytes in size.");
             }
@@ -617,14 +702,12 @@ socket.on("login_accepted", function(data) {
                 var size = Math.round((sizesCount - 1) * delta/maxTime);
 
                 if (size <= 2) {
-                    var messageData = {
-                        userID: abungo.state.userID,
-                        sticker: e.target.getAttribute("title"),
-                        stickerSize: size,
-                        messageID: makeMessageID()
-                    };
-                    socket.emit("message", messageData);
-                    makeMessageElem(messageData, "self", isAtBottom());
+                    abungo.messages.send({
+                        sticker: {
+                            name: e.target.getAttribute("title"),
+                            size: size
+                        }
+                    });
                 }
             };
         }
@@ -681,15 +764,11 @@ socket.on("login_accepted", function(data) {
             var blob = dataURItoBlob(dataURI);
             var now = new Date();
 
-            var messageData = {
-                userID: abungo.state.userID,
+            abungo.messages.send({
                 mediaUpload: blob,
                 mediaType: "image/png",
-                mediaName: "Abungo snap.png",
-                messageID: makeMessageID()
-            };
-            socket.emit("message", messageData);
-            makeMessageElem(messageData, "self", isAtBottom());
+                mediaName: "Abungo snap.png"
+            });
         }
     });
 
@@ -838,15 +917,11 @@ socket.on("login_accepted", function(data) {
                 // send the blob
                 var now = new Date();
 
-                var messageData = {
-                    userID: abungo.state.userID,
+                abungo.messages.send({
                     mediaUpload: blob,
                     mediaType: "audio/wav",
-                    mediaName: "Abungo audio.wav",
-                    messageID: makeMessageID()
-                };
-                socket.emit("message", messageData);
-                makeMessageElem(messageData, "self", isAtBottom());
+                    mediaName: "Abungo audio.wav"
+                });
 
                 that.classList.remove("recording");
             }
@@ -971,21 +1046,6 @@ socket.on("login_accepted", function(data) {
         if (confirm("Are you sure you want to leave? Your chat history will be lost.")) {
             window.location.reload();
         }
-    });
-
-    /* popup buttons */
-
-    each($$("label.button.popup"), function(elem) {
-        elem.addEventListener("click", function(e) {
-            if (e.target === this) {
-                if (!this.classList.contains("popup-opened")) {
-                    each($$("label.button.popup-opened"), function(elemOpened) {
-                        elemOpened.classList.remove("popup-opened");
-                    });
-                }
-                this.classList.toggle("popup-opened");
-            }
-        });
     });
 
     /* send reconnect requests when socket conection lost */
