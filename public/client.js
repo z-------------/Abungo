@@ -84,66 +84,6 @@ var abungo = {
         }
     };
 
-    abungo.attachmentPlugins = {
-        plugins: []
-    };
-    abungo.attachmentPlugins.add = function(config) {
-        if (!config || typeof config !== "object") {
-            throw new Error("Missing config object");
-            return;
-        }
-
-        for (key of abungo.constants.ATTACHMENT_PLUGIN_REQUIRED_KEYS) {
-            if (!config.hasOwnProperty(key)) {
-                throw new Error("Missing key in config: " + key);
-                return;
-            }
-        }
-
-        // create element
-        var elem = document.createElement("label");
-
-        // add classes
-        elem.classList.add("button", "popup", "popup-" + config.id);
-
-        // insert html
-        elem.innerHTML = "<div class='popup_popup popup_popup-" + config.id + "'>" +
-            config.content + "</div>";
-
-        // add listeners
-        elem.addEventListener("click", function(e) {
-            if (e.target === this) {
-                if (!this.classList.contains("popup-opened")) {
-                    each($$("label.button.popup-opened"), function(elemOpened) {
-                        elemOpened.classList.remove("popup-opened");
-                        elemOpened.dispatchEvent(new CustomEvent("popupClosed"));
-                    });
-                    this.classList.add("popup-opened");
-                    config.onOpen();
-                } else {
-                    this.classList.remove("popup-opened");
-                    config.onClose();
-                }
-            }
-        });
-
-        elem.addEventListener("popupClosed", function() { // custom event fired on close
-            config.onClose();
-        });
-
-        // add to list of plugins
-        abungo.attachmentPlugins.plugins.push((function() {
-            var object = config;
-            object.element = elem;
-            delete object.content;
-            return object;
-        }()));
-
-        // display on attachment bar
-        document.querySelector("." + abungo.constants.classes.ATTACHMENT_BAR)
-            .appendChild(elem);
-    };
-
     /* basic, non specific functions */
 
     var $ = function(selector) {
@@ -1074,6 +1014,22 @@ var abungo = {
             if (confirm("Are you sure you want to leave? Your chat history will be lost.")) {
                 window.location.reload();
             }
+        });
+
+
+        /* popup buttons */
+
+        each($$("label.button.popup"), function(elem) {
+            elem.addEventListener("click", function(e) {
+                if (e.target === this) {
+                    if (!this.classList.contains("popup-opened")) {
+                        each($$("label.button.popup-opened"), function(elemOpened) {
+                            elemOpened.classList.remove("popup-opened");
+                        });
+                    }
+                    this.classList.toggle("popup-opened");
+                }
+            });
         });
 
         /* send reconnect requests when socket conection lost */
