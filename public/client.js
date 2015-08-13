@@ -289,7 +289,7 @@ var abungo = {
             bodyContent = "<img class='message_sticker message_sticker-" + data.stickerSize + "' src='img/stickers/" + data.sticker + ".svg'>";
         } else {
             isMessage = true;
-            bodyContent = parseMDL(Autolinker.link(HTMLify(cleanseHTML(data.message))));
+            bodyContent = Autolinker.link(parseMDL(HTMLify(cleanseHTML(data.message))));
         }
 
         elem.innerHTML = "<h3>" + data.nick + "</h3><p>" + bodyContent + "</p>";
