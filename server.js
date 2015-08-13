@@ -84,11 +84,9 @@ app.get("/error/:code", function(req, res) {
 });
 
 app.get("*", function(req, res) {
-    fs.exists(__dirname + "/public" + req.originalUrl, function(exists) {
-        if (exists) {
-            res.sendFile(__dirname + "/public" + req.originalUrl);
-        } else {
-            sendError(res, 404);
+    res.sendFile(__dirname + "/public" + req.originalUrl, function(err) {
+        if (err) {
+            sendError(res, err.status || 404);
         }
     });
 });
