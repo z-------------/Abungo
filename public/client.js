@@ -97,6 +97,27 @@ var abungo = {
         }
     };
 
+    /* sounds stuff */
+
+    abungo.sounds = {
+        buffers: {},
+        context: new window.AudioContext()
+    };
+
+    // load notif sound
+
+    (function(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "sound/message.ogg", true);
+        xhr.responseType = "arraybuffer";
+        xhr.onload = function() {
+            abungo.sounds.context.decodeAudioData(xhr.response, function(buffer) {
+                abungo.sounds.buffers.notif = buffer;
+            });
+        };
+        xhr.send();
+    }());
+
     /* basic, non specific functions */
 
     var $ = function(selector) {
@@ -355,22 +376,10 @@ var abungo = {
                         });
 
                         // play sound
-                        (function(url) {
-                            var audioCtx = new window.AudioContext();
-
-                            var request = new XMLHttpRequest();
-                            request.open("GET", "sound/message.ogg", true);
-                            request.responseType = "arraybuffer";
-                            request.onload = function() {
-                                audioCtx.decodeAudioData(request.response, function(buffer) {
-                                    var source = audioCtx.createBufferSource();
-                                    source.buffer = buffer;
-                                    source.connect(audioCtx.destination);
-                                    source.start(0);
-                                });
-                            };
-                            request.send();
-                        }());
+                        var source = abungo.sounds.context.createBufferSource();
+                        source.buffer = abungo.sounds.buffers.notif;
+                        source.connect(abungo.sounds.context.destination);
+                        source.start(0);
                     }
                 });
             }
