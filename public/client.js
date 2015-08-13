@@ -333,12 +333,15 @@ var abungo = {
                             abungo.state.notifications = [];
                         }
 
+                        // display the notification
                         var n = new Notification(nick + " on #" + abungo.state.room, {
                             body: text,
-                            icon: "/img/logo/icon196.png"
+                            icon: "/img/logo/icon196.png",
+                            silent: true
                         });
                         abungo.state.notifications.push(n);
 
+                        // focus and click listeners
                         window.addEventListener("focus", function() {
                             if (n) {
                                 n.close();
@@ -350,6 +353,24 @@ var abungo = {
                             scrollToBottom();
                             abungo.state.notifications.remove(n);
                         });
+
+                        // play sound
+                        (function(url) {
+                            var audioCtx = new window.AudioContext();
+
+                            var request = new XMLHttpRequest();
+                            request.open("GET", "sound/message.ogg", true);
+                            request.responseType = "arraybuffer";
+                            request.onload = function() {
+                                audioCtx.decodeAudioData(request.response, function(buffer) {
+                                    var source = audioCtx.createBufferSource();
+                                    source.buffer = buffer;
+                                    source.connect(audioCtx.destination);
+                                    source.start(0);
+                                });
+                            };
+                            request.send();
+                        }());
                     }
                 });
             }
@@ -448,9 +469,10 @@ var abungo = {
         }
     };
 
-    /* navigator.getUserMedia prefix support */
+    /* prefix support */
 
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
     /* socket.io shenanigans */
 
