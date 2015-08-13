@@ -55,11 +55,13 @@ var abungo = {
             type = content.file.type;
             name = content.file.name;
 
-            if (typeof content.file === "object") {
-                data = content.file.data;
-            } else {
+            if (content.file instanceof File) {
                 data = content.file;
+            } else {
+                data = content.file.data;
             }
+
+            console.log(content, data);
 
             size = data.size;
 
