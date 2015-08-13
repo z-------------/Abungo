@@ -15,6 +15,10 @@ var abungo = {
             "name", "icon", "id", "content",
             "onOpen", "onClose"
         ],
+        SOUNDS: {
+            notif: "sound/message.ogg",
+            salute: "sound/yeya-salute.ogg"
+        },
 
         classes: {
             ATTACHMENT_BAR: "sendbar_attach"
@@ -104,19 +108,20 @@ var abungo = {
         context: new window.AudioContext()
     };
 
-    // load notif sound
+    // load sounds
+    Object.keys(abungo.constants.SOUNDS).forEach(function(soundName) {
+        var url = abungo.constants.SOUNDS[soundName];
 
-    (function(url) {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "sound/message.ogg", true);
+        xhr.open("GET", url, true);
         xhr.responseType = "arraybuffer";
         xhr.onload = function() {
             abungo.sounds.context.decodeAudioData(xhr.response, function(buffer) {
-                abungo.sounds.buffers.notif = buffer;
+                abungo.sounds.buffers[soundName] = buffer;
             });
         };
         xhr.send();
-    }());
+    });
 
     /* basic, non specific functions */
 
@@ -345,6 +350,14 @@ var abungo = {
         });
     };
 
+    var playSound = function(buffer) {
+        var source = abungo.sounds.context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(abungo.sounds.context.destination);
+        source.start(0);
+    };
+    window.playSound = playSound;
+
     var showNotification = function(nick, text) {
         if (!document.hasFocus() || !isAtBottom()) {
             if (window.Notification && Notification.permission !== "denied") {
@@ -376,10 +389,7 @@ var abungo = {
                         });
 
                         // play sound
-                        var source = abungo.sounds.context.createBufferSource();
-                        source.buffer = abungo.sounds.buffers.notif;
-                        source.connect(abungo.sounds.context.destination);
-                        source.start(0);
+                        playSound(abungo.sounds.buffers.notif);
                     }
                 });
             }
