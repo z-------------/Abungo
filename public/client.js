@@ -46,12 +46,25 @@ var abungo = {
         }
 
         if (type === "file") {
-            if (content.file && content.file.size < 10000000) { // 10 mb
+            var data, type, name, size;
+
+            type = content.file.type;
+            name = content.file.name;
+
+            if (typeof content.file === "object") {
+                data = content.file.data;
+            } else {
+                data = content.file;
+            }
+
+            size = data.size;
+
+            if (data && size < 10000000) { // 10 mb
                 var messageData = {
                     userID: abungo.state.userID,
-                    mediaUpload: content.file,
-                    mediaType: content.file.type,
-                    mediaName: content.file.name,
+                    mediaUpload: data,
+                    mediaType: type,
+                    mediaName: name,
                     messageID: makeMessageID()
                 };
                 socket.emit("message", messageData);
@@ -733,9 +746,11 @@ var abungo = {
                 var now = new Date();
 
                 abungo.messages.send({
-                    mediaUpload: blob,
-                    mediaType: "image/png",
-                    mediaName: "Abungo snap.png"
+                    file: {
+                        data: blob,
+                        type: "image/png",
+                        name: "Abungo snap.png"
+                    }
                 });
             }
         });
@@ -886,9 +901,11 @@ var abungo = {
                     var now = new Date();
 
                     abungo.messages.send({
-                        mediaUpload: blob,
-                        mediaType: "audio/wav",
-                        mediaName: "Abungo audio.wav"
+                        file: {
+                            data: blob,
+                            type: "audio/wav",
+                            name: "Abungo audio.wav"
+                        }
                     });
 
                     that.classList.remove("recording");
