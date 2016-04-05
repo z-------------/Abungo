@@ -26,6 +26,7 @@ var abungo = {
     };
 
     abungo.messages = {};
+    abungo.messages.queue = [];
     abungo.messages.send = function(content) {
         if (!abungo.state.nick || !abungo.state.room || !abungo.state.userID) {
             throw new Error("User isn't logged in");
@@ -36,7 +37,7 @@ var abungo = {
             return;
         }
 
-        var type;
+        var type, messageData;
 
         if (content.message) {
             type = "text";
@@ -66,7 +67,7 @@ var abungo = {
             size = data.size;
 
             if (data && size < 10000000) { // 10 mb
-                var messageData = {
+                messageData = {
                     userID: abungo.state.userID,
                     mediaUpload: data,
                     mediaType: type,
@@ -81,7 +82,7 @@ var abungo = {
         } else if (type === "sticker") {
             var stickerSize = content.sticker.size || 0;
             if (stickerSize <= 2) {
-                var messageData = {
+                messageData = {
                     userID: abungo.state.userID,
                     sticker: content.sticker.name,
                     stickerSize: stickerSize,
@@ -93,7 +94,7 @@ var abungo = {
                 throw new Error("Unsupported sticker size (" + stickerSize.toString() + ")");
             }
         } else if (type === "text") {
-            var messageData = {
+            messageData = {
                 message: textifyHTML(content.message),
                 userID: abungo.state.userID,
                 messageID: makeMessageID()
@@ -101,6 +102,8 @@ var abungo = {
             socket.emit("message", messageData);
             makeMessageElem(messageData, "self", true);
         }
+
+        abungo.messages.queue.push(messageData);
     };
 
     /* sounds stuff */
@@ -561,6 +564,11 @@ var abungo = {
                     });
 
                     updateConnectionStatusIndicator(0);
+
+                    // send pending messages from before disconnection
+                    for (pendingMessage of abungo.messages.queue) {
+                        socket.emit("message", pendingMessage);
+                    }
                 });
             });
         }
@@ -650,6 +658,16 @@ var abungo = {
 
             if (data.nick === abungo.state.nick) {
                 type = "self";
+
+                // remove from message queue
+                for (var i = 0; i < abungo.messages.queue.length; i++) {
+                    var pendingMessage = abungo.messages.queue[i];
+                    if (pendingMessage.messageID === data.messageID) {
+                        abungo.messages.queue = abungo.messages.queue.slice(1, i);
+                    }
+                }
+
+                // remove 'message-notdelivered' class from message element
                 var messageElem = $(".message-notdelivered[data-message-id='" + data.messageID + "']");
                 console.log(messageElem, data.messageID);
                 messageElem.classList.remove("message-notdelivered");
@@ -1105,6 +1123,12 @@ var abungo = {
                 updateConnectionStatusIndicator(0);
             }
         }, 5000);
+
+        /* log socket errors */
+
+        socket.on("error", function(err) {
+            console.log(err);
+        });
     });
 
     socket.on("login_rejected", function(data) {
