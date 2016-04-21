@@ -784,7 +784,7 @@ var abungo = {
                         });
                     } else if (this.classList.contains("popup-opened")) {
                         videoElem.removeAttribute("src");
-                        videoStream.stop();
+                        videoStream.getVideoTracks()[0].stop();
                     }
                 }
             });
@@ -910,7 +910,7 @@ var abungo = {
                     });
                 } else {
                     // stop the stream
-                    audioStream.stop();
+                    audioStream.getAudioTracks()[0].stop();
 
                     // flatten left and right channels
                     var leftBuffer = mergeBuffers(leftchannel, recordingLength);
